@@ -1,0 +1,162 @@
+﻿@model wu2.Models.Users
+
+@{
+    ViewBag.Title = "編輯資料";
+}
+
+<style>
+    .cbody {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 80vh;
+        margin: 0 auto;
+    }
+    .bcontainer {
+        background-color: snow;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 345px;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    h2 {
+        text-align: center; 
+        margin-bottom: 20px; 
+    }
+
+    .form-group {
+        margin-bottom: 20px; 
+    }
+
+  
+    .form-control {
+        width: 100%; 
+        padding: 8px;
+        font-size: 16px; 
+        border: 1px solid #ced4da; 
+        border-radius: 4px; 
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.75rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 0.25rem;
+        margin-top: 1rem;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover, .btn-secondary:hover {
+        opacity: 0.9;
+    }
+</style>
+<div class="cbody">
+    <div class="bcontainer">
+        <h2>編輯資料</h2>
+
+        @using (Html.BeginForm("EditUserProfile", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                @Html.HiddenFor(model => model.UserId)
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.FullName, "全名", htmlAttributes: new { @class = "control-label required-field" })
+                @Html.EditorFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control", @required = "required" } })
+                @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.BankAccount, "銀行資訊", htmlAttributes: new { @class = "control-label" })
+                <input type="text" id="bankAccount" name="BankAccount" class="form-control" placeholder="格式: xxx-xxxxxxxxxxxxxxx" />
+                <span id="bankAccountValidation" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PhoneNumber, "電話號碼", htmlAttributes: new { @class = "control-label" })
+                <input type="text" id="phoneNumber" name="PhoneNumber" class="form-control" placeholder="手機號碼格式為:0912345678" pattern="\d{10}" title="請輸入10位數字" />
+                <span id="phoneNumberValidation" class="text-danger"></span>
+            </div>
+
+
+            <div class="form-group">
+                @Html.Label("個人照片", htmlAttributes: new { @class = "control-label" })
+                <input type="file" name="ProfilePhoto" />
+                @Html.ValidationMessage("ProfilePhoto", "", new { @class = "text-danger" })
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="保存" class="btn btn-primary" />
+                @Html.ActionLink("返回", "UserProfile", null, new { @class = "btn btn-secondary", title = "返回" })
+            </div>
+
+            if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.ErrorMessage
+                </div>
+            }
+        }
+    </div>
+    </div>
+<style>
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    
+</style><script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const bankAccountInput = document.getElementById('bankAccount');
+        const validationMessage = document.getElementById('bankAccountValidation');
+
+        bankAccountInput.addEventListener('input', function () {
+            // Remove non-numeric characters and reformat
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 3) {
+                value = value.slice(0, 3) + '-' + value.slice(3);
+            }
+            if (value.length > 17) {
+                value = value.slice(0, 17);
+            }
+            this.value = value;
+
+            // Validate and display message
+            const pattern = /^\d{3}-\d{8,13}$/;
+            if (!pattern.test(this.value)) {
+                validationMessage.textContent = '請輸入符合格式的銀行資訊 (例如: 822-140812334331212)';
+            } else {
+                validationMessage.textContent = '';
+            }
+        });
+    });
+</script>
+<script>document.addEventListener('DOMContentLoaded', function() {
+    const phoneNumberInput = document.getElementById('phoneNumber');
+    const validationMessage = document.getElementById('phoneNumberValidation');
+
+    phoneNumberInput.addEventListener('input', function() {
+        // Remove non-numeric characters
+        this.value = this.value.replace(/\D/g, '');
+
+        // Ensure length is 10 digits
+        if (this.value.length > 10) {
+            this.value = this.value.slice(0, 10);
+        }
+
+        // Validate and display message
+        if (this.value.length !== 10) {
+            validationMessage.textContent = '請輸入10位數字';
+        } else {
+            validationMessage.textContent = '';
+        }
+    });
+});</script>

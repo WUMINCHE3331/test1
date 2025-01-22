@@ -1,0 +1,147 @@
+﻿@model wu2.Models.Users
+
+@{
+    ViewBag.Title = "個人資料";
+}
+
+<style>
+  .profile-container {
+    margin-top: 22px;
+    position: relative;
+}
+
+.profile {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.left-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-left: 100px;
+}
+
+.right-column {
+    flex: 1;
+}
+
+.profile-photo {
+    width: 60%;
+    height: 80%;
+    border-radius: 50%;
+    margin-top: 30px;
+    border: 4px solid #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.edit-button {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+.register {
+    position: absolute;
+    left: 30px;
+    bottom: 0;
+    font-size: small;
+}
+
+/* Media queries for mobile devices */
+@@media (max-width:576px) {
+    .profile {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+    }
+
+    .left-column {
+        margin-left: 0;
+        align-items: center;
+    }
+
+    .profile-photo {
+        width: 80%;
+        height: auto;
+    }
+
+    .register {
+        position: static;
+        margin-top: 10px;
+    }
+
+    .right-column {
+        width: 100%;
+        text-align: center;
+    }
+
+    .edit-button {
+        position: static;
+        margin-top: 20px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .edit-button a {
+        width: 80%;
+    }
+}
+</style>
+
+<div class="profile-container">
+    <h2>個人資料</h2>
+
+    <div class="profile">
+        <div class="left-column">
+            @if (!string.IsNullOrEmpty(Model.ProfilePhoto))
+            {
+                <img src="@Url.Content(Model.ProfilePhoto)" alt="Profile Photo" class="profile-photo" />
+            }
+            else
+            {
+                <img src="~/UserProfilePhotos/defaultPerson.jpg" class="profile-photo" alt="未設定" />
+              
+            }
+            <p class="register">註冊日期: @Model.RegistrationDate</p>
+        </div>
+
+        <div class="right-column">
+            <h4>用戶名:</h4>
+            <p>@Model.FullName</p>
+            <h4>電子郵件:</h4>
+            <p>@Model.Email</p>
+            <h4>電話號碼:</h4>
+            @if (string.IsNullOrEmpty(Model.PhoneNumber))
+            {
+                <p>尚未設定</p>
+            }
+            else
+            {
+                <p>@Model.PhoneNumber</p>
+            }
+            <h4>LineID:</h4>
+            <p>@Model.LineUserId</p>
+            <h4>GoogleID:</h4>
+            <p>@Model.GoogleId</p>
+            <h4>銀行帳戶:</h4>
+            @if (string.IsNullOrEmpty(Model.BankAccount))
+            {
+                <p>尚未設定</p>
+            }
+            else
+            {
+                <p>@Model.BankAccount</p>
+            }
+        </div>
+    </div>
+
+    <div class="edit-button">
+        @Html.ActionLink("編輯資料", "EditUserProfile", null, new { @class = "btn btn-primary" })
+    </div>
+</div>

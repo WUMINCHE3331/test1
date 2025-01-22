@@ -1,0 +1,315 @@
+﻿@model wu2.Models.LoginViewModel
+@{
+    ViewBag.Title = "Login";
+}@{
+    var clientId = "2005979321";
+    var redirectUri = Url.Action("Callback", "Line", null, Request.Url.Scheme);
+    var state = Guid.NewGuid().ToString("N");
+    var authorizationUrl = $"https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id={clientId}&redirect_uri={redirectUri}&state={state}&scope=profile%20openid%20email";
+}
+
+@*<p><strong>Group ID: </strong><span id="groupIdDisplay"></span></p>
+<p><strong>Chat ID: </strong><span id="chatIdDisplay"></span></p>*@
+
+<div id="userInfo" style="display: none;">
+    <p><strong>User ID:</strong> <span id="userId"></span></p>
+    <p><strong>Full Name:</strong> <span id="fullName"></span></p>
+    <p><strong>Email:</strong> <span id="email"></span></p>
+    <p>
+        <strong>Profile Photo:</strong> <img id="profilePhoto" style="width: 100px; height: 100px;" />
+    </p>
+</div>
+@*<div id="loginStatus">
+    <p id="statusMessage">Checking LIFF environment...</p>
+</div>
+<p>Group ID: <span id="groupIdDisplay">Loading...</span></p>
+<button id="sendMessageButton"></button>*@
+<div class="login-container">
+    <h2>登入</h2>
+
+    <!-- Social Login Buttons -->
+    <div class="social-login">
+        <a href="@Url.Action("Login", "TestGoogleLogin")" class="btn btn-google">
+            <i class="fab fa-google"></i> Google
+        </a>
+        <a href="@authorizationUrl" class="btn btn-line">
+            <i class="fab fa-line"></i> Line
+        </a>
+    </div>
+
+    <!-- Divider -->
+    <div class="divider">
+        <span>or</span>
+    </div>
+
+    <!-- Login Form -->
+    @using (Html.BeginForm("Login", "Account", FormMethod.Post))
+    {
+        <div class="form-group">
+            <label for="Email" class="form-label">
+                <i class="fas fa-envelope"></i>
+            </label>
+            @Html.EditorFor(m => m.Email, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入帳號" } })
+
+        </div>
+
+        <div class="form-group">
+            <label for="PasswordHash" class="form-label">
+                <i class="fas fa-lock"></i>
+            </label>
+            @Html.EditorFor(m => m.PasswordHash, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入密碼", type = "password" } })
+
+        </div>
+        <input type="hidden" name="JoinLink" value="@ViewBag.JoinLink" />
+        <div class="checkbox-container">
+            <div>
+                <input type="checkbox" id="rememberMe" name="rememberMe" />
+                <label for="rememberMe">記住我</label>
+            </div>
+            <a href="@Url.Action("ForgotPassword", "Account")" class="forgot-password">忘記密碼?</a>
+        </div>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <button type="submit" class="btn btn-primary" style="font-weight: bold;">登入</button>
+
+    }
+
+    <div class="footer-links">
+        <p>沒有帳號嗎? <a href="@Url.Action("Register", "Account")" class="footer-link-text">註冊</a></p>
+    </div>
+</div>
+
+
+<style>
+    /* Default icon color */
+
+
+    /* Container styling */
+    .login-container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        max-width: 400px;
+        margin: auto;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .checkbox-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 24px;
+    }
+    /* Social login buttons */
+    .social-login {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+        .social-login a {
+            flex: 1;
+            padding: 10px;
+            margin: 0 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            border: 1px solid #ddd; /* 輕微邊框 */
+            background-color: #f9f9f9; /* 輕微的灰色背景 */
+            color: inherit;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* 輕微陰影 */
+            transition: background-color 0.3s ease, box-shadow 0.3s ease; /* 動態效果 */
+        }
+
+    /* Google button */
+    .btn-google {
+        color: #4285F4;
+    }
+
+        .btn-google:hover {
+            background-color: #eef3fc; /* Hover 時背景稍微變深 */
+            box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15); /* Hover 時陰影變重 */
+        }
+
+    /* Line button */
+    .btn-line {
+        color: #00c300;
+    }
+
+        .btn-line:hover {
+            background-color: #e6f9e6; /* Hover 時背景稍微變深 */
+            box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15); /* Hover 時陰影變重 */
+        }
+
+    .btn-google i {
+        color: #4285F4; /* Google 標準藍色圖標 */
+        font-size: 1.6rem;
+    }
+
+    .btn-line i {
+        color: #00c300; /* Line 綠色圖標 */
+        font-size: 1.9rem;
+    }
+    /* Icons styling to ensure proper display */
+    .social-login i {
+        margin-right: 8px;
+    }
+
+
+    /* Divider styling */
+    .divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 20px 0;
+    }
+
+        .divider span {
+            color: #aaa;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            height: 1px;
+            flex-grow: 1;
+            background: #e0e0e0;
+        }
+
+    /* Form styling */
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+        height: 50px;
+    }
+
+        .form-group label {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #aaa;
+        }
+
+    .form-control {
+        width: 100%;
+        height: 100%;
+        padding: 10px 10px 10px 40px;
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+    }
+
+    .btn-primary {
+        background-color: #76b1d8; /* 主題藍紫色 */
+        color: white;
+        border: none;
+        padding: 10px;
+        font-size: 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease; /* 過渡效果 */
+    }
+
+        .btn-primary:hover {
+            background-color: #4a90e2 !important; /* 懸停時更深的藍紫色 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* 添加輕微陰影效果 */
+        }
+
+        .btn-primary:active {
+            background-color: #2e0cb0; /* 點擊時的深藍紫色 */
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2); /* 點擊時按下的效果 */
+        }
+
+    /* Forgot password link */
+    .forgot-password {
+        display: block;
+        text-decoration: none;
+        color: #4a90e2;
+        font-weight: bold;
+    }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+    /* Footer links */
+    .footer-links {
+        margin-top: 20px;
+    }
+
+        .footer-links p {
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+    .footer-link-text {
+        color: #4a90e2;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+        .footer-link-text:hover {
+            text-decoration: underline;
+        }
+
+    /* Validation message */
+    .text-danger {
+        color: #e74c3c;
+        font-size: 14px;
+        text-align: left;
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var emailInput = document.getElementById("Email");
+        var passwordInput = document.getElementById("PasswordHash"); 
+        var rememberMeCheckbox = document.getElementById("rememberMe");
+
+        // 檢查本地存儲中是否有已記住的電子郵件和密碼
+        var rememberedEmail = localStorage.getItem("rememberedEmail");
+        var rememberedPassword = localStorage.getItem("rememberedPassword");
+
+        if (rememberedEmail) {
+            emailInput.value = rememberedEmail;
+            rememberMeCheckbox.checked = true;
+        }
+
+        if (rememberedPassword) {
+            passwordInput.value = rememberedPassword;
+            rememberMeCheckbox.checked = true;
+        }
+
+        // 當複選框狀態改變時的事件處理
+        rememberMeCheckbox.addEventListener("change", function () {
+            if (this.checked) {
+                localStorage.setItem("rememberedEmail", emailInput.value);
+                localStorage.setItem("rememberedPassword", passwordInput.value); // 記住密碼
+            } else {
+                localStorage.removeItem("rememberedEmail");
+                localStorage.removeItem("rememberedPassword"); // 移除記住的密碼
+            }
+        });
+
+        // 當電子郵件或密碼字段內容改變時，如果複選框是選中的，更新記住的內容
+        emailInput.addEventListener("input", function () {
+            if (rememberMeCheckbox.checked) {
+                localStorage.setItem("rememberedEmail", emailInput.value);
+            }
+        });
+
+        passwordInput.addEventListener("input", function () {
+            if (rememberMeCheckbox.checked) {
+                localStorage.setItem("rememberedPassword", passwordInput.value); // 更新記住的密碼
+            }
+        });
+    });
+
+</script>

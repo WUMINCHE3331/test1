@@ -1,0 +1,1036 @@
+﻿@model wu2.Models.ExpenseViewModel
+@{
+    ViewBag.Title = "新增支出";
+    string GetProfilePhoto(string profilePhoto)
+    {
+        return !string.IsNullOrEmpty(profilePhoto) ? Url.Content(profilePhoto) : Url.Content("~/UserProfilePhotos/defaultPerson.jpg");
+    }
+}
+@{
+    List<string> expenseTypes = new List<string> { "餐飲", "交通", "娛樂", "購物", "其他", "自行輸入" };
+    List<string> PaymentMethod = new List<string> { "現金", "信用卡", "LinePay", "街口支付", "其他" };
+}
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}@{
+    var groupBudget = ViewBag.GroupBudget as decimal?;
+    var totalExpenses = ViewBag.TotalExpenses as decimal?;
+    var currency = ViewBag.Currency;
+}
+<h2 class="text-center">新增你的支出</h2>
+<div class="expense-cotainer">
+    @Html.ActionLink("返回群組", "Details", "Group", new { id = ViewBag.GroupId }, new { @class = "btn btn-secondary  btn-sm" })
+
+    <div class="budget-container p-3 mb-3 border rounded shadow-sm d-flex justify-content-between">
+        <p class="budget-label mb-2">
+            <strong>
+                <i class="fas fa-wallet"></i> 剩餘預算:
+            </strong>
+            <span class="remaining-budget">
+                @if (groupBudget.HasValue)
+                {
+                    @(groupBudget.Value - (totalExpenses ?? 0)) @currency
+                }
+                else
+                {
+                    <span class="text-muted">未設置</span>
+                }
+            </span>
+        </p>  @*<div>
+            <input type="checkbox" id="integer-calculation" name="IntegerCalculation" value="true" class="mr-2" />
+            <label for="integer-calculation" class="mb-0">
+                <i class="fas fa-calculator"></i>整數分帳
+            </label>
+        </div>*@
+    </div>
+
+    <div class="form-group d-flex align-items-center mt-3">
+
+    </div>
+
+    <style>
+        .budget-container {
+            background-color: #f8f9fa; /* 淡灰色背景 */
+            border-color: #e0e0e0; /* 邊框顏色 */
+        }
+
+        .budget-label {
+            font-size: 1.1rem; /* 提高文字大小 */
+            color: #333; /* 深色文字 */
+        }
+
+        .remaining-budget {
+            font-weight: bold;
+            color: #28a745; /* 成功狀態的綠色 */
+        }
+
+            .remaining-budget.text-muted {
+                color: #6c757d; /* 預設為灰色文字 */
+            }
+
+        .form-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .form-group label {
+            font-size: 1rem;
+            color: #495057;
+            cursor: pointer;
+        }
+
+        .form-group i {
+            margin-right: 5px;
+            color: #007bff; /* 藍色圖標 */
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            var totalAmountInput = document.getElementById('total-amount');
+
+
+            totalAmountInput.value = '';
+
+            totalAmountInput.addEventListener('input', function () {
+                if (this.value === '') {
+                    this.value = '';
+                }
+            });
+        });
+    </script>
+    @using (Html.BeginForm("Create", "Expense", FormMethod.Post, new { enctype = "multipart/form-data", id = "expenseForm" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            @Html.HiddenFor(model => model.GroupId)
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group custom-input-group">
+                                <div class="icon-label-container">
+                                    <i class="fas fa-calendar-alt icon"></i> <!-- 使用 Font Awesome 圖標 -->
+                                    <span class="input-label">日期</span>
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="datetime-local"
+                                           id="Date"
+                                           name="Date"
+                                           class="custom-input"
+                                           value="@ViewBag.CurrentTime"
+                                           max="@ViewBag.MaxDateTime"
+                                           required="required" />
+                                    @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            @*<div class="form-group">
+                                    @Html.LabelFor(model => model.ExpenseItem, htmlAttributes: new { @class = " required-field control-label col-md-4" })
+                                    <div class="col-md-8">
+                                        @Html.EditorFor(model => model.ExpenseItem, new { htmlAttributes = new { @class = "form-control ", @id = "expenseItem", placeholder = "支出項目", required = "required" } })
+                                        @Html.ValidationMessageFor(model => model.ExpenseItem, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>*@
+                            <style>
+                                /* 設定圖標和文字顯示樣式 */
+                                .custom-input-group {
+                                    display: flex;
+                                    align-items: center;
+                                    background-color: #f5f5f5; /* 灰色背景 */
+                                    padding: 10px;
+                                    border-radius: 8px; /* 圓角 */
+                                    margin-bottom: 15px; /* 下方留白 */
+                                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 陰影 */
+                                }
+
+                                    .custom-input-group .icon {
+                                        color: #76b1d8; /* 金色圖標 */
+                                        font-size: 20px;
+                                        margin-right: 15px; /* 圖標與文字間距 */
+                                    }
+
+                                    .custom-input-group .input-label {
+                                        color: black; /* 金色文字 */
+                                        font-size: 16px;
+                                        margin-right: auto; /* 標籤與輸入框距離 */
+                                    }
+
+                                    .custom-input-group .custom-input {
+                                        flex-grow: 1; /* 讓輸入框自動佔滿剩餘空間 */
+                                        background-color: transparent; /* 無背景色 */
+                                        border: none; /* 無邊框 */
+                                        padding: 0; /* 移除內邊距 */
+                                        font-size: 16px;
+                                        color: #333;
+                                        transition: border-color 0.3s ease; 
+                                    }
+
+                                        .custom-input-group .custom-input::placeholder {
+                                            color: #bbb; /* 佔位符顏色 */
+                                        }
+
+                                        /* 當輸入框聚焦時移除默認的邊框顯示 */
+                                        .custom-input-group .custom-input:focus {
+                                            border-bottom: 1px solid #a58a60;
+                                        }
+
+                                /* 調整 Validation Message 顯示 */
+                                .text-danger {
+                                    color: #e74c3c;
+                                    font-size: 14px;
+                                }
+                                /* select2 調整 */
+                                .form-horizontal .select2-container--default .select2-selection--single {
+                                    border-bottom: thin;
+                                    border: none;
+                                    box-shadow: none;
+                                    padding: 0;
+                                    height: auto;
+                                }
+
+                                    .form-horizontal .select2-container--default .select2-selection--single .select2-selection__rendered {
+                                        color: #333;
+                                        font-size: 16px;
+                                    }
+
+                                    .form-horizontal .select2-container--default .select2-selection--single .select2-selection__arrow {
+                                        display: none;
+                                    }
+                                /* 照片預覽的調整 */
+                                #imagePreview {
+                                    margin-top: 10px;
+                                }
+
+                                #photoPreview {
+                                    max-width: 200px;
+                                    max-height: 200px;
+                                    display: none;
+                                }
+
+                                #removeImageBtn {
+                                    display: none;
+                                }
+
+                                /* 調整textarea的樣式 */
+                                textarea.form-control {
+                                    resize: none;
+                                    border: none;
+                                    padding: 10px;
+                                    background-color: #f5f5f5;
+                                }
+
+           
+                            </style>
+                            <div class="form-group custom-input-group">
+                                <div class="icon-label-container">
+                                    <i class="fas fa-list-alt icon"></i> <!-- 這裡添加圖標 -->
+                                    <span class="input-label">款項</span> <!-- 標籤文字 -->
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.EditorFor(model => model.ExpenseItem, new { htmlAttributes = new { @class = "custom-input", @id = "expenseItem", placeholder = "支出項目", required = "required" } })
+                                    @Html.ValidationMessageFor(model => model.ExpenseItem, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group custom-input-group">
+                                <div class="icon-label-container">
+                                    <i class="fas fa-dollar-sign icon"></i>
+                                    <span class="input-label">金額</span>
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "custom-input", @value = "", @id = "total-amount", placeholder = "總金額", required = "required", @type = "number" } })
+                                    @Html.ValidationMessageFor(model => model.TotalAmount, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group custom-input-group">
+                                <div class="icon-label-container">
+                                    <i class="fas fa-list icon"></i> <!-- 圖標 -->
+                                    <span class="input-label">類別</span>
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(model => model.ExpenseType, new SelectList(expenseTypes), new { @class = "form-control select2 custom-select", id = "expenseTypeDropdown", @placeholder = "選擇或輸入支出類型" })
+                                    @Html.ValidationMessageFor(model => model.ExpenseType, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group custom-input-group">
+                                <div class="icon-label-container">
+                                    <i class="fas fa-credit-card icon"></i> <!-- 圖標 -->
+                                    <span class="input-label">消費</span>
+                                </div>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(model => model.PaymentMethod, new SelectList(PaymentMethod), new { @class = "form-control select2 custom-select", id = "paymentMethodDropdown", @placeholder = "選擇或輸入消費類型" })
+                                    @Html.ValidationMessageFor(model => model.PaymentMethod, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group custom-input-group">
+                                <div class="icon-label-container">
+                                    <i class="fas fa-sticky-note icon"></i> <!-- 圖標 -->
+                                    <span class="input-label">備註</span>
+                                </div>
+                                <div class="col-md-10">
+                                    @Html.TextAreaFor(model => model.Note, new { @class = "form-control custom-input", placeholder = "備註" })
+                                    @Html.ValidationMessageFor(model => model.Note, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="form-group custom-input-group">
+                                <div class="icon-label-container">
+                                    <i class="fas fa-camera icon"></i> <!-- 圖標 -->
+                                    <span class="input-label">照片</span>
+                                </div>
+                                <div class="col-md-10">
+                                    <input type="file" name="Photo" id="photoInput" accept="image/*" onchange="previewImage(event)" class="form-control custom-input" />
+                                    @Html.ValidationMessageFor(model => model.Photo, "", new { @class = "text-danger" })
+                                    <div id="imagePreview" style="margin-top: 10px;">
+                                        <img id="photoPreview" src="" alt="Photo Preview" style="max-width: 200px; max-height: 200px; display: none;" />
+                                        <button type="button" id="removeImageBtn" style="display: none;" onclick="removeImage()">刪除照片</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                        <p class="text-center ">若有小數點產生，於新增後隨機分配補齊整數</p>
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+
+                                @Html.LabelFor(model => model.PaidBy, "誰付錢", htmlAttributes: new { @class = "control-label col-md-4 required-field" })
+                                <div class="col-md-4">
+                                    <p>$: <span id="remaining-paid-amount" class="remaining-amount">0</span></p>
+                                </div>
+                                <div id="PaidBy" class="col-md-12">
+                                    @for (int i = 0; i < ViewBag.Users.Count; i++)
+                                    {
+                                        var user = ViewBag.Users[i];
+                                        int sessionUserId = (int)Session["UserId"];
+                                        bool isChecked = user.UserId == sessionUserId;
+                                        <div class="checkbox custom-input-group">
+
+                                            <label class="input-label d-flex align-items-center">
+                                                <input type="checkbox" name="PaidBy[@i].IsChecked" value="true" class="paid-by-checkbox mr-1" @(isChecked ? "checked" : "" ) data-user-id="@user.UserId" />
+                                                @user.FullName
+                                            </label>
+                                            <div class="d-flex align-items-center">
+                                                <input type="hidden" name="PaidBy[@i].UserId" value="@user.UserId" />
+                                                <img src="@GetProfilePhoto(user.ProfilePhoto)" alt="Profile Picture" class="rounded-circle profile-picture  mr-1">
+                                                <span></span>
+                                                <!-- 包裝金額欄位與錢號 -->
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">$</span>
+                                                    </div>
+                                                    <input type="number" id="paidAmount_@user.UserId" step="0.001" name="PaidBy[@i].Amount" placeholder="@user.FullName 的金額" class="form-control amount-input-paid custom-input" value="" data-user-id="@user.UserId" @(isChecked ? "" : "disabled") />
+                                                </div>
+
+                                                <input type="number" id="portionPaid_@user.UserId" name="PaidBy[@i].Portion" step="0.01" class="portion-input-paid custom-input small-input" data-user-id="@user.UserId" @(isChecked ? "" : "disabled") />
+                                                <span>%</span>
+                                                <span id="portionPercentage_@user.UserId"></span>
+
+                                            </div>
+                                        </div>
+                                    }
+                                    @Html.ValidationMessageFor(model => model.PaidBy, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.Label("分給誰", htmlAttributes: new { @class = "control-label col-md-4 required-field" })
+                                <div class="col-md-4">
+                                    <p>$: <span id="remaining-split-amount" class="remaining-amount">0</span></p>
+                                </div>
+                                <div id="split-amounts" class="col-md-12">
+                                    @for (int i = 0; i < ViewBag.Users.Count; i++)
+                                    {
+                                        var user = ViewBag.Users[i];
+                                        bool isChecked = true;
+                                        <div class="checkbox custom-input-group">
+                                            <label class="input-label d-flex align-items-center">
+                                                <input type="checkbox" name="SplitDetails[@i].IsChecked" class="split-by-checkbox mr-1" value="true" @(isChecked ? "checked" : "") data-user-id="@user.UserId" />
+                                                @user.FullName
+                                            </label>
+                                            <div class="d-flex align-items-center">
+                                                <input type="hidden" name="SplitDetails[@i].UserId" value="@user.UserId" />
+                                                <img src="@GetProfilePhoto(user.ProfilePhoto)" alt="Profile Picture" class="rounded-circle profile-picture  mr-1">
+
+                                                <!-- 包裝金額欄位與錢號 -->
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text">$</span>
+                                                    </div>
+                                                    <input type="number" id="splitAmount_@user.UserId" step="0.001" name="SplitDetails[@i].Amount" data-user-id="@user.UserId" class="form-control amount-input custom-input" value="" placeholder="金額" @(isChecked ? "" : "disabled") />
+                                                </div>
+
+                                                <input type="number" id="portion_@user.UserId" name="SplitDetails[@i].Portion" step="0.01" data-user-id="@user.UserId" class="portion-input custom-input small-input" @(isChecked ? "" : "disabled") />
+                                                <span>%</span>
+
+                                                <input type="hidden" name="SplitDetails[@i].Note" id="Note_@user.UserId" class="form-control" placeholder="備註" rows="1" style="width: 150px;" @(isChecked ? "" : "disabled") />
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="float:right">新增支出</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <br />
+
+        </div>
+
+    }
+</div>
+<style>
+    /* 設定金額欄位與錢號的組合 */
+    .input-label {
+        max-width: 100px; /* 限制最大寬度 */
+        overflow: hidden; /* 隱藏超出的內容 */
+        white-space: nowrap; /* 禁止換行 */
+        text-overflow: ellipsis; /* 使用省略號表示過長文字 */
+        font-weight: bold; 
+    }
+
+
+    .input-group {
+        display: flex;
+        align-items: center;
+    }
+
+    .input-group-prepend .input-group-text {
+        background-color: #f5f5f5;
+        border: none;
+        color: black;
+        font-size: 16px;
+        font-weight: bold;
+        padding: 5px 10px;
+    }
+
+    .amount-input-paid, .amount-input {
+        width: 130px; /* 控制金額輸入框的寬度 */
+    }
+
+    /* 設定百分比欄位的寬度 */
+    .small-input {
+        width: 55px; /* 控制百分比輸入框的寬度 */
+    }
+
+    /* 取消輸入框聚焦時的顏色變化 */
+    input:focus {
+        outline: none !important; /* 移除聚焦時的邊框 */
+        box-shadow: none !important; /* 移除陰影 */
+        border-color: initial; /* 保持原來的邊框顏色 */
+    }
+</style>
+<script>
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('photoPreview');
+        const removeBtn = document.getElementById('removeImageBtn');
+        const reader = new FileReader();
+
+        reader.onload = function () {
+            preview.src = reader.result; // 預覽URL
+
+            preview.style.display = 'block'; // 顯示預覽
+            removeBtn.style.display = 'inline-block'; // 顯示刪除 
+        };
+
+        if (file) {
+            reader.readAsDataURL(file); // READ CONTENT
+    }
+
+    function removeImage() {
+        const photoInput = document.getElementById('photoInput');
+        const preview = document.getElementById('photoPreview');
+        const removeBtn = document.getElementById('removeImageBtn');
+
+        // 清空文件输入
+        photoInput.value = '';
+        // 隐藏图片预览和删除按钮
+        preview.src = '';
+        preview.style.display = 'none';
+        removeBtn.style.display = 'none';
+    }
+</script>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const totalAmountInput = document.getElementById("total-amount");
+        const paidByCheckboxes = document.querySelectorAll(".paid-by-checkbox");
+        const splitByCheckboxes = document.querySelectorAll(".split-by-checkbox");
+        const portionInputs = document.querySelectorAll(".portion-input");
+        const portionPaidInputs = document.querySelectorAll(".portion-input-paid");
+        const amountInputsPaid = document.querySelectorAll(".amount-input-paid");
+        const amountInputs = document.querySelectorAll(".amount-input");
+        const remainingPaidAmountSpan = document.getElementById("remaining-paid-amount");
+        const remainingSplitAmountSpan = document.getElementById("remaining-split-amount");
+        function calculateRemainingAmount(amountInputs, remainingAmountSpan) {
+            let totalAmount = parseFloat(totalAmountInput.value) || 0;
+            let totalPaidAmount = 0;
+
+            amountInputs.forEach(input => {
+                totalPaidAmount += parseFloat(input.value) || 0;
+            });
+
+            let remainingAmount = totalAmount - totalPaidAmount;
+            remainingAmountSpan.textContent = remainingAmount.toFixed(2);
+
+            if (remainingAmount < 0) {
+                remainingAmountSpan.classList.add('over-budget');
+            } else {
+                remainingAmountSpan.classList.remove('over-budget');
+            }
+        }
+
+        $(document).ready(function () {
+            $('#expenseTypeDropdown').change(function () {
+                if ($(this).val() === "自行輸入") { // "Other" 是你預設的一個選項，表示自由輸入
+                    $('#expenseTypeInput').show();
+                    $('#expenseTypeDropdown').hide();
+                }
+            });
+
+            $('#expenseTypeInput').on('blur', function () {
+                if ($(this).val().trim() === "") {
+                    $('#expenseTypeInput').hide();
+                    $('#expenseTypeDropdown').show();
+                }
+            });
+        });
+
+        function clearInputFields(checkboxes, inputSelector, additionalSelectors = []) {
+            checkboxes.forEach(checkbox => {
+                let userId = checkbox.dataset.userId;
+                let amountInput = document.getElementById(`${inputSelector}_${userId}`);
+                amountInput.disabled = !checkbox.checked;
+                if (!checkbox.checked) {
+                    amountInput.value = "";
+                }
+                additionalSelectors.forEach(selector => {
+                    let additionalInput = document.getElementById(`${selector}_${userId}`);
+                    additionalInput.disabled = !checkbox.checked;
+                    if (!checkbox.checked) {
+                        additionalInput.value = "";
+                    }
+                });
+            });
+        }
+
+        function updatePaidByAmounts() {
+            let totalAmount = parseFloat(totalAmountInput.value) || 0;
+            let selectedCheckboxes = Array.from(paidByCheckboxes).filter(cb => cb.checked);
+            let selectedCount = selectedCheckboxes.length;
+
+            if (selectedCount > 0 && totalAmount >= 0) {
+                let amountPerPerson = (totalAmount / selectedCount).toFixed(2);
+
+                selectedCheckboxes.forEach(checkbox => {
+                    let userId = checkbox.dataset.userId;
+                    let amountInput = document.getElementById(`paidAmount_${userId}`);
+                    amountInput.value = amountPerPerson;
+                });
+            }
+
+            clearInputFields(paidByCheckboxes, 'paidAmount', ['portionPaid']);
+            updatePortionByAmount(); // 新增的調用
+            calculateRemainingAmount(amountInputsPaid, remainingPaidAmountSpan);
+        }
+
+        function updateSplitByAmounts() {
+            let totalAmount = parseFloat(totalAmountInput.value) || 0;
+            let selectedCheckboxes = Array.from(splitByCheckboxes).filter(cb => cb.checked);
+            let selectedCount = selectedCheckboxes.length;
+
+            if (selectedCount > 0 && totalAmount >= 0) {
+                let amountPerPerson = (totalAmount / selectedCount).toFixed(2);
+
+                selectedCheckboxes.forEach(checkbox => {
+                    let userId = checkbox.dataset.userId;
+                    let amountInput = document.getElementById(`splitAmount_${userId}`);
+                    amountInput.value = amountPerPerson;
+                });
+            }
+
+            clearInputFields(splitByCheckboxes, 'splitAmount', ['portion', 'Note']);
+            updatePortionByAmount(); // 新增的調用
+            calculateRemainingAmount(amountInputs, remainingSplitAmountSpan);
+        }
+
+        function updateAmountsByPortion() {
+            let totalAmount = parseFloat(totalAmountInput.value) || 0;
+
+            portionPaidInputs.forEach(input => {
+                let portion = parseFloat(input.value) || 0;
+                let userId = input.dataset.userId;
+                let amountInput = document.getElementById(`paidAmount_${userId}`);
+
+                if (portion > 0 && totalAmount >= 0) {
+                    let calculatedAmount = ((portion / 100) * totalAmount).toFixed(2);
+                    amountInput.value = calculatedAmount;
+                } else {
+                    amountInput.value = "";
+                }
+            });
+
+            portionInputs.forEach(input => {
+                let portion = parseFloat(input.value) || 0;
+                let userId = input.dataset.userId;
+                let amountInput = document.getElementById(`splitAmount_${userId}`);
+
+                if (portion > 0 && totalAmount >= 0) {
+                    let calculatedAmount = ((portion / 100) * totalAmount).toFixed(2);
+                    amountInput.value = calculatedAmount;
+                } else {
+                    amountInput.value = "";
+                }
+            });
+            calculateRemainingAmount(amountInputsPaid, remainingPaidAmountSpan);
+            calculateRemainingAmount(amountInputs, remainingSplitAmountSpan);
+        }
+
+
+        function updatePortionByAmount() {
+            let totalAmount = parseFloat(totalAmountInput.value) || 0;
+
+            amountInputsPaid.forEach(input => {
+                let amount = parseFloat(input.value) || 0;
+                let userId = input.dataset.userId;
+                let portionInput = document.getElementById(`portionPaid_${userId}`);
+
+                if (portionInput) {
+                    if (amount > 0 && totalAmount > 0) {
+                        let calculatedPortion = ((amount / totalAmount) * 100).toFixed(1);
+                        portionInput.value = calculatedPortion;
+                    } else {
+                        portionInput.value = "";
+                    }
+                }
+            });
+
+            amountInputs.forEach(input => {
+                let amount = parseFloat(input.value) || 0;
+                let userId = input.dataset.userId;
+                let portionInput = document.getElementById(`portion_${userId}`);
+
+                if (portionInput) {
+                    if (amount > 0 && totalAmount > 0) {
+                        let calculatedPortion = ((amount / totalAmount) * 100).toFixed(1);
+                        portionInput.value = calculatedPortion;
+                    } else {
+                        portionInput.value = "";
+                    }
+                }
+            });
+            calculateRemainingAmount(amountInputsPaid, remainingPaidAmountSpan);
+            calculateRemainingAmount(amountInputs, remainingSplitAmountSpan);
+        }
+
+        totalAmountInput.addEventListener("input", function () {
+            updatePaidByAmounts();
+            updateSplitByAmounts();
+
+        });
+
+        paidByCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", updatePaidByAmounts);
+        });
+
+        splitByCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", updateSplitByAmounts);
+        });
+
+        portionPaidInputs.forEach(input => {
+            input.addEventListener("input", updateAmountsByPortion);
+        });
+
+        portionInputs.forEach(input => {
+            input.addEventListener("input", updateAmountsByPortion);
+        });
+
+        amountInputsPaid.forEach(input => {
+            input.addEventListener("input", updatePortionByAmount);
+        });
+
+        amountInputs.forEach(input => {
+            input.addEventListener("input", updatePortionByAmount);
+        });
+
+    });
+</script>
+<script>
+    // 表單提交事件
+    $('#expenseForm').submit(async function (e) {
+        // 檢查是否在 LIFF 客戶端中運行
+        if (typeof liff !== 'undefined' && liff.isInClient()) {
+            e.preventDefault(); // 阻止默認表單提交行為，僅在 LIFF 中阻止
+
+            // 獲取表單數據
+            const expenseItem = document.getElementById('expenseItem').value;
+            const totalAmount = document.getElementById('total-amount').value;
+            const paymentMethod = document.getElementById('paymentMethodDropdown').value;
+            const expenseTypeDropdown = document.getElementById('expenseTypeDropdown').value;
+            const selectedPayers = getSelectedPayers();
+            const payerNames = selectedPayers.map(payer => payer.userName).join(', ');
+            const selectedSpliters = getSelectedSplitDetails();
+            const spliterNames = selectedSpliters.map(spliter => spliter.userName).join(', ');
+            var formData = new FormData(this);
+            // 檢查是否上傳了照片
+            const photoInput = document.getElementById('photoInput'); // 照片輸入框ID
+            const hasPhoto = photoInput && photoInput.files.length > 0;
+            // 使用 AJAX 提交表單數據
+            $.ajax({
+                type: 'POST',
+                url: '/expense/create',
+                data: formData,  // 使用 FormData
+                processData: false,  // 告訴 jQuery 不要處理數據
+                contentType: false,  // 告訴 jQuery 不設置內容類型
+                success: async function (response) {
+                    if (response.success) {
+                        // 提示支出創建成功
+                        alert(response.message);
+                        // 如果有附加照片，添加提示
+                        // 構建發送消息的內容
+                        let message = `新增了支出項目：${expenseItem}\n金額：${totalAmount} 元\n付款人：${payerNames} \n分帳人 : ${spliterNames} \n消費類型 : ${expenseTypeDropdown} \n支付方式 : ${paymentMethod}`;
+
+                        // 如果有附加照片，添加提示
+                        if (hasPhoto) {
+                            message += "\n附加照片：有";
+                        }
+
+                        // 發送消息並關閉 LIFF 窗口
+                        await sendMessage(message);
+                    } else {
+
+                    }
+                },
+                error: function () {
+                    alert('新增支出時出現錯誤');
+                }
+            });
+        }
+        // 如果不在 LIFF 中，不阻止默認表單提交，允許正常提交表單以便分帳完成
+    });    // 發送消息並關閉 LIFF 窗口的函數
+
+</script>
+<script>
+    // 得到被勾選的付款人
+    function getSelectedPayers() {
+        const selectedPayers = [];
+        const checkedCheckboxes = document.querySelectorAll('.paid-by-checkbox:checked');
+
+        checkedCheckboxes.forEach(function (checkbox) {
+            const userId = checkbox.getAttribute('data-user-id');
+            const paidAmount = document.querySelector(`#paidAmount_${userId}`).value;
+            const userName = checkbox.parentElement.textContent.trim();
+
+            selectedPayers.push({
+                userId: userId,
+                userName: userName,
+                paidAmount: paidAmount
+            });
+        });
+
+        return selectedPayers;
+    }
+
+    function getSelectedSplitDetails() {
+        const selectedSplitters = [];
+        const checkedSplitters = document.querySelectorAll('.split-by-checkbox:checked');
+
+        checkedSplitters.forEach(function (checkbox) {
+            const userId = checkbox.getAttribute('data-user-id');
+            const splitAmount = document.querySelector(`#splitAmount_${userId}`).value;
+            const userName = checkbox.parentElement.textContent.trim();
+
+            selectedSplitters.push({
+                userId: userId,
+                userName: userName,
+                splitAmount: splitAmount
+            });
+        });
+
+        return selectedSplitters;
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        // 初始化 Select2，支援 tags 和自定義輸入
+        $('#expenseTypeDropdown').select2({
+            tags: true, // 允許自定義輸入
+            placeholder: "選擇或輸入支出類型",
+            allowClear: true
+        });
+
+        $('#paymentMethodDropdown').select2({
+            tags: true, // 允許自定義輸入
+            placeholder: "選擇或輸入消費類型",
+            allowClear: true
+        });
+    });
+
+</script>
+<style>
+    .icon-label-container {
+        display: flex;
+        align-items: center;
+    }
+
+        .icon-label-container i {
+            width: 30px; 
+            height: 30px; 
+            text-align: center;
+            line-height: 30px; 
+            margin-right: 10px; 
+        }
+
+        .icon-label-container span {
+            font-size: 16px; 
+            color: #333;
+        }
+
+    .card {
+        background-color: #ffffff;
+        border-radius: 15px; /* 圓角卡片 */
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* 柔和陰影 */
+        margin-bottom: 30px;
+        transition: all 0.3s ease; /* 過渡效果 */
+    }
+
+        .card:hover {
+            transform: translateY(-5px); /* 鼠標懸停時輕微上移 */
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2); /* 懸停時增加陰影 */
+        }
+
+    /* 卡片標題樣式 */
+    .card-header {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        font-size: 20px;
+        border-radius: 12px 12px 0 0;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    /* 表單輸入框樣式 */
+    .form-groups {
+        display: flex;
+        align-items: center;
+        background-color: #f5f5f5;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #dcdcdc;
+        padding: 12px;
+        width: 100%;
+        font-size: 16px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+            outline: none;
+        }
+
+    /* 圖像上傳部分樣式 */
+    #imagePreview {
+        margin-top: 10px;
+        text-align: center;
+    }
+
+    #photoPreview {
+        display: block;
+        margin: 10px auto;
+        max-width: 100%;
+        max-height: 150px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #removeImageBtn {
+        display: inline-block;
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+        #removeImageBtn:hover {
+            background-color: #c82333;
+        }
+
+    /* 付錢和分攤部分 */
+    .d-flex {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .profile-picture {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 10px;
+    }
+
+    /* 剩餘金額顯示 */
+    .remaining-amount {
+        font-weight: bold;
+        color: #28a745;
+        font-size: 18px;
+    }
+
+    /* 按鈕樣式 */
+    .btn {
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff, #0056b3); /* 漸變藍色背景 */
+        color: white;
+        border: none;
+    }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3, #004085); /* 懸停時漸變加深 */
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* 懸停時陰影加強 */
+        }
+
+    /* 錯誤信息樣式 */
+    .text-danger {
+        color: #e74c3c;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* 響應式調整 */
+    @@media (max-width:576px) {
+        .d-flex {
+            align-items: flex-start;
+        }
+
+        .container {
+            padding: 0 !important;
+        }
+
+        .card {
+            padding: 0;
+            margin: 0 !important;
+        }
+
+        .form-horizontal {
+            padding: 0;
+        }
+
+        .profile-picture {
+            width: 30px;
+            height: 30px;
+            margin: 0;
+        }
+
+        .btn {
+            font-size: 14px;
+            padding: 10px;
+        }
+    }
+</style>
+<style>
+    /* 增加卡片陰影和間距 */
+    .card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    /* 圓角輸入框 */
+    .form-control {
+        border-radius: 8px;
+    }
+
+        /* 懸停時的表單輸入框效果 */
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+    /* 新增支出按鈕樣式 */
+    .btn-primary {
+        background-color: #5f41e4;
+        color: white;
+        border-radius: 50px;
+        padding: 12px 20px;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #4320df;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+    .profile-picture {
+        width: 45px;
+        height: 45px;
+        margin-right: 1rem;
+    }
+
+    .profile-picture {
+        width: 45px;
+        height: 45px;
+        margin-right: 1rem;
+    }
+</style>
+
+
+<style>
+    .form-group .control-label {
+        display: flex;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .over-budget {
+        color: red;
+        font-weight: bold;
+    }
+</style>

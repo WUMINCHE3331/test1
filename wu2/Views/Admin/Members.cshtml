@@ -1,0 +1,26 @@
+﻿@model List<wu2.Models.Users>
+
+<h2>所有成員</h2>
+
+<table class="table">
+    <tr>
+        <th>姓名</th>
+        <th>電子郵件</th>
+        <th>電話</th>
+        <th>銀行</th>
+        <th>角色</th>
+        <th>註冊日期</th>
+    </tr>
+    @foreach (var member in Model)
+    {
+        <tr>
+            <td>@member.FullName</td>
+            <td>@member.Email</td>
+            <td>@member.PhoneNumber</td>
+            <td>@member.BankAccount</td>
+            <td>@member.Role</td>
+            <td>@member.RegistrationDate</td>
+        </tr>
+    }
+</table>
+

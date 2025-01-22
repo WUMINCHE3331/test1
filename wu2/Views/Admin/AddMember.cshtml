@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "Add Member";
+}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            @Html.ActionLink("返回群組", "Details", "Group", new { id = ViewBag.GroupId }, new { @class = "btn btn-secondary" })
+        </div>
+
+        <div class="card-body">
+            <h2 class="card-title">加入虛擬組員</h2>
+            <p class="card-subtitle">（直接輸入為直接加入組員，密碼默認為：<strong>"1"</strong>）</p>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+
+            <div class="form-container">
+                @using (Html.BeginForm("AddMember", "Admin", FormMethod.Post))
+                {
+                    <input type="hidden" name="groupId" value="@ViewBag.GroupId" />
+
+                    <div class="form-group">
+                        @Html.Label("FullName", "名稱（可選）")
+                        @Html.TextBox("fullName", null, new { @class = "form-control", placeholder = "默認亂碼" })
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">加入組員</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .container {
+        max-width: 600px;
+        margin: 3rem auto;
+        padding: 0;
+    }
+
+    .card {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background-color: #f5f5f5;
+        padding: 1rem;
+        text-align: left;
+    }
+
+        .card-header .btn-secondary {
+            float: left;
+        }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .card-title {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .card-subtitle {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .form-container {
+        margin-top: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.2rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        font-size: 1rem;
+        border-radius: 4px;
+        width: 100%; /* 全寬按鈕 */
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        color: white;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+    .alert {
+        padding: 15px;
+        margin-bottom: 1rem;
+        border-radius: 4px;
+        font-size: 0.9rem;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+</style>

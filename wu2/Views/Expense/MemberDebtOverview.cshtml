@@ -1,0 +1,43 @@
+﻿@model IEnumerable<wu2.Models.MemberDebtViewModel>
+
+@{
+    ViewBag.Title = "組員總債務表";
+}
+
+<h2>組員總債務表</h2>
+
+@Html.ActionLink("返回群組", "Details", "Group", new { id = ViewBag.GroupId }, new { @class = "btn btn-secondary" })
+<a href="@Url.Action("PairwiseSettlement","Settle", new { groupId = ViewBag.GroupId })" class="btn btn-primary">帳務結清</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>組員</th>
+            <th>應收總額</th>
+            <th>應付總額</th>
+            <th>淨利</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var member in Model)
+        {
+            <tr>
+                <td>@member.UserName</td>
+                <td>$ @member.TotalOwedTo</td> <!-- 應收總額 -->
+                <td>$ @member.TotalOwed</td> <!-- 應付總額 -->
+                <td>
+                    @{
+                        var result = member.NetDebt;
+                        if (result >= 0)
+                        {
+                            @($"$ {result}")
+                        }
+                        else
+                        {
+                            @($"$ {result}")
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

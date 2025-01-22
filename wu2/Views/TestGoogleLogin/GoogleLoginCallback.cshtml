@@ -1,0 +1,16 @@
+﻿
+@model dynamic
+
+<h2>Google Login Result</h2>
+
+<p>Email: @ViewBag.Email</p>
+<p>Name: @ViewBag.Name</p>
+<p>Google ID: @ViewBag.GoogleId</p>
+
+<h3>All Claims</h3>
+<ul>
+    @foreach (var claim in ViewBag.Claims)
+    {
+        <li>@claim.Type: @claim.Value</li>
+    }
+</ul>

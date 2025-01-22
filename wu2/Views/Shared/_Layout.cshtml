@@ -1,0 +1,1687 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustSplit - Make You So Eazy</title>
+
+    @Scripts.Render("~/bundles/modernizr")
+    <!-- Remove the duplicate jQuery 3.5.1 and keep jQuery 3.6.0 -->
+    <link rel="icon" href="~/Images/S__52396068.jpg" type="image/jpg">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Keep only jQuery 3.6.0 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/Scripts/country-list.js"></script>
+
+
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-sm fixed-top" style="height: 60px; background-color: #76b1d8; ">
+        <div class="container">
+
+            <a class="navbar-brand" style="font-size:30px" href="@Url.Action("Index", "Home")">
+                <img src="~/Images/S__52396068.jpg" alt="Brand" style="height:48px; margin-right:10px; margin-bottom:5px; border-radius:5px; box-shadow:-3px 1px 5px;">
+                <span class="brand-name">JustSplit</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="hamburger" style="position: absolute; left: 20px; top: 10px; z-index: 999;" id="toggle-btn">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+            <div class="collapse navbar-collapse d-sm-inline-flex " id="navbarNav">
+                @{ 
+                    string profilePhotoPath = Session["ProfilePhotoPath"] as string;
+                    if (!string.IsNullOrEmpty(profilePhotoPath))
+                    {
+                        profilePhotoPath = Url.Content(profilePhotoPath);
+                    }
+                    bool hasUnreadNotifications = ViewBag.HasUnreadNotifications ?? false;
+                }
+                @if (Session["UserID"] != null)
+                {
+                    <ul class="navbar-nav flex-sm-grow-0" id="navbarNavItems">
+               
+                        <li class="nav-item dropdown">
+
+                            @if (!string.IsNullOrEmpty(Session["Role"] as string) && Session["Role"].ToString() == "Root")
+                            {<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    管理員專用
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="@Url.Action("AdminIndex", "Admin")">群組總覽</a>
+                                    <a class="dropdown-item" href="@Url.Action("members", "Admin")">會員總覽</a>
+                                    <a class="dropdown-item" href="@Url.Action("CreateAnnouncement", "Admin")">廣播公告</a>
+                                    <a class="dropdown-item" href="@Url.Action("Register", "Account")">註冊會員</a>
+                                </div>}
+                        </li>
+                    </ul>
+                }
+                <ul class="navbar-nav ml-auto d-flex align-items-center">
+                    @if (Session["UserID"] != null)
+                    {
+                        <!--<li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if (!string.IsNullOrEmpty(profilePhotoPath))
+                            {
+                                <img src="@profilePhotoPath" class="rounded-circle" alt="用戶頭像" width="48" height="48" style="margin-right:8px; border:groove;">
+                            }
+                            else
+                            {
+                                <img src="~/UserProfilePhotos/defaultPerson.jpg" class="rounded-circle" alt="未設定" width="40" height="40" style="margin-right:8px;">
+                            }
+                        </a>-->
+
+                        <!-- Dropdown menu -->
+                        <!--<div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="@Url.Action("Update", "Account")">設定</a>
+                                <div class="dropdown-divider"></div>
+                                @Html.ActionLink("登出", "Logout", "Account", new { area = "" }, new { @class = "dropdown-item" })
+                            </div>
+                        </li>
+
+                        <li class="nav-item flex-grow-1 text-center">
+                            <span class="navbar-text" style=" font-size:18px; margin-top:2px; color:black">你好, @Session["FullName"]</span>
+                        </li>-->
+
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("登入", "Login", "Account", new { area = "" }, new { @class = "btn-rounded btn-login1" })
+                        </li>
+                        <li class="nav-item">
+                            @Html.ActionLink("註冊", "Register", "Account", new { area = "" }, new { @class = "btn-rounded btn-register1" })
+                        </li>
+
+                    }
+                </ul>
+
+            </div>
+            @if (Session["UserID"] != null)
+            {
+                <ul class="notice-messenger d-flex p-0 align-items-center" style="list-style:none;margin:0;">
+                    <li class="nav-item">
+                        @Session["FullName"]
+                    </li>
+                    <li class="nav-item">
+                        <a id="notificationBell" class="nav-link" style="color:white;" href="@Url.Action("Notifications", "Group")" title="通知">
+                            <i class="fas fa-bell"></i>
+                            <span id="notificationCountBadge" style="color:black;">0</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a id="chatIcon" class="nav-link" style="color:white;" href="javascript:void(0);" title="聊天">
+                            <i class="fas fa-comments"></i>
+                            <span id="chatCountBadge">0</span>
+                        </a>
+                    </li>
+                </ul>
+            }
+        </div>
+
+    </nav>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a class="navbar-brand2 mr-2" style="font-size: 30px;" href="@Url.Action("Index", "Home")">
+                <img src="~/Images/S__52396068.jpg" alt="Brand" style="height:40px; border-radius:5px; box-shadow:-3px 1px 5px;">
+
+            </a>
+            @if (Session["UserID"] == null)
+            {<span style="font-size:24px">JustSplit</span>}
+
+            @if (Session["UserID"] != null)
+            {
+
+                if (!string.IsNullOrEmpty(profilePhotoPath))
+                {
+                    <img src="@profilePhotoPath" class="rounded-circle" alt="用戶頭像" width="48" height="48" style="margin-right:8px; border:groove;"><span> @Session["FullName"]</span>
+
+
+                }
+                else
+                {
+                    <img src="~/UserProfilePhotos/defaultPerson.jpg" class="rounded-circle" alt="未設定" width="40" height="40" style="margin-right:8px;"> <span> @Session["FullName"]</span>
+                }
+                <span></span>
+            }
+
+        </div>
+        @{ViewBag.LineUrl = "https://line.me/R/ti/p/@291fmudz"; }
+        <div class="divider"></div>
+        <ul class="sidebar-menu">
+            @if (Session["UserID"] != null)
+            {
+
+                <li class="group-item">
+                    <a href="/Group/MyGroups" class="collapsible2  dropdown-item custom-button"><i class="fas fa-users icon"></i>我的群組</a>
+                    <div class="dropdown-content" style="max-height:230px;overflow-y:scroll;overflow-x:hidden" id="groupList">
+                    </div>
+                </li>
+                <li class="group-item">
+                    <a href="/Group/Mygroups" class="dropdown-item custom-button">
+                        <i class="fas fa-users"></i> 群組列表
+                    </a>
+                </li>
+
+                <li class="group-item">
+                    <a href="/Group/Create" class="dropdown-item custom-button">
+                        <i class="fas fa-plus-circle icon"></i> 創建新群組
+                    </a>
+                </li>
+                <li class="group-item">
+                    <a class="dropdown-item custom-button" href="@Url.Action("Update", "Account")">
+                        <i class="fas fa-cog icon"></i> 設定
+                    </a>
+                </li>
+
+                <li class="group-item">
+                    <a class="dropdown-item custom-button" href="https://line.me/R/ti/p/@ViewBag.LineUrl">
+                        <i class="fab fa-line line-icon"></i> Line
+                    </a>
+                </li>
+                <li class="group-item">
+                    <a class="dropdown-item custom-button" href="@Url.Action("Logout", "Account")">
+                        <i class="fas fa-sign-out-alt"></i> 登出
+                    </a>
+                </li>
+
+
+            }
+            else
+            {
+
+
+                <li class="group-item">
+                    <a class="dropdown-item custom-button" href="@Url.Action("Login", "Account")">
+                        <i class="fas fa-sign-in-alt icon"></i> 登入
+                    </a>
+                </li>
+
+                <li class="group-item">
+                    <a class="dropdown-item custom-button" href="/Home/About">
+                        <i class="fas fa-heart icon"></i> JustSplit的起源
+                    </a>
+                </li>
+
+                <li class="group-item">
+                    <a class="dropdown-item custom-button" href="https://line.me/R/ti/p/@ViewBag.LineUrl">
+                        <i class="fab fa-line line-icon"></i> LineBot機器人
+                    </a>
+                </li>
+                <li class="group-item">
+                    <a class="dropdown-item custom-button" href="/Home/QA">
+                        <i class="fas fa-question-circle icon"></i> Q&A
+                    </a>
+                </li>
+                <li class="group-item">
+                    <a class="dropdown-item custom-button" href="/Home/Sponsor">
+                        <i class="fas fa-hands-helping icon"></i> 贊助我們
+                    </a>
+                </li>
+                <li class="group-item qr-container">
+                    <div class="qr-box">
+                        <img class="qr-img" src="https://qr-official.line.me/gs/M_291fmudz_BW.png?oat_content=qr" alt="Line QR Code" title="LineBot QRCODE">
+                    </div>
+                </li>
+
+            }
+        </ul>
+        <style>
+            /* 整體容器樣式 */
+            .dropdown-menu {
+                padding: 10px;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            }
+            .fa-hands-helping{
+                color: green;
+            }
+            .fa-question-circle {
+                color: #f39c12;
+            }
+
+            /* 統一按鈕風格 */
+            .custom-button {
+                display: flex;
+                align-items: center;
+                font-size: 16px;
+                padding: 12px 20px;
+                color: #333;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                transition: background-color 0.3s ease;
+                text-decoration: none;
+            }
+
+
+            /* 移動裝置上的點擊效果 */
+            .group-item a:active {
+                transform: scale(0.95);
+                background-color: #f9f9f9;
+                color: black;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                transition: transform 0.1s ease;
+            }
+            .custom-button:hover {
+                text-decoration: none;
+            }
+
+                .custom-button .icon {
+                    margin-right: 10px;
+                    font-size: 20px;
+                }
+
+            /* 針對不同 icon 的樣式 */
+            .fa-line {
+                color: #00b900;
+                font-size: 1.7rem;
+                margin-right: 10px;
+            }
+
+            .fa-heart {
+                color: #e74c3c;
+                font-size: 1.7rem;
+                margin-right: 10px;
+            }
+
+            .fa-sign-in-alt {
+                color: #007bff;
+                font-size: 1.7rem;
+                margin-right: 10px;
+            }
+
+            /* QR Code 容器樣式 */
+            .qr-container {
+                margin-top: 20px;
+                text-align: center;
+            }
+
+            .qr-box {
+                display: inline-block;
+                padding: 10px;
+                background-color: #fff;
+                border: 2px solid #ddd;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .qr-img {
+                width: 150px;
+                height: 150px;
+                object-fit: contain;
+            }
+        </style>
+       
+    </div>
+    <div id="loading"></div>
+    <div class="overlay" id="overlay"></div>
+    <div class="container body-content" id="mainContent" style="margin-top:100px;height:100vh">
+        <div>
+            @RenderBody()
+        </div>
+        <div id="chatSidebar" class="chat-sidebar">
+            <div id="groupChatSection">
+                <h4 style="text-align:center;margin:10px;">群組</h4>
+                <div id="groupChatContacts"></div>
+            </div>
+            <div id="personalChatSection">
+                <h4 style="text-align:center;margin:5px;">成員</h4>
+                <div id="personalChatContacts"></div>
+            </div>
+        </div>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <script type="text/javascript">
+            alert('@TempData["ErrorMessage"]');
+            </script>
+        }
+        <!-- Chat Template -->
+        <div id="chatTemplate" class="chat-window-template" style="display:none;">
+            <div class="chat-window">
+                <div class="chat-header">
+                    <img class="chat-photo" src="" alt="User Photo" style="width:40px;height:40px;margin-right:8px;border-radius:10px;">
+                    <span class="chat-title"></span>
+                    <button class="close-chat">x</button>
+                </div>
+                <div class="chat-history"></div>
+                <div class="chat-members">
+                    <ul class="members-list"></ul>
+                </div>
+                <div class="chat-input">
+                    <input type="text" class="message-input" placeholder="輸入內容" />
+                    <button class="send-button">傳送</button>
+                </div>
+            </div>
+        </div>
+        <h1 id="groupIdInput"></h1>
+        <input type="hidden" id="userId" value="@Session["UserID"]" />
+
+
+
+        <section class="footer">
+            <div class="box-container">
+                <!-- Logo and Social Media -->
+                <div class="box">
+                    <h3 style="display: inline-flex; align-items: center;">
+                        JustSplit
+                        <img src="/Images/S__52396068.jpg" alt="JustSplit Logo" style="width:35px;height:35px;margin-left: 10px;" />
+                    </h3>
+
+                    <p class="mb-2">輕鬆管理您的團體分帳，讓每個人都有清晰的記錄，出門旅遊輕鬆記帳，由一群對寫程式有興趣的大學生所打造</p>
+
+                </div>
+
+                <!-- Contact Info -->
+                <div class="box">
+                    <h3>聯絡資訊</h3>
+                    <a href="tel:+1234567890" class="links"><i class="fas fa-phone footer-i"></i> <span>+123-456-7890</span> </a>
+                    <a href="mailto:wuminzhe9@pccu.edu.tw" class="links"><i class="fas fa-envelope footer-i"></i><span> wuminzhe9@pccu.edu.tw </span></a>
+                    <a href="https://www.pccu.edu.tw/" class="links"><i class="fas fa-map-marker-alt footer-i"></i> <span>台灣 </span></a>
+                    <div class="share">
+                        <a href="https://line.me/R/ti/p/@ViewBag.LineUrl" class="fab fa-line"></a>
+                        <a href="https://www.youtube.com/watch?v=Wmm1ReZ1kX8&t=1s" class="fab fa-youtube"></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="box">
+                    <h3>用戶支援</h3>
+                    <a href="/home/QA" class="links"><i class="fas fa-arrow-right footer-i"></i> <span>常見問題</span> </a>
+                    <a href="https://www.youtube.com/watch?v=Wmm1ReZ1kX8&t=1s" class="links"><i class="fas fa-arrow-right footer-i"></i> <span>使用教學</span> </a>
+                    <a href="mailto:wuminzhe9@pccu.edu.tw" class="links"><i class="fas fa-arrow-right footer-i"></i> <span>客戶支援 </span></a>
+                    <a href="mailto:wuminzhe9@pccu.edu.tw" class="links"><i class="fas fa-arrow-right footer-i"></i> <span>回報問題 </span></a>
+                </div>
+
+            </div>
+            <div class="credit">由 <span>Justsplit</span> 版權所有</div>
+            <div>
+                <h2 class="text-center">&copy; JustSplit</h2>
+            </div>
+        </section>
+
+        <script>
+            // 選取所有 Q&A 的項目
+            const items = document.querySelectorAll('.qa-item');
+
+            items.forEach(item => {
+                const question = item.querySelector('.question');
+
+                question.addEventListener('click', () => {
+                    // 切換 active 樣式，控制展開與收合
+                    item.classList.toggle('active');
+                });
+            });
+
+        </script>
+        <style>
+            .footer {
+                background-color: #e3f1f8;
+                margin-top: 4rem;
+                padding: 2rem 1rem;
+                left: 0;
+                right: 0;
+                position: absolute;
+            }
+
+                .footer .box-container {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 2rem;
+                }
+
+                .footer .box {
+                    padding: 1rem;
+                    background-color: #fff;
+                    border-radius: 0.5rem;
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                }
+
+                    .footer .box h3 {
+                        font-size: 1.8rem;
+                        color: #333;
+                        margin-bottom: 1rem;
+                    }
+
+                    .footer .box p {
+                        font-size: 1.2rem;
+                        color: #777;
+                        line-height: 1.6;
+                        margin-bottom: 1rem;
+                    }
+
+                    .footer .box .links {
+                        display: block;
+                        font-size: 1.2rem;
+                        color: #555;
+                        margin-bottom: 0.8rem;
+                        text-decoration: none;
+                        transition: all 0.3s ease; /* 平滑過渡效果 */
+                    }
+
+            .footer-i {
+                color: #4a90e2; /* 設定圖標顏色 */
+                transition: all 0.3s ease; /* 添加平滑過渡效果 */
+                padding-right: 0.5rem; /* 初始右側間距 */
+            }
+
+            .footer .box .links a {
+                display: inline-flex; /* 讓圖標和文字水平排列 */
+                align-items: center; /* 垂直置中 */
+                text-decoration: none; /* 移除連結底線 */
+                color: #4a90e2; /* 預設文字顏色 */
+                transition: all 0.3s ease-in-out; /* 平滑過渡效果 */
+                overflow: hidden; /* 避免內容溢出 */
+            }
+
+            .footer .box .links span {
+                padding-left: 0; /* 預設的左側 padding */
+                transition: padding-left 0.3s ease-in-out; /* 緩和過渡效果 */
+            }
+
+            .footer .box .links:hover span {
+                padding-left: 10px; /* 懸停時增加左側 padding */
+            }
+
+
+            .footer .box .links:hover {
+                color: #333;
+            }
+
+            .footer .box .share {
+                display: flex; /* 使用 flexbox 排版 */
+            }
+
+                .footer .box .share a {
+                    display: inline-block;
+                    font-size: 2.2rem; /* 保持適當字體大小 */
+                    color: #4a90e2; /* 原始顏色 */
+                    width: 50px; /* 固定寬度 */
+                    height: 50px; /* 固定高度 */
+                    margin-right: 1rem; /* 元素間距 */
+                    background-color: #eee; /* 淺灰背景色 */
+                    border-radius: 12px; /* 輕微圓角 */
+                    display: flex;
+                    align-items: center;
+                    justify-content: center; /* 內容置中 */
+                    transition: all 0.3s ease; /* 平滑過渡效果 */
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加輕微陰影 */
+                }
+
+                    .footer .box .share a:hover {
+                        color: #fff; /* 懸停時文字變為白色 */
+                        background-color: #4a90e2; /* 懸停時背景變為主色 */
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* 加強陰影效果 */
+                        transform: scale(1.05); /* 輕微放大效果 */
+                        text-decoration: none;
+                    }
+
+
+
+            .footer .credit {
+                text-align: center;
+                margin-top: 2rem;
+                font-size: 1.2rem;
+                color: #555;
+                padding-top: 1rem;
+            }
+
+                .footer .credit span {
+                    color: #4a90e2;
+                }
+        </style>
+    </div>
+    <form id="groupForm">
+        <input type="hidden" id="groupIdInput" name="groupId" value="">
+        <input type="hidden" id="chatIdInput" name="chatId" value="">
+  
+    </form>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script src="~/Scripts/jquery-3.7.0.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    @RenderSection("scripts", required: false)
+    <script src="~/Scripts/jquery.signalR-2.4.3.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+    <script>
+        const liffId = '2006127909-ObP6XZR9';
+
+        // 初始化 LIFF 應用
+        async function initLiff() {
+            try {
+                await liff.init({ liffId });
+                console.log('LIFF initialized successfully');
+
+                if (liff.isInClient()) {
+                    console.log('Running inside LIFF browser');
+                    document.getElementById('mainContent').style.display = 'none';
+                    document.getElementById('loading').style.display = 'block'; 
+
+                    // 檢查是否已經登入
+                    if (!liff.isLoggedIn()) {
+                
+                        liff.login();
+                    } else {
+              
+                        await handleLiffLogin();
+                    }
+                } else {
+                    console.log('Not in LIFF browser');
+                }
+            } catch (error) {
+                console.error('LIFF initialization failed', error);
+                document.getElementById('loading').style.display = 'none'; 
+                document.getElementById('statusMessage').innerText = 'LIFF initialization failed: ' + error.message;
+            }
+        }
+
+   
+        function loadMainContent() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        }
+
+  
+        async function handleLiffLogin() {
+            try {
+                console.log('User is logged in');
+                const profile = await liff.getProfile();
+                const email = liff.getDecodedIDToken().email;
+
+                // 發送用戶資料到後端處理
+                const response = await fetch('/Account/HandleLiffLogin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        LineUserId: profile.userId,
+                        FullName: profile.displayName,
+                        Email: email,
+                        ProfilePhotoPath: profile.pictureUrl
+                    })
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    console.log('Session set successfully on the server');
+                    loadMainContent(); 
+                } else {
+                    console.error('Login failed:', result.message);
+                    document.getElementById('statusMessage').innerText = 'Login failed: ' + result.message;
+                    document.getElementById('loading').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('獲取用戶資料失敗:', error);
+                document.getElementById('statusMessage').innerText = 'Error getting user profile: ' + error.message;
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+
+        function closeLiffWindow() {
+            liff.closeWindow();
+        }
+
+
+        async function sendMessage(message) {
+            try {
+                if (liff.isInClient()) {
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                    }
+
+                    await liff.sendMessages([{
+                        type: 'text',
+                        text: message
+                    }]);
+                    alert('消息已發送！');
+                    liff.closeWindow();
+                } else {
+                    alert('當前不在 LINE 客戶端中，無法發送消息');
+                }
+            } catch (error) {
+                console.error('發送消息失敗:', error);
+                alert('發送消息失敗！錯誤信息：' + error.message);
+            }
+        }
+
+        // 在頁面加載完成後執行
+        window.onload = function () {
+            initLiff();
+
+            // 獲取URL參數
+            function getUrlParameter(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+
+            const groupId = getUrlParameter('groupId');
+            const chatId = getUrlParameter('chatId');
+
+            // 如果 URL 中有 groupId存到 localStorage 中
+            if (groupId) {
+                localStorage.setItem('groupId', groupId);
+            }
+
+            // 如果 URL 中有 chatId，存到 localStorage 中
+            if (chatId) {
+                localStorage.setItem('chatId', chatId);
+            }
+
+
+            const storedGroupId = localStorage.getItem('groupId');
+            const storedChatId = localStorage.getItem('chatId');
+
+  
+            document.getElementById('groupIdDisplay').textContent = storedGroupId ? storedGroupId : '未找到 GroupID';
+            document.getElementById('chatIdDisplay').textContent = storedChatId ? storedChatId : '未找到 ChatID';
+
+            document.getElementById('groupIdInput').value = storedGroupId;
+            document.getElementById('chatIdInput').value = storedChatId;
+        };
+    </script>
+
+
+
+    <style>
+        /* 品牌名稱樣式 */
+        .brand-name {
+            font-size: 30px;
+            font-weight: bold;
+            color: #212529; /* 藍色品牌名稱 */
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1); /* 輕微陰影效果 */
+        }
+        /* 橢圓形按鈕基礎樣式 */
+        .btn-rounded {
+            padding: 9px 25px;
+            border-radius: 50px; /* 圓潤的橢圓形外觀 */
+            font-size: 16px;
+            text-align: center;
+            display: inline-block;
+            text-decoration: none;
+            transition: all 0.4s ease; /* 過渡效果加強 */
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); /* 默認陰影 */
+            font-weight: bold;
+        }
+
+        /* 登入按鈕樣式 - 漸變背景 */
+        .btn-login1 {
+            /*background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);*/ /* 漸變藍色背景 */
+            background-color: black; /* 漸變藍色背景 */
+            color: white;
+            border: 2px solid transparent;
+        }
+
+            .btn-login1:hover {
+                /*background: linear-gradient(135deg, #0056b3 0%, #004085 100%);*/ /* 懸停時更深的漸變藍色 */
+                background-color: white;
+                /*     color: white;*/
+                color: black;
+                box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* 懸停時陰影加強 */
+                transform: translateY(-2px); /* 輕微提升效果 */
+            }
+
+        /* 註冊按鈕樣式 - 漸變邊框 */
+        .btn-register1 {
+            background-color: #ffffff; /* 白色背景 */
+            /*color: #007bff;*/ /* 藍色字體 */
+            color: black;
+        }
+
+            .btn-register1:hover {
+                /*background-color: #007bff;*/ /* 懸停時藍色背景 */
+                background-color: black;
+                color: white; /* 懸停時字體變為白色 */
+                box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2); /* 懸停時陰影加強 */
+                transform: translateY(-2px); /* 輕微提升效果 */
+            }
+
+        /* 按下時的內陰影效果 */
+        .btn-rounded1:active {
+            box-shadow: inset 0px 4px 6px rgba(0, 0, 0, 0.2); /* 點擊時按下效果 */
+            transform: translateY(2px); /* 按下時按鈕稍微向下移動 */
+        }
+    </style>
+    <style>
+        a {
+            color: black;
+        }
+
+
+
+        #loading {
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .badge {
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            position: absolute;
+            top: 5px;
+            left: 10px;
+        }
+
+        .badge2 {
+            color: red;
+        }
+
+        .chat-sidebar {
+            position: fixed;
+            right: -300px;
+            top: 0;
+            width: 200px;
+            margin-top: 60px;
+            font-size: 20px;
+            height: 100%;
+            background-color: #f1f1f1;
+            border-left: 1px solid #ddd;
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+            overflow: scroll;
+            padding-bottom: 35px;
+        }
+
+            .chat-sidebar.active {
+                right: 0;
+            }
+
+        .chat-window {
+            position: fixed;
+            box-shadow: 1px 1px 6px;
+            bottom: 0;
+            right: 200px;
+            width: 350px;
+            height: 400px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: scroll;
+            padding: 10px;
+        }
+
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #ddd;
+            padding: 10px;
+            border: none;
+        }
+
+            .chat-input input {
+                flex: 1;
+                padding: 5px;
+                margin-right: 20px;
+            }
+
+        .close-chat {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .send-button {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .contact {
+            position: relative;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-message {
+            position: relative;
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+
+        .message-content {
+            padding-right: 60px;
+        }
+
+        .message-timestamp {
+            position: absolute;
+            right: 4px;
+            top: 3px;
+            color: #999;
+            font-size: 0.8em;
+        }
+
+        .read-status {
+            color: #999;
+            font-size: 0.6em;
+        }
+
+        .chat-message strong {
+            color: #333;
+        }
+
+        .chat-message em {
+            color: #999;
+            font-size: 0.8em;
+        }
+    </style>
+    <style>
+        :root {
+            --poppins: 'Poppins', sans-serif;
+            --lato: 'Lato', sans-serif;
+            --light: #fff;
+            --blue: #007bff; 
+            --purple: #5f41e4;
+            --purple-hover: #4320df;
+            --purple-hover-active: #2e0cb0;
+            --light-blue: #D8E6F3;
+            --grey: #eee;
+            --dark-grey: #AAAAAA;
+            --dark: #342E37;
+            --red: #DB504A;
+            --yellow: #FFCE26;
+            --light-yellow: #FFF2C6;
+            --orange: #FD7238;
+            --light-orange: #FFE0D3;
+            --box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar {
+            background-color: #bfebcc; 
+            color: var(--dark);
+            padding: 30px 20px 20px 20px;
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: -300px;
+            transition: left 0.3s ease;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            z-index: 1500;
+            overflow-y: scroll;
+        }
+        /* 取消預設的邊框圓角 */
+        .dropdown-content {
+            max-height: 230px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+            border-radius: 0; /* 取消邊框圓角 */
+        }
+
+            /* 滾輪樣式設計 */
+            .dropdown-content::-webkit-scrollbar {
+                width: 6px; /* 修改滾輪寬度 */
+            }
+
+            /* 滾輪軌道 */
+            .dropdown-content::-webkit-scrollbar-track {
+                background: #ecefbc; /* 滾輪軌道顏色 */
+                border-radius: 5px; /* 滾輪圓角，可根據需要調整 */
+            }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #ecefbc; /* 滾輪軌道顏色 */
+            border-radius: 5px; /* 滾輪圓角，可根據需要調整 */
+        }
+        /* 滾輪本體 */
+        .dropdown-content::-webkit-scrollbar-thumb {
+            background: #000000; /* 滾輪本體顏色 */
+            border-radius: 5px; /* 滾輪圓角，可根據需要調整 */
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #000000; /* 滾輪本體顏色 */
+            border-radius: 5px; /* 滾輪圓角，可根據需要調整 */
+        }
+        /* 滾輪本體懸停時顏色 */
+        .dropdown-content::-webkit-scrollbar-thumb:hover {
+            background: #000000;
+        }
+
+        /* 使用 Firefox 的滚动条样式 */
+        /* 修改sidebar滾輪樣式 */
+
+
+        /* Webkit瀏覽器的滾輪樣式 (Chrome, Safari, Edge) */
+        .sidebar::-webkit-scrollbar {
+            width: 6px; /* 修改滾輪寬度 */
+        }
+
+        /* Webkit滾輪軌道 */
+        .sidebar::-webkit-scrollbar-track {
+            background-color: #ecefbc; /* 滾輪軌道顏色 */
+        }
+
+        /* Webkit滾輪本體 */
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: #ecefbc; /* 滾輪軌道顏色 */
+            border-radius: 5px; /* 滾輪圓角 */
+        }
+
+        /* 處理當 sidebar 活動時的樣式 */
+        .sidebar.active {
+            left: 0;
+        }
+
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+
+            .sidebar-header i {
+                font-size: 24px;
+                margin-right: 10px;
+                animation: spin 4s infinite linear;
+            }
+
+            .sidebar-header h2 {
+                font-size: 28px;
+                margin: 0;
+            }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .group-item {
+            margin: 15px 0;
+         
+        }
+
+            .group-item a {
+                text-decoration: none;
+                color: var(--dark);
+                display: flex;
+                align-items: center;
+                padding: 8px;
+                border-radius: 8px;
+                transition: background 0.3s ease, transform 0.3s ease;
+                cursor: pointer;
+                font-size: 1.2rem;
+            }
+
+                .group-item a:hover {
+                    transform: scale(1.05);
+                }
+
+                .group-item a .icon {
+                    margin-right: 10px;
+                }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+        }
+
+            .overlay.active {
+                display: block;
+            }
+    </style>
+    <style>
+        body {
+            background-color: azure;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            font-size: 18px;
+        }
+
+        .body-content {
+            margin-top: 15px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+  
+        .hamburger {
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-right: 1.2rem;
+        }
+
+
+            .hamburger .bar {
+                width: 28px;
+                height: 5px;
+                background-color: white;
+                margin: 5px 0;
+                transition: all 0.3s ease;
+            }
+
+       
+            .hamburger:hover .bar {
+                background-color: var(--blue); 
+                transform: scale(1.1);
+            }
+
+        #chatIcon.nav-link.red {
+            color: red !important;
+        }
+
+        #notificationBell.nav-link.red {
+            color: red !important;
+        }
+
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        .navbar {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            height: 50px; 
+            padding: 0;
+        }
+        .navbar-nav .nav-link {
+            font-size: 20px;
+            border-radius: 10%;
+            color: black !important;
+            transition: color 0.3s, background-color 0.3s, font-size 0.3s;
+            padding: 0.5rem 1rem;
+        }
+
+            .navbar-nav .nav-link:hover {
+                color: black !important;
+                background-color: #f0f0f0;
+                font-weight: bold;
+                font-size: 22px;
+            }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='blue' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+
+        @@media (max-width:576px) {
+
+            .body-content {
+                padding: 0 !important;
+            }
+
+            .navbar-collapse {
+                display: flex;
+                flex-direction: column;
+                background-color: ghostwhite;
+                padding-top: 10px;
+                border-radius: 5px;
+                position: fixed;
+                right: 5px;
+                top: 65px;
+                width: auto;
+                box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+            }
+
+            .navbar-brand {
+                display: none;
+            }
+
+            .navbar-nav {
+                flex-direction: column;
+                margin: 0;
+                width: 100%;
+            }
+
+                .navbar-nav.ml-auto {
+                    order: 1;
+                    text-align: center !important;
+                }
+
+                .navbar-nav.flex-sm-grow-0 {
+                    order: 2;
+                    text-align: center;
+                }
+
+                .navbar-nav .nav-item {
+                    text-align: center;
+                    margin: 1px;
+                    font-size: 33px;
+                    line-height: 1.0;
+                    width: 100%;
+                }
+
+            .navbar-toggler {
+                margin-left: auto;
+            }
+
+
+            .navbar-toggler-icon {
+                font-size: 30px;
+                display: none;
+            }
+
+            .chat-sidebar {
+                width: 100%;
+                right: -100%;
+                height: 50%;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+                .chat-sidebar.active {
+                    right: 0;
+                }
+
+            .chat-window {
+                width: 100%;
+                right: 0;
+                height: 50%;
+                bottom: 0;
+            }
+        }
+
+        .group-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+    </style>
+
+
+    <script>
+        $(document).ready(function () {
+            // Function to update the chat notification count
+            function updateChatCount() {
+                $.get('/Chat/GetTotalUnreadCount', function (response) {
+                    if (response.success) {
+                        $('#chatCountBadge').text(response.totalUnreadCount);
+                        if (response.totalUnreadCount > 0) {
+                            $('#chatIcon').addClass('red');
+                            $('#chatCountBadge').show();
+                        } else {
+                            $('#chatIcon').removeClass('red');
+                            $('#chatCountBadge').hide();
+                        }
+                    } else {
+                        console.log("Error getting total unread count: " + response.message);
+                    }
+                }).fail(function (error) {
+                    console.log("Error getting total unread count: " + error.responseText);
+                });
+            }
+
+            // Initial update on page load
+            updateChatCount();
+
+            // Set an interval to periodically update the chat count
+            setInterval(updateChatCount, 4000); // Update every 4 seconds
+
+            // Toggle chat sidebar visibility
+            $('#chatIcon').click(function () {
+                $('#chatSidebar').toggleClass('active');
+            });
+
+            // Initialize SignalR connection
+            var chat = $.connection.chatHub;
+
+            // Define client method to handle incoming messages
+            chat.client.addMessage = function (userName, message, timestamp, groupId) {
+                console.log('Message content:', message);  // 檢查 message 的內容
+                var chatHistory = $('#chatWindow-' + groupId + ' .chat-history');
+                var parsedDate = new Date(timestamp);
+                var formattedDate = isNaN(parsedDate.getTime()) ? '(Invalid Date)' : parsedDate.toLocaleString();
+                var messageContent = message;
+                var currentUserId = $('#userId').val();  // 当前登录用户的 ID
+
+                // 如果是 Line CDN 的圖片，直接使用該 URL，不加 localhost 前綴
+
+                if (message.startsWith('http://') || message.startsWith('https://')) {
+                    messageContent = '<img src="' + message + '" alt="Uploaded Image" style="max-width: 100%;">';
+                }
+
+                // Append new message to chat history
+                chatHistory.append(
+                    '<div class="chat-message">' +
+                    '<div class="message-content">' +
+                    '<div class="read-status">0 已讀</div>' +
+                    '<strong>' + userName + ':</strong> ' + messageContent +
+                    '<div class="message-timestamp">' + formattedDate + '</div>' +
+                    '</div>' +
+                    '</div>'
+                );
+                chatHistory.scrollTop(chatHistory.prop("scrollHeight"));
+                markAllMessagesAsRead(groupId);
+            };
+
+            // Start SignalR connection
+            $.connection.hub.logging = true;
+            $.connection.hub.start().done(function () {
+                console.log("SignalR connected");
+
+                // Fetch user chat data
+                $.get('/Chat/GetUserChatData', function (response) {
+                    if (response.success) {
+                        var contacts = response.groupContacts;
+                        var users = response.users;
+                        var personalContacts = response.personalContacts;
+                        var addedGroupIds = new Set();
+
+                        // Collect group contacts
+                        $('#groupChatContacts .contact').each(function () {
+                            addedGroupIds.add($(this).data('groupid'));
+                        });
+
+                        // Process group contacts
+                        contacts.forEach(function (contact) {
+                            if (!addedGroupIds.has(contact.GroupId)) {
+                                var relativePhotoUrl = contact.GroupsPhoto ? contact.GroupsPhoto.replace('~', '') : '/UserProfilePhotos/defaultPerson.jpg';
+                                var absolutePhotoUrl;
+                                if (contact.GroupsPhoto && contact.GroupsPhoto.includes('sprofile.line-scdn.net')) {
+                                    // 如果是來自 Line CDN，直接使用該 URL
+                                    absolutePhotoUrl = contact.GroupsPhoto;
+                                } else {
+                                    // 否則，處理本地圖片，加上伺服器的前綴
+                                    var relativePhotoUrl = contact.GroupsPhoto ? contact.GroupsPhoto.replace('~', '') : '/UserProfilePhotos/defaultPerson.jpg';
+                                    absolutePhotoUrl = window.location.origin + relativePhotoUrl;
+                                }
+                                var contactHtml = '<div class="contact" data-groupid="' + contact.GroupId + '">';
+                                contactHtml += '<img src="' + absolutePhotoUrl + '" style="width:40px;height:40px;margin-right:8px;border-radius:10px;" alt="Group Photo">';
+                                contactHtml += contact.GroupName;
+                                if (contact.UnreadCount > 0) {
+                                    contactHtml += '<span class="badge badge-danger unread-count">' + contact.UnreadCount + '</span>';
+                                }
+                                contactHtml += '</div>';
+                                $('#groupChatContacts').append(contactHtml);
+                                addedGroupIds.add(contact.GroupId);
+                            }
+                        });
+
+                        // Process personal contacts
+                        personalContacts.forEach(function (contact) {
+                            if (!addedGroupIds.has(contact.UserId)) {
+                                var relativePhotoUrl = contact.UserPhoto ? contact.UserPhoto.replace('~', '') : '/UserProfilePhotos/defaultPerson.jpg';
+                                var absolutePhotoUrl;
+                                if (contact.UserPhoto && contact.UserPhoto.includes('profile')) {
+                                    // 如果是來自 Line CDN，直接使用該 URL
+                                    absolutePhotoUrl = contact.UserPhoto;
+                                } else {
+                                    // 否則，處理本地圖片，加上伺服器的前綴
+                                    var relativePhotoUrl = contact.UserPhoto ? contact.UserPhoto.replace('~', '') : '/UserProfilePhotos/defaultPerson.jpg';
+                                    absolutePhotoUrl = window.location.origin + relativePhotoUrl;
+                                }
+
+                                var contactHtml = '<div class="contact" data-userid="' + contact.UserId + '">';
+                                contactHtml += '<img src="' + absolutePhotoUrl + '" style="width:40px;height:40px;margin-right:8px;border-radius:10px;" alt="User Photo">';
+                                contactHtml += contact.UserName;
+                                if (contact.UnreadCount > 0) {
+                                    contactHtml += '<span class="badge badge-danger unread-count">' + contact.UnreadCount + '</span>';
+                                }
+                                contactHtml += '</div>';
+                                $('#personalChatContacts').append(contactHtml);
+                                addedGroupIds.add(contact.UserId);
+                            }
+                        });
+
+                        // Handle click on contact to open chat window
+                        $('#groupChatContacts, #personalChatContacts').on('click', '.contact', function () {
+                            var groupId = $(this).data('groupid');
+                            var userId = $(this).data('userid');
+                            var chatId = groupId ? groupId : userId;
+                            var chatType = groupId ? 'group' : 'user';
+                            var chatName = $(this).text();
+
+                            // Remove unread count badge
+                            $(this).find('.unread-count').remove();
+                            if ($('#chatWindow-' + chatId).length == 0) {
+                                var chatWindow = $('#chatTemplate').clone().removeAttr('id').removeAttr('style');
+                                chatWindow.find('.chat-title').text(chatName);
+                                chatWindow.attr('id', 'chatWindow-' + chatId);
+                                var photoUrl = '';
+                                if (chatType === 'group') {
+                                    // 如果是群組聊天，使用群組的圖片
+                                    photoUrl = $(this).find('img').attr('src');
+                                } else {
+                                    // 如果是個人聊天，使用個人的圖片
+                                    photoUrl = $(this).find('img').attr('src');
+                                }
+
+                                // 設置圖片 URL 到聊天室
+                                chatWindow.find('.chat-photo').attr('src', photoUrl);
+                                $('body').append(chatWindow);
+
+                                // Load messages for selected chat
+                                var loadUrl = chatType === 'group' ? '/Chat/LoadMessages' : '/Chat/LoadPersonalMessages';
+                                var data = chatType === 'group' ? { groupId: chatId } : { userId: chatId };
+
+                                $.get(loadUrl, data, function (messages) {
+                                    var chatHistory = chatWindow.find('.chat-history');
+                                    messages.forEach(function (message) {
+                                        var userName = users[message.UserId.toString()] || message.UserId;
+                                        var parsedDate = new Date(message.CreatedAt);
+                                        var formattedDate = isNaN(parsedDate.getTime()) ? '(Invalid Date)' : parsedDate.toLocaleString();
+                                        chatHistory.append(
+                                            '<div class="chat-message">' +
+                                            '<div class="message-content">' +
+                                            '<div class="read-status">' + message.ReadCount + ' 已讀</div>' + // 显示已读人数
+                                            '<strong>' + userName + ':</strong> ' + message.Content +
+                                            '<div class="message-timestamp" >' + formattedDate + '</div>' +
+                                            '</div>' +
+                                            '</div>'
+                                        );
+                                    });
+
+                                    chatHistory.scrollTop(chatHistory.prop("scrollHeight"));
+                                });
+
+                                // Mark all messages as read
+                                var markAsReadUrl = chatType === 'group' ? '/Chat/MarkAllMessagesAsRead' : '/Chat/MarkAllPersonalMessagesAsRead';
+                                var markAsReadData = chatType === 'group' ? { groupId: chatId, userId: $('#userId').val() } : { userId: chatId };
+
+                                $.post(markAsReadUrl, markAsReadData, function (response) {
+                                    if (response.success) {
+                                        console.log("All messages marked as read successfully");
+                                    } else {
+                                        console.log("Error marking all messages as read: " + response.message);
+                                    }
+                                });
+
+                                // Handle sending messages
+                                chatWindow.find('.send-button').click(function () {
+                                    var messageInput = chatWindow.find('.message-input');
+                                    var message = messageInput.val();
+                                    var currentUserId = $('#userId').val();
+
+                                    if (message.trim() === '') return;
+
+                                    console.log("Sending message: " + message);
+
+                                    var dataToSend = {
+                                        content: message,
+                                        userId: currentUserId
+                                    };
+
+                                    if (chatType === 'group') {
+                                        dataToSend.groupId = chatId;
+                                    } else {
+                                        dataToSend.userId = chatId;
+                                    }
+
+                                    $.ajax({
+                                        type: "POST",
+                                        url: '/Chat/SaveMessage',
+                                        data: dataToSend,
+                                        success: function (response) {
+                                            if (response.success) {
+                                                var timestamp = new Date(response.data.CreatedAt).toLocaleString();
+                                                var userName = response.data.UserName || currentUserId;
+                                                chat.server.broadcastMessage(chatId, currentUserId, message, response.data.CreatedAt, userName).done(function () {
+                                                    console.log("Message broadcasted successfully");
+                                                }).fail(function (error) {
+                                                    console.log("Error broadcasting message: " + error);
+                                                });
+                                            } else {
+                                                console.log("Error saving message: " + response.message);
+                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.log("Error saving message: " + xhr.responseText);
+                                        }
+                                    });
+
+                                    messageInput.val('').focus();
+                                });
+
+                                // Handle Enter key for sending messages
+                                chatWindow.find('.message-input').keydown(function (e) {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        chatWindow.find('.send-button').click();
+                                    }
+                                });
+
+                                // Handle Escape key for closing chat window
+                                $(document).keydown(function (e) {
+                                    if (e.key === 'Escape' || e.key === 'Esc') {
+                                        e.preventDefault();
+                                        chatWindow.find('.close-chat').click();
+                                    }
+                                });
+
+                                // Handle closing chat window
+                                chatWindow.find('.close-chat').click(function () {
+                                    chatWindow.remove();
+                                });
+
+                                chat.server.joinGroup(chatId); // 标记所有消息为已读，并更新未读消息数
+                                markAllMessagesAsRead(chatId, function () {
+                                    $(this).find('.badge').remove(); // 移除未读消息提示
+                                });
+                            }
+                        });
+                    } else {
+                        console.log("Error loading chat data: " + response.message);
+                    }
+                });
+            }).fail(function (error) {
+                console.log("SignalR connection failed: " + error);
+            });
+
+            // Function to mark all messages as read
+            function markAllMessagesAsRead(groupId) {
+                var userId = $('#userId').val();
+                $.ajax({
+                    type: "POST",
+                    url: '/Chat/MarkAllMessagesAsRead',
+                    data: {
+                        groupId: groupId,
+                        userId: userId
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            console.log("All messages marked as read successfully");
+                        } else {
+                            console.log("Error marking all messages as read: " + response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("Error marking all messages as read: " + xhr.responseText);
+                    }
+                });
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('toggle-btn');
+            const overlay = document.getElementById('overlay');
+            const collapsibles = document.querySelectorAll('.collapsible');
+            toggleBtn.addEventListener('click', function () {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+                toggleBtn.classList.toggle('active'); 
+            });
+
+            overlay.addEventListener('click', function () {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                toggleBtn.classList.remove('active');
+            });
+            collapsibles.forEach(function (collapsible) {
+                collapsible.addEventListener('click', function () {
+                    collapsible.classList.toggle('active');
+                    const dropdownContent = collapsible.nextElementSibling;
+                    if (dropdownContent.style.display === "block") {
+                        dropdownContent.style.display = "none";
+                    } else {
+                        dropdownContent.style.display = "block";
+                    }
+                });
+            });
+
+
+
+        });
+    </script>
+    @if (Session["UserID"] != null)
+    {
+        <script>
+                $(document).ready(function(){
+                    $("#notificationsDropdown").on('show.bs.dropdown', function(){
+                        $.get("@Url.Action("LoadNotifications", "Group")", function(data){
+                            $("#notificationsContainer").html(data);
+                        });
+                    });
+
+                    // 定義定時器，每隔一段時間檢查未讀通知數量
+                    setInterval(function () {
+                        $.ajax({
+                            url: '/Group/UnreadNotificationsCount', // 替換為你的控制器方法路徑
+                            type: 'GET',
+                            success: function (data) {
+                                // 更新鈴鐺圖標上的未讀通知數量
+                                $('#notificationCountBadge').text(data);
+                                if (data > 0) {
+                                    $('#notificationBell').addClass('red');
+                                } else {
+                                    $('#notificationBell').removeClass('red');
+                                }
+                            },
+                            error: function (error) {
+                                console.log(error);
+                            }
+                        });
+                    }, 3000); // 每隔3秒執行一次
+
+                    // 标记为已读
+                    $(document).on('click', '.mark-as-read-btn', function () {
+                        var notificationId = $(this).closest('.notification-item').data('notification-id');
+
+                        // 發送 AJAX 請求標記通知為已讀
+                        $.ajax({
+                            url: '/Group/MarkAsRead',
+                            type: 'POST',
+                            data: { notificationId: notificationId },
+                            context: this, // 將當前按鈕元素作為上下文
+                            success: function (response) {
+                                // 更新 UI，將點擊的通知標記為已讀
+                                $(this).closest('.notification-item').addClass('read-notification');
+                                location.reload();
+                            },
+                            error: function (error) {
+                                console.error('An error occurred:', error);
+                            }
+                        });
+                    });
+                });
+        </script>
+    }
+    <script>
+        $(document).ready(function () {
+            $('.collapsible2').on('click', function (e) {
+                e.preventDefault();
+                var dropdown = $(this).next('.dropdown-content');
+                dropdown.slideToggle(200);
+                $(this).toggleClass('active'); 
+            });
+            const chatId = localStorage.getItem('chatId') || null;
+        
+            $.ajax({
+                url: '/Group/GetUserGroups', 
+                type: 'GET',
+                data: { chatId: chatId || null },
+                success: function (response) {
+                    if (response.success) {
+                        var groupList = $('#groupList');
+                        var groupCount = $('#groupCount');
+                        groupList.empty(); 
+
+                        response.groups.forEach(function (group) {
+                            var groupItem;
+                            if (group.GroupsPhoto) {
+                                var photoPath = group.GroupsPhoto.replace('~', '');
+                                groupItem = `
+                                                                                                                                                                                                     <a href="/Group/Details/?id=${group.GroupId}" class="group-link">
+                                                                                                                                                                                                         <img src="${photoPath}" alt="${group.GroupName} Photo" class="group-photo">
+                                                                                                                                                                                                         <span class="group-name">${group.GroupName}</span>
+                                                                                                                                                                                                     </a>
+                                                                                                                                                                                                 `;
+                            } else {
+
+                                var defaultPhotoPath = '/userprofilephotos/defaultPerson.jpg';
+                                groupItem = `
+                                                                                                                                                    <a href="/Group/Details/?id=${group.GroupId}" class="group-link">
+                                                                                                                                                        <img src="${defaultPhotoPath}" alt="Default Group Photo" class="group-photo">
+                                                                                                                                                        <span class="group-name">${group.GroupName}</span>
+                                                                                                                                                    </a>
+                                                                                                                                                `;
+                            }
+                            groupList.append(groupItem);
+                        });
+                        groupCount.text(response.groups.length);
+                    } else {
+                        /*alert(response.message);*/
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('An error occurred while fetching the group data:', error);
+                }
+            });
+        });
+
+    </script>
+
+
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,247 @@
+﻿@model IEnumerable<wu2.Models.Expenses>
+
+@{
+    ViewBag.Title = "群組支出列表";
+    int memberCount = Model.Count();
+}
+
+@*@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+
+
+}*@
+ @{string GetProfilePhoto(string profilePhoto)
+    {
+        return !string.IsNullOrEmpty(profilePhoto) ? Url.Content(profilePhoto) : Url.Content("~/UserProfilePhotos/defaultPerson.jpg");
+    } }
+<div class="expense-container">
+    <h2 class="title">群組支出列表</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="action-buttons">
+        @Html.ActionLink("新增支出", "Create", new { groupId = ViewBag.GroupId }, new { @class = "btn btn-primary btn-md" })
+        @Html.ActionLink("返回", "Details", "Group", new { id = ViewBag.GroupId }, new { @class = "btn btn-outline-secondary btn-md" })
+    </div>
+
+    <div class="total-expenses">
+        <label>
+            <input type="checkbox" id="toggleRound" checked /> 顯示為整數
+        </label>
+        <strong>筆數:</strong> @memberCount 筆;
+        <strong>總支出：</strong> @(@ViewBag.TotalExpenses != null ? @ViewBag.TotalExpenses.ToString("N0") + " $" : "0元")
+    </div>
+
+    <div class="expense-list">
+        @foreach (var item in Model)
+        {
+            <div class="expense-item" onclick="window.location.href='@Url.Action("Details", new { id = @item.ExpenseId })'">
+                <div class="expense-left">
+                    <img src="@GetProfilePhoto(item.Users.ProfilePhoto)" class="creator-photo" alt="@item.Users.FullName">
+                    <div class="expense-info">
+                        <h5 class="mb-2">@item.ExpenseType: @item.ExpenseItem</h5>
+                 
+                        <p class="expense-date">@String.Format("{0:MMMM dd, yyyy h:mm tt}", item.CreatedAt)</p>
+                    </div>
+                </div>  
+                <div class="expense-right">
+                    <span class="expense-amount" data-originalamount="@item.TotalAmount.ToString("F2")">
+                        $@item.TotalAmount.ToString("F2")
+                    </span>
+                    <div class="more-options">
+                        <button class="more-btn" onclick="toggleMenu(event)">
+                            <i class="fas fa-wrench"></i> <!-- 使用 Font Awesome 板手圖標 -->
+                        </button>
+                        <div class="more-menu">
+                            @if (!item.Debts.Any(d => d.IsPaid))
+                            {
+                                <a class="btn" href="@Url.Action("Edit", new { id = item.ExpenseId })">編輯</a>
+                                using (Html.BeginForm("DeleteExpense", "Expense", FormMethod.Post, new { onsubmit = "return confirm('確定要刪除這筆支出嗎？');" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="expenseId" value="@item.ExpenseId" />
+                                    <button type="submit" class="btn">刪除</button>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">(已結清)</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<script>
+    function toggleMenu(event) {
+        event.stopPropagation(); // 防止事件冒泡到父層
+        const menu = event.target.closest('.more-options').querySelector('.more-menu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+</script>
+<style>
+    .expense-container {
+        margin: 2rem auto;
+        max-width: 900px;
+        background-color: #fafafa;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .expense-left{
+        display:flex;
+    }
+    .title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        text-align: center;
+        color: #333;
+    }
+    .action-buttons {
+        display: flex;
+        justify-content: space-between; /* 讓按鈕水平置中 */
+        gap: 15px; /* 增加按鈕間距 */
+        margin-bottom: 20px;
+    }
+    .action-buttons a {
+        margin-right: 10px;
+        text-decoration: none;
+    }
+
+    .total-expenses {
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        color: #555;
+    }
+
+    .expense-list {
+        margin-top: 1rem;
+    }
+
+    .expense-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background-color: #fff;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        transition: box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+        .expense-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+    .creator-photo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-right: 15px;
+        object-fit: cover;
+    }
+
+    .expense-info h5 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+
+    .expense-info p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #777;
+    }
+
+    .expense-right {
+        display: flex;
+        align-items: center;
+    }
+
+    .expense-amount {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ff5722;
+        margin-right: 15px;
+    }
+
+    .more-options {
+        position: relative;
+        display: flex; /* 使用 flexbox */
+        justify-content: center; /* 水平置中 */
+        align-items: center; /* 垂直置中 */
+        height: 100%; /* 確保父容器的高度完全填充 */
+    }
+
+    .more-btn {
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        padding: 0; /* 移除內邊距，避免影響置中 */
+        line-height: 1; /* 讓文字高度和圖標保持一致 */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    .more-menu {
+        width: 80px;
+        padding: 4px 8px;
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        padding: 10px;
+        z-index: 999;
+    }
+
+    .more-options:hover .more-menu {
+        display: block;
+    }
+
+</style>
+
+<script>
+    function updateTotalAmountDisplay() {
+        // 獲取 checkbox 狀態
+        var roundToInteger = document.getElementById('toggleRound').checked;
+
+        // 遍歷所有帶有 class="totalAmountCell" 的元素
+        var cells = document.querySelectorAll('.totalAmountCell');
+
+        cells.forEach(function (cell) {
+            // 從 data-originalamount 屬性中獲取原始 TotalAmount
+            var originalAmount = parseFloat(cell.getAttribute('data-originalamount'));
+
+            // 根據 checkbox 的狀態決定顯示格式
+            var formattedAmount = roundToInteger ? Math.floor(originalAmount) : originalAmount.toFixed(2);
+
+            // 更新顯示
+            cell.innerText = '$ ' + formattedAmount;
+        });
+    }
+
+    // 頁面加載時執行一次
+    updateTotalAmountDisplay();
+
+    // 當 checkbox 改變時更新顯示
+    document.getElementById('toggleRound').addEventListener('change', updateTotalAmountDisplay);
+</script>

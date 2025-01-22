@@ -1,0 +1,61 @@
+﻿@model wu2.Models.Notices
+@if (Session["UserID"] != null)
+{
+
+    <div class="main-content">
+        @if (Model != null && !string.IsNullOrEmpty(Model.Title) && !string.IsNullOrEmpty(Model.Content))
+        {
+            <div id="announcementContainer" class="announcement-container">
+                <div class="latest-announcement">
+                    <div class="latest-announcement-content">
+                        <strong id="announcementTitle">@Model.Title</strong>
+                        <p id="announcementContent">@Model.Content</p>
+                        <small>@Model.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss") By 官方</small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>}
+
+    <style>
+        .announcement-container {
+            position: fixed; 
+            top: 59px;
+            left: 0;
+            width: 150px; 
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            background-color: cornsilk;
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            padding: 10px;
+            box-sizing: border-box; 
+        }
+
+        .latest-announcement strong {
+            font-size: 22px;
+            color: #333; 
+        }
+
+        .latest-announcement p {
+            margin-top: 5px;
+            font-size: 20px;
+            color: black; 
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {         
+            var announcementContainer = document.getElementById('announcementContainer');
+            if (!announcementContainer) return;
+            var title = document.getElementById('announcementTitle');
+            var content = document.getElementById('announcementContent');
+            if (!title || !content || content.innerText.trim() === '') {
+                announcementContainer.style.display = 'none';
+            } else {
+                announcementContainer.style.backgroundColor = '';
+            }
+        });
+    </script>

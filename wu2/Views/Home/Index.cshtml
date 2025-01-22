@@ -1,0 +1,1239 @@
+﻿@{
+    ViewBag.Title = "分帳系統";
+
+
+}
+@model wu2.Models.DashboardViewModel
+<style>
+    @@media (max-width:576px) {
+        main .box-info {
+            padding-top: 100px !important;
+        }
+    }
+
+    .select2-results__option img, .select2-selection__rendered img {
+        width: 22px; 
+        height: auto; 
+        margin-right: 5px;
+    }
+
+    .select2-selection__rendered {
+        padding-left: 10px;
+    }
+
+    .select2-selection__arrow {
+        height: 38px !important;
+    }
+
+    .select2-container--default .select2-selection--single {
+        height: 40px;
+        padding: 5px 10px;
+    }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 30px; 
+        }
+</style>
+@if (Session["UserID"] != null)
+{<main>
+        <section class="text-center" style="background-color:transparent">
+            <div class="container">
+                @if (Model.Notices != null && !string.IsNullOrEmpty(Model.Notices.Title) && !string.IsNullOrEmpty(Model.Notices.Content))
+                {
+                    <div class="card border-0">
+                        <div class="card-header p-0" id="headingNotice">
+                            <div class="d-flex justify-content-center align-items-center">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseNotice" aria-expanded="true" aria-controls="collapseNotice">
+                                        <h4 class="card-title">@Model.Notices.Title</h4>
+                                    </button>
+                                </h5>
+                            </div>
+                        </div>
+
+                        <div id="collapseNotice" class="collapse" aria-labelledby="headingNotice">
+                            <div class="card-body">
+
+                                <p class="card-text">@Model.Notices.Content</p>
+                                <div style="border-top: 1px solid rgba(0,0,0,.125); margin-top: 10px; padding-top: 10px;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">發布者: 官方</small>
+                                        <small class="text-muted">發布時間: @Model.Notices.CreatedAt.Value.ToString("yyyy-MM-dd HH:mm:ss")</small>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </section>
+        <ul class="box-info">
+            <li>
+                <i class='bx bx-group'></i> <!-- 群組數量圖標 -->
+                <div class="text">
+                    <h3>@ViewBag.JoinedGroupsCount</h3> <!-- 顯示加入的群組數量 -->
+                    <p>群組數量</p>
+                </div>
+            </li>
+            @*@Session["currentUrl"]*@
+            <li>
+                <i class='bx bx-dollar-circle'></i> <!-- 尚未結清的金額圖標 -->
+                <div class="text">
+                    <h3>@("$" + Math.Truncate(ViewBag.UnsettledAmount))</h3> <!-- 顯示尚未結清的金額，無小數點 -->
+                    <p>你的債務</p>
+                </div>
+            </li>
+            <li>
+                <i class='bx bx-wallet'></i> <!-- 總花費圖標 -->
+                <div class="text">
+                    <h3>@("$" + Math.Truncate(ViewBag.TotalExpenses))</h3> <!-- 顯示總花費，無小數點 -->
+                    <p>總花費</p>
+                </div>
+            </li>
+        </ul>
+
+        @*<div>
+                <p><strong>Group ID: </strong><span id="groupIdDisplay"></span></p>
+                <p><strong>Chat ID: </strong><span id="chatIdDisplay"></span></p>
+            </div>*@
+        <div class="table-data">
+            <div class="content-wrapper">
+                <div class="expense-list">
+                    @if (Model.Expenses == null || !Model.Expenses.Any())
+                    {
+                        <p class="text-muted">尚未交易</p>
+                    }
+                    else
+                    {
+                        foreach (var expense in Model.Expenses)
+                        {
+                            <div class="expense-item">
+                        
+                                <a href="/Expense/Details?Id=@expense.ExpenseId" class="info-icon">
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
+                                <div class="left">
+                                    <p><span style="font-weight:bold">@expense.ExpenseType :</span> @expense.item</p>
+                                    <p class="text-muted">建立者: @expense.CreatedByName</p>
+                                    <p><span style="color:orange;font-weight:bold">$@expense.TotalAmount.ToString("N2")</span></p>
+
+                                </div>
+
+                                <div class="right">
+                                    分帳者
+                                    <div class="members">
+                                        @foreach (var member in expense.ExpenseMembers)
+                                        {
+                                            <div class="member">
+                                                @if (!string.IsNullOrEmpty(member.Photo))
+                                                {
+                                                    <img src="@Url.Content(member.Photo)" class="user-img rounded-circle"
+                                                         title="@member.FullName" />
+                                                }
+                                                else
+                                                {
+                                                    <img src="@Url.Content("~/Images/default-avatar.png")" class="user-img rounded-circle"
+                                                         title="Default Avatar" />
+                                                }
+
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+        
+                <div class="todo">
+                    <div class="head">
+              
+                        <div class="input-group">
+                       
+                            <input type="text" id="new-task" placeholder="新增代辦事項">
+                            <button id="add-task-btn"><i class='bx bx-plus'></i></button>
+                        </div>
+                    </div>
+           
+                    <ul class="todo-list" id="todo-list">
+               
+                    </ul>
+                </div>
+
+            </div>
+            <style>
+
+            </style>
+            <div class="chart-container">
+                <div class="head">
+                    <h3>各消費種類花費</h3>
+                </div>
+                <canvas id="expenseTypeChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <div class="head">
+                    <h3>各群組消費</h3>
+                </div>
+                <canvas id="groupExpenseChart"></canvas>
+            </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const addTaskBtn = document.getElementById("add-task-btn");
+                    const newTaskInput = document.getElementById("new-task");
+                    const todoList = document.getElementById("todo-list");
+
+                    loadTasks();
+
+         
+                    addTaskBtn.addEventListener("click", handleAddTask);
+                    newTaskInput.addEventListener("keypress", function (event) {
+                        if (event.key === "Enter") {
+                            handleAddTask();
+                            event.preventDefault(); 
+                        }
+                    });
+
+               
+                    function handleAddTask() {
+                        const taskText = newTaskInput.value.trim();
+                        if (taskText !== "") {
+                            addTask(taskText);
+                            saveTasks(); 
+                            newTaskInput.value = "";
+                        }
+                    }
+
+                 
+                    function addTask(taskText, isCompleted = false) {
+                        const li = document.createElement("li");
+                        if (isCompleted) {
+                            li.classList.add("completed");
+                        }
+
+                      
+                        const taskP = document.createElement("p");
+                        taskP.textContent = taskText;
+
+                
+                        const completeBtn = document.createElement("button");
+                        completeBtn.innerHTML = "&#10003;";
+                        completeBtn.classList.add("complete-btn");
+                        completeBtn.addEventListener("click", function () {
+                            li.classList.toggle("completed");
+                            saveTasks(); 
+                        });
+
+               
+                        const deleteBtn = document.createElement("button");
+                        deleteBtn.innerHTML = "&#10007;";
+                        deleteBtn.classList.add("delete-btn");
+                        deleteBtn.addEventListener("click", function () {
+                            todoList.removeChild(li); 
+                            saveTasks();
+                        });
+
+                 
+                        const buttonContainer = document.createElement("div");
+                        buttonContainer.classList.add("button-container");
+                        buttonContainer.appendChild(completeBtn);
+                        buttonContainer.appendChild(deleteBtn);
+
+                        li.appendChild(taskP);
+                        li.appendChild(buttonContainer);
+                   
+                        if (todoList.firstChild) {
+                            todoList.insertBefore(li, todoList.firstChild);
+                        } else {
+                            todoList.appendChild(li); 
+                        }
+                    }
+                    function saveTasks() {
+                        try {
+                            const tasks = [];
+                            document.querySelectorAll("#todo-list li").forEach(li => {
+                                const taskText = li.querySelector("p").textContent;
+                                const isCompleted = li.classList.contains("completed");
+                                tasks.push({ text: taskText, completed: isCompleted });
+                            });
+                            localStorage.setItem("todoTasks", JSON.stringify(tasks));
+                        } catch (error) {
+                            console.error("Error saving tasks to localStorage", error);
+                        }
+                    }
+
+                    function loadTasks() {
+                        try {
+                            const storedTasks = localStorage.getItem("todoTasks");
+                            if (storedTasks) {
+                                const tasks = JSON.parse(storedTasks);
+                                tasks.forEach(task => addTask(task.text, task.completed));
+                            }
+                        } catch (error) {
+                            console.error("Error loading tasks from localStorage", error);
+                        }
+                    }
+                });
+            </script>
+            <style>
+                .content-wrapper {
+                    width: 100%;
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 20px;
+                }
+
+                /* Responsive design for smaller screens (like mobile) */
+                @@media (max-width:576px) {
+                    .content-wrapper {
+                        flex-direction: column;
+                    }
+
+                    .container {
+                        margin: 0 !important;
+                    }
+
+                    .expense-list,
+                    .todo {
+                        width: 100% !important;
+                    }
+                }
+
+                .todo {
+                    background-color: #fff;
+                    width: 40%;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+                    height: 100%; 
+                    overflow: auto;
+                    margin: 0 auto;
+                }
+
+                .head {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                }
+
+                    .head input {
+                        flex-grow: 1;
+                        padding: 10px;
+                        font-size: 16px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        margin-right: 10px;
+                    }
+
+                    .head button {
+                        background-color: #007bff;
+                        color: white;
+                        border: none;
+                        padding: 10px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    }
+
+                        .head button:hover {
+                            background-color: #0056b3;
+                        }
+
+                .todo-list {
+                    list-style-type: none;
+                    padding: 0;
+                }
+
+                    .todo-list li {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 10px;
+                        margin-bottom: 10px;
+                        background-color: #f9f9f9;
+                        border-radius: 4px;
+                        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                    }
+
+                        .todo-list li.completed p {
+                            text-decoration: line-through;
+                            color: gray;
+                        }
+
+                        .todo-list li p {
+                            margin: 0;
+                        }
+
+                        .todo-list li button {
+                            border: none;
+                            background: none;
+                            cursor: pointer;
+                            font-size: 18px;
+                        }
+
+                            .todo-list li button.complete-btn {
+                                color: green;
+                            }
+
+                            .todo-list li button.delete-btn {
+                                color: red;
+                            }
+        
+                .input-group {
+                    position: relative;
+                    width: 100%;
+                }
+
+          
+                    .input-group input {
+                        width: 100%;
+                        padding: 10px;
+                        padding-right: 50px; 
+                        font-size: 16px;
+                        border: 1px solid #ddd;
+                        border-radius: 4px;
+                        box-sizing: border-box;
+                    }
+
+                    /* 按钮样式 */
+                    .input-group button {
+                        position: absolute;
+                        top: 50%;
+                        right: 0;
+                        transform: translateY(-50%);
+                        background-color: #007bff;
+                        color: white;
+                        border: none;
+                        padding: 10px;
+                        border-radius: 0 4px 4px 0;
+                        cursor: pointer;
+                        height: 100%;
+                    }
+
+                        .input-group button i {
+                            font-size: 18px;
+                        }
+
+                    
+                        .input-group button:hover {
+                            background-color: #0056b3;
+                        }
+            </style>
+            <style>
+                /* 整個費用列表的外觀 */
+                .expense-list {
+                    width: 60%;
+                    max-width: 1200px;
+                    max-height: 400px;
+                    overflow-y: scroll;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background-color: #f9f9f9;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                }
+
+                /* 每個費用項目 */
+                .expense-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    padding: 10px;
+                    margin-bottom: 15px;
+                    background-color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+                }
+
+                    /* 左側區塊（顯示費用創建者和總額） */
+                    .expense-item .left {
+                        width: 100%;
+                    }
+
+                        .expense-item .left p {
+                            margin: 5px 0;
+                            font-size: 16px;
+                            color: #333;
+                        }
+
+                    /* 右側區塊（顯示成員） */
+                    .expense-item .right {
+                        width: 100%;
+                    }
+
+                        .expense-item .right p {
+                            font-size: 16px;
+                            margin-bottom: 10px;
+                            font-weight: bold;
+                        }
+
+                /* 成員區塊的外觀 */
+                .members {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+
+                .member {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    text-align: center;
+                }
+
+                /* 成員圖片 */
+                .user-img {
+                    width: 45px;
+                    height: 45px;
+                    margin-left: -20px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                }
+
+                /* 成員名字 */
+                .member p {
+                    margin-top: 8px;
+                    font-size: 14px;
+                    color: #555;
+                }
+            </style>
+            <!-- 新增的兩個圖表容器 -->
+
+
+        </div>
+
+
+    </main>
+}
+else
+{
+<main>
+
+
+    <section id="features" class="container mt-3">
+    
+
+        <div id="userInfo">
+        </div>
+      
+        <div class="row">
+
+            <style>
+                .heading {
+                    display: flex; /* 使用 Flex 佈局 */
+                    align-items: center; /* 垂直對齊中線 */
+                    justify-content: center;
+                    font-size: 32px;
+                    font-weight: bold;
+                    text-align: center;
+                    position: relative;
+                    overflow: hidden; /* 讓動畫不會超出邊界 */
+                }
+
+                    .heading span {
+                        background: linear-gradient(135deg, #007bff, #0056b3); /* 漸變藍色 */
+                        color: #fff; /* 白色文字 */
+                        display: inline-block;
+                        padding: .5rem 3rem;
+                        clip-path: polygon(100% 0, 93% 50%, 100% 99%, 0% 100%, 7% 50%, 0% 0%);
+                        border-radius: 8px;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                        position: relative;
+                        z-index: 1;
+                        overflow: hidden; /* 讓閃光效果只顯示在標籤內部 */
+                        transition: all 0.3s ease;
+                    }
+
+                        /* 閃耀效果 */
+                        .heading span::before {
+                            content: '';
+                            position: absolute;
+                            top: 0;
+                            left: -150%; /* 初始位置在標籤之外 */
+                            width: 50%;
+                            height: 100%;
+                            background: rgba(255, 255, 255, 0.3);
+                            transform: skewX(-20deg); /* 傾斜角度 */
+                            z-index: 2;
+                            transition: all 0.3s ease;
+                            animation: shine 4s infinite; /* 設定動畫，無限循環 */
+                        }
+
+                /* 定義動畫的keyframes */
+                @@keyframes shine {
+                    0% {
+                        left: -150%;
+                    }
+
+                    50% {
+                        left: 150%; /* 光線穿過標籤 */
+                    }
+
+                    100% {
+                        left: 150%; /* 動畫結束時也在標籤之外 */
+                    }
+                }
+
+                /* 當鼠標懸停時放大和變暗 */
+                .heading span:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+                }
+            </style>
+
+            <div class="carousel-container">
+                <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                        <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                        <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                        <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+
+
+                    </ol>
+                    <div class="carousel-inner">
+
+                        <div class="carousel-item active">
+                            <img src="~/Images/下載.png" class="d-block w-100" alt="Slide 1">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="~/Images/下載 (1).png" class="d-block w-100" alt="Slide 2">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="~/Images/下載 (2).png" class="d-block w-100" alt="Slide 3">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="~/Images/下載 (3).png" class="d-block w-100" alt="Slide 4">
+                        </div>
+                    </div>
+                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <h2 class="heading mt-3 m-0">
+        <span class="ml-3">我們獨有特色</span>
+    </h2>
+ 
+
+    <section class="products" id="products">
+
+        <div class="swiper product-slider">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide box">
+                    <img src="~/Images/line.png" />
+                    <h3>使用區域無限制</h3>
+                    <p>方便使用的網響應式網頁版！與line 連動使用更加便利！無需多安裝App ！一指輕鬆分帳～</p>
+                </div>
+
+                <div class="swiper-slide box">
+                    <img src="~/Images/分帳.png" />
+                    <h3>自動分帳</h3>
+                    <p>自動計算並生成分帳報表，讓每個人都能清楚了解各自的支出和負債情況。</p>
+                </div>
+
+                <div class="swiper-slide box">
+                    <img src="~/Images/支付.png" />
+                    <h3>多種支付方式</h3>
+                    <p>支援多種支付方式和各國貨幣，讓你跨國旅遊不擔心外國貨幣以及支付問題 !</p>
+
+
+                </div>
+
+                <div class="swiper-slide box">
+                    <img src="~/Images/安全.png" />
+                    <h3>安全的帳戶管理</h3>
+                    <p>安全的身分驗證和訪問控制！安全的加密協定，嚴格的訪問控制，個資不外洩。</p>
+                </div>
+                <div class="swiper-slide box">
+                    <img src="~/Images/成員管理.png" />
+                    <h3>成員管理</h3>
+                    <p>安全的訪問控制和身分驗證，輕鬆管理分帳成員，並設置各成員的權限與角色，讓管理變得更簡單。</p>
+                </div> <div class="swiper-slide box">
+                    <img src="~/Images/報表.png" />
+                    <h3>報表生成</h3>
+                    <p>快速生成詳細的收支報表，且支援下載PDF格式檔案，方便記錄與分享。</p>
+                </div>
+            </div>   
+            <h2 class="heading mt-3 m-0">
+                <span class="ml-3 "> 如何快速上手</span>
+            </h2>
+            <div class="video-container" id="tutorial">
+                <iframe width="853"
+                        height="480"
+                        src="https://www.youtube.com/embed/Wmm1ReZ1kX8"
+                        title="113 畢業專題 第4組 JustSplit"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <style>
+
+        .products .product-slider {
+            padding: 1rem;
+        }
+
+        .products {
+            padding: 1rem; /* 自身的內邊距 */
+            margin: 0 -30px; /* 突破父容器的邊距 */
+            width: calc(100% + 60px); /* 寬度補償負 margin */
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%; /* 父容器寬度設為 100% */
+            padding-top: 56.25%; /* 16:9 的高度比例 (9 / 16 = 0.5625) */
+            margin-top: 2rem; /* 與上方區塊保持間距 */
+        }
+
+            .video-container iframe {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%; /* 影片寬度佔滿父容器 */
+                height: 100%; /* 影片高度佔滿父容器 */
+                border-radius: 8px; /* 可選：添加圓角 */
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 可選：添加陰影 */
+                border: none; /* 移除邊框 */
+            }
+
+
+        .products .product-slider .box {
+            background: #fff;
+            border-radius: 8px; /* 調整邊框圓角 */
+            min-height: 360px;
+            max-width: 360px;
+            text-align: center;
+            outline: 2px solid rgba(0, 0, 0, 0.1); /* 更具體的 outline */
+            outline-offset: -8px; /* 調整 outline 的偏移量 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 調整陰影效果 */
+            transition: 0.3s;
+        }
+
+            .products .product-slider .box:hover {
+                outline: 2px solid rgba(0, 0, 0, 0.2); /* 懸停時 outline 顏色加深 */
+                transform: scale(1.05); /* 懸停時放大 */
+                outline-offset: 0px;
+            }
+
+            .products .product-slider .box img {
+                margin-bottom: 6px;
+                width: 100%;
+                height: 200px; /* 調整高度 */
+                object-fit: cover; /* 保持圖片比例 */
+                border-radius: 8px; /* 調整邊框圓角 */
+            }
+
+        .products p {
+            font-size: 18px; /* 調整文字字體大小 */
+            color: #777; /* 調整字體顏色 */
+            margin: 0 14px !important; /* 左右間距 */
+            line-height: 1.8; /* 調整行高 */
+            text-align: justify; /* 文字對齊（可選） */
+        }
+
+        .products .product-slider .box h3 {
+            font-size: 26px; /* 調整標題字體大小 */
+            line-height: 1.6;
+            font-weight: bold;
+            color: #333; /* 調整字體顏色 */
+        }
+
+
+        @@media (max-width: 576px) {
+            .products .product-slider {
+                grid-template-columns: 1fr; /* 小螢幕顯示為單列 */
+                margin: 15px;
+            }
+
+
+                    .products .product-slider .box h3 {
+                        font-size: 22px; /* 減小標題字體 */
+                    }
+        }
+    </style>
+    <script>
+        var swiper = new Swiper(".product-slider", {
+            loop: true,
+            spaceBetween: 20,
+            autoplay: {
+                delay: 7500,
+                disableOnInteraction: false,
+            },
+            centeredSlides: true,
+            breakpoints: {
+                0: {
+                    slidesPerView: 1,
+
+                },
+                768: {
+                    slidesPerView: 2,
+
+                },
+                1024: {
+                    slidesPerView: 3,
+
+                },
+            },
+        });
+
+
+    </script>
+    <style>
+
+        .features img {
+            width: 100%;
+            height: 240px; /* 調整高度 */
+            object-fit: cover;
+            border-radius: 8px; /* 調整邊框圓角 */
+        }
+
+        .features .box-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* 動態列數 */
+            gap: 24px; /* 調整列與列之間的間距 */
+        }
+
+            .features .box-container .box {
+                padding: 28px 24px; /* 調整內邊距     */
+                background: #fff;
+                outline: 2px solid rgba(0, 0, 0, 0.1); /* 更具體的 outline */
+                outline-offset: -8px; /* 調整 outline 的偏移量 */
+                text-align: center;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 調整陰影效果 */
+                border-radius: 8px; /* 調整邊框圓角 */
+                transition: 0.3s;
+            }
+
+                .features .box-container .box:hover {
+                    outline: 2px solid rgba(0, 0, 0, 0.2); /* 懸停時 outline 顏色加深 */
+                    transform: scale(1.05); /* 懸停時放大 */
+                    outline-offset: 0px; /* 調整 outline 的偏移量 */
+                }
+
+                .features .box-container .box h3 {
+                    font-size: 28px; /* 調整標題字體大小 */
+                    line-height: 1.8;
+                    font-weight: bold;
+                    color: #333; /* 調整字體顏色 */
+                }
+
+                .features .box-container .box p {
+                    font-size: 18px; /* 調整文字字體大小 */
+                    line-height: 1.8;
+                    color: #777; /* 調整字體顏色 */
+                    padding: 16px 0; /* 調整內部間距 */
+                }
+
+        @@media (max-width: 576px) {
+            .box-container {
+                grid-template-columns: 1fr; /* 小螢幕顯示為單列 */
+                margin: 15px;
+            }
+
+            .features .box-container .box {
+                padding: 12px; /* 再次減小內邊距 */
+            }
+
+                .features .box-container .box h3 {
+                    font-size: 22px; /* 進一步減小標題字體 */
+                }
+
+                .features .box-container .box p {
+                    font-size: 16px; /* 進一步減小正文字體 */
+                }
+        }
+    </style>
+
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="photo-gallery mt-3">
+
+                @*<img src="/images/功能10.gif" alt="Second Photo" style="height:400px;">*@
+                <h2 class="heading mt-3 m-0">
+                    <span class="ml-3 ">  頂尖開發團隊</span>
+                </h2>
+                <img src="/images/資訊競賽用.gif" alt="First Photo" style="height: 400px;">
+            </div>
+        </div>
+    </div>
+    <style>
+        .photo-gallery {
+            display: flex;
+            flex-direction: column;
+        }
+
+            .photo-gallery img {
+                width: 100%; /* 讓圖片自適應容器寬度 */
+                margin: auto;
+                border-radius: 30px;
+                height: auto; /* 保持圖片比例 */
+                border-radius: 10px; /* 可以讓圖片邊角圓滑 */
+            }
+    </style>
+ 
+</main>
+
+}
+<script>
+    // 從 ViewBag 取出資料
+    var expenseTypeData = @Html.Raw(Json.Encode(ViewBag.ExpenseTypeData));
+    var groupExpenseData = @Html.Raw(Json.Encode(ViewBag.GroupExpenseData));
+    var labels = expenseTypeData.map(item => item.ExpenseType); // 消費類型
+    var data = expenseTypeData.map(item => item.Count); // 消費類型次數
+    // 各消費種類花費圖表
+    var ctx1 = document.getElementById('expenseTypeChart').getContext('2d');
+    var expenseTypeChart = new Chart(ctx1, {
+        type: 'bar', // 圖表類型
+        data: {
+            labels: labels, // 消費種類
+            datasets: [{
+                label: '消費類型次數',
+                data: data, // 各類型的總花費
+                backgroundColor: 'rgba(75, 192, 192, 0.2)', // 條狀圖的背景顏色
+                borderColor: 'rgba(75, 192, 192, 1)', // 條狀圖的邊框顏色
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // 各群組消費圖表too
+    var ctx2 = document.getElementById('groupExpenseChart').getContext('2d');
+    var groupExpenseChart = new Chart(ctx2, {
+        type: 'bar', // 圖表類型
+        data: {
+            labels: groupExpenseData.map(x => x.GroupName), // 群組名稱
+            datasets: [{
+                label: '總花費',
+                data: groupExpenseData.map(x => x.TotalAmount), // 各群組的總花費
+
+            }]
+        }
+    });
+</script>
+<style>
+    .table-data .charts {
+        display: flex;
+        justify-content: space-between; /* 在父容器內分配空間 */
+        flex-wrap: wrap; /* 當空間不足時自動換行 */
+        gap: 20px; /* 圖表之間的間距 */
+    }
+
+    body {
+        background: #d1dbeb !important;
+    }
+
+    .chart-container {
+        flex: 1; /* 讓容器佔滿空間 */
+        min-width: 48%; /* 最小寬度為 48% */
+        max-width: 48%; /* 最大寬度為 48% */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        background: #fff;
+        border-radius: 10px;
+    }
+
+    @@media (max-width:576px) {
+        .chart-container {
+            max-width: 100%; /* 在手機模式下每個圖表佔滿 100% */
+        }
+    }
+
+
+    main {
+        padding: 0px;
+        font-family: var(--poppins);
+    }
+
+        main .head-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            grid-gap: 16px;
+            flex-wrap: wrap;
+        }
+
+            main .head-title .left h1 {
+                font-size: 36px;
+                font-weight: 600;
+                margin-bottom: 10px;
+                color: var(--dark);
+            }
+
+            main .head-title .left .breadcrumb {
+                display: flex;
+                align-items: center;
+                grid-gap: 16px;
+            }
+
+                main .head-title .left .breadcrumb li {
+                    color: var(--dark);
+                }
+
+                    main .head-title .left .breadcrumb li a {
+                        color: var(--dark-grey);
+                        pointer-events: none;
+                    }
+
+                        main .head-title .left .breadcrumb li a.active {
+                            color: var(--blue);
+                            pointer-events: unset;
+                        }
+
+            main .head-title .btn-download {
+                height: 36px;
+                padding: 0 16px;
+                border-radius: 36px;
+                background: var(--blue);
+                color: var(--light);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                grid-gap: 10px;
+                font-weight: 500;
+            }
+
+
+
+
+        main .box-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-gap: 24px;
+            margin-top: 36px;
+            margin: auto;
+            padding: 0;
+        }
+
+            main .box-info li {
+                padding: 24px;
+                background: var(--light);
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                grid-gap: 24px;
+            }
+
+                main .box-info li .bx {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 10px;
+                    font-size: 36px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                main .box-info li:nth-child(1) .bx {
+                    background: var(--light-blue);
+                    color: var(--blue);
+                }
+
+                main .box-info li:nth-child(2) .bx {
+                    background: var(--light-yellow);
+                    color: var(--yellow);
+                }
+
+                main .box-info li:nth-child(3) .bx {
+                    background: var(--light-orange);
+                    color: var(--orange);
+                }
+
+                main .box-info li .text h3 {
+                    font-size: 24px;
+                    font-weight: 600;
+                    color: var(--dark);
+                }
+
+                main .box-info li .text p {
+                    color: var(--dark);
+                }
+
+
+
+
+
+        main .table-data {
+            display: flex;
+            flex-wrap: wrap;
+            grid-gap: 36px;
+            margin-top: 24px;
+            width: 100%;
+            color: var(--dark);
+        }
+
+            main .table-data > div {
+                border-radius: 20px;
+                background: var(--light);
+                padding: 24px;
+                overflow-x: auto;
+            }
+
+            main .table-data .head {
+                display: flex;
+                align-items: center;
+                grid-gap: 16px;
+                margin-bottom: 24px;
+            }
+
+                main .table-data .head h3 {
+                    margin-right: auto;
+                    font-size: 24px;
+                    font-weight: 600;
+                }
+
+                main .table-data .head .bx {
+                    cursor: pointer;
+                }
+</style>
+
+<style>
+    #announcementSection {
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+    }
+
+    #announcementContainer {
+        max-width: 100%; /* 容器寬度設為100% */
+        margin: 0 auto;
+        padding: 10px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        position: relative; /* 使時間信息可以相對定位 */
+    }
+
+    .latest-announcement {
+        text-align: center; /* 使內容置中 */
+    }
+
+    .latest-announcement-content {
+        font-family: 'Arial', sans-serif;
+        color: #333333;
+    }
+
+    #announcementTitle {
+        font-size: 24px;
+        font-weight: bold;
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+
+    #announcementContent {
+        font-size: 18px;
+        line-height: 1.6;
+        margin-bottom: 35px; /* 增加底部邊距，以便放置時間信息 */
+    }
+
+    .announcementTime {
+        position: absolute;
+        right: 20px; /* 距離右邊20px */
+        bottom: 20px; /* 距離底部20px */
+        font-size: 14px;
+        color: #888888;
+        text-align: right; /* 文字右對齊 */
+    }
+    /* Responsive design */
+    @@media (max-width:576px) {
+        #announcementContainer {
+            padding: 15px;
+        }
+
+        #announcementTitle {
+            font-size: 20px;
+        }
+
+        #announcementContent {
+            font-size: 14px;
+        }
+    }
+</style>
+
+
+<style>
+    .carousel-container {
+        width: 100vw; /* 佔滿整個視窗寬度 */
+        margin-left: calc(-50vw + 50%); /* 保證內容居中且滿版 */
+        margin-right: calc(-50vw + 50%); /* 保證內容居中且滿版 */
+        margin-top: -6vh;
+        position: relative;
+    }
+
+    .carousel-item img {
+        width: 100%; /* 确保图片宽度为100% */
+        height: 360px; /* 调整幻灯片图片高度 */
+        border: 2px solid #ddd;
+    }
+
+    p {
+        margin: 0 !important;
+    }
+
+    .carousel-control-next-icon, .carousel-control-prev-icon {
+        background-color: rgba(128, 128, 128, 0.7); /* 添加灰色半透明背景 */
+        border-radius: 50%; /* 圓形 */
+        width: 40px; /* 圓形的寬度 */
+        height: 40px; /* 圓形的高度 */
+        background-size: 50%; /* 調整箭頭大小 */
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .carousel-control-next-icon {
+        background-image: url('data:image/svg+xml;charset=UTF8,%3Csvg xmlns%3D%22http://www.w3.org/2000/svg%22 viewBox%3D%220 0 8 8%22 fill%3D%22white%22%3E%3Cpath d%3D%22M1 0l4 4-4 4V0z%22/%3E%3C/svg%3E'); /* 右箭頭 */
+    }
+
+    .carousel-control-prev-icon {
+        background-image: url('data:image/svg+xml;charset=UTF8,%3Csvg xmlns%3D%22http://www.w3.org/2000/svg%22 viewBox%3D%220 0 8 8%22 fill%3D%22white%22%3E%3Cpath d%3D%22M5 0L1 4l4 4V0z%22/%3E%3C/svg%3E'); /* 左箭頭 */
+    }
+
+
+
+
+    .custom-heading {
+        font-weight: bold;
+        font-size: 3.6em;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        background: linear-gradient(to bottom right, #4dc3ff, #007bff);
+        box-shadow: 5px 5px 5px #003270;
+        border: 3px solid transparent;
+        color: #fff;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.4), 3px 3px 6px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+</style>
+
+<script>
+
+    $('.carousel').carousel({
+        interval: 5000 
+    });
+</script>

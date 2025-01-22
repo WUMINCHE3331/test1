@@ -1,0 +1,67 @@
+﻿@model IEnumerable<wu2.Models.MemberExpensePercentage>
+
+@{
+    ViewBag.Title = "組員支出比例";
+}
+
+<h2 class="title">組員支出比例</h2>
+
+<div class="chart-container">
+    <canvas id="memberExpenseChart" width="800" height="400"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var ctx = document.getElementById('memberExpenseChart').getContext('2d');
+        var memberExpenseChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Encode(Model.Select(m => m.MemberName))),
+                datasets: [{
+                    label: '支出占比 (%)',
+                    data: @Html.Raw(Json.Encode(Model.Select(m => m.Percentage))),
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw.toFixed(2) + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    .title {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .chart-container {
+        display: flex;
+        justify-content: center;
+        margin: 20px 0;
+    }
+</style>

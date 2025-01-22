@@ -1,0 +1,221 @@
+﻿@model IEnumerable<wu2.Models.Notifications>
+
+@{
+    ViewBag.Title = "通知";
+}
+<style>
+    .notification-item2 {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        position: relative;
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+    .btn-icon {
+        padding: 10px; 
+        font-size: 20px; 
+        background-color: transparent; 
+        border: none;
+        color: #17a2b8;
+    }
+@@media (max-width: 768px) {
+        .btn-icon {
+            padding: 10px; 
+            font-size: 20px; 
+            background-color: transparent;
+            border: none; 
+            color: #17a2b8; 
+        }
+         
+            .btn-icon i {
+                margin-right: 0;
+            }
+
+        p{
+            font-size:90%;
+        }
+
+    }
+
+    .notification-actions {
+        display: flex;
+        gap: 20px;
+    }
+
+    .mark-as-read-btn {
+        background-color: #007bff;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-left: auto;
+    }
+
+    .btn-accept, .btn-reject {
+        background-color: green;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+    .btn-reject {
+        background-color: red;
+    }
+
+        .btn-accept:hover, .btn-reject:hover {
+            opacity: 0.8;
+        }
+    /* 已讀通知圓圈圖示的樣式 */
+    .read-notification .fa-circle {
+        color: black; /* 圖示的顏色，可以自行調整 */
+        margin-right: 10px;
+    }
+
+    /* 未讀通知圓圈圖示的樣式 */
+    .unread-notification .fa-circle {
+        color: red; /* 圖示的顏色，可以自行調整 */
+        margin-right: 10px;
+    }
+
+    .notification-time {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+
+    #markAllAsRead {
+        float: right;
+    }
+</style>
+
+<h2>通知</h2>
+
+@using (Html.BeginForm("MarkAllAsRead", "Group", FormMethod.Post))
+{
+    <button type="submit" id="markAllAsRead" class="btn btn-success">已讀所有</button>
+    <br />
+    <hr />
+}
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Message"]
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+@functions {
+    // 定义辅助方法来替换字段值为中文
+    public string ReplaceAdminWithChinese(string message)
+    {
+        if (message.Contains("Admin"))
+        {
+            message = message.Replace("Admin", "管理員");
+        }
+        if (message.Contains("Viewer"))
+        {
+            message = message.Replace("Viewer", "查看者");
+        }
+        if (message.Contains("Editor"))
+        {
+            message = message.Replace("Editor", "編輯者");
+        }
+        return message;
+    }
+}
+@foreach (var notification in Model)
+{
+    <div class="notification-item2">
+        <div>
+
+            <div class="notification-item @(notification.IsRead.HasValue && notification.IsRead.Value ? "read-notification" : "unread-notification")">
+
+                <div style="margin-right: 8px; display:flex">
+                    <i class="fas fa-circle" style="font-size: 10px;"></i>
+                    <small>來自: @notification.Groups.GroupName</small>
+
+                </div>
+
+                <p>@ReplaceAdminWithChinese(notification.Message)</p>
+                @if (notification.NotificationType != "Invitation" && (!notification.IsRead.HasValue || !notification.IsRead.Value))
+                {
+                    <div class="notification-actions">
+                        <div class="notification-item" data-notification-id="@notification.NotificationId">
+                            <button class="mark-as-read-btn">已讀</button>
+                        </div>
+                    </div>
+                }
+                <small class="notification-time text-muted">@notification.Date</small>
+            </div>
+        </div>
+
+        @if (notification.RelatedExpenseId.HasValue)
+        {<div class="notification-actions">
+                <form action="@Url.Action("Details", "Expense")" method="get">
+                    <input type="hidden" name="id" value="@notification.RelatedExpenseId" />
+                    <!-- 替换按钮为 Font Awesome 图标 -->
+                    <button type="submit" class="btn btn-icon">
+                        <i class="fas fa-info-circle"></i> <!-- 使用 Font Awesome 的信息图标 -->
+                    </button>
+                </form>
+            </div>
+
+
+        }
+
+        @if (notification.NotificationType == "DebtPaymentInitiated" && notification.UserId == (int)Session["UserID"] && (!notification.IsRead.HasValue || !notification.IsRead.Value))
+        {
+            <div class="notification-actions">
+                @using (Html.BeginForm("ConfirmPayment", "Settle", FormMethod.Post))
+                {
+                    @Html.Hidden("debtId", notification.RelatedDebtId)
+                    <button type="submit" name="isReceived" value="true" class="btn-accept">已收到</button>
+                    <button type="submit" name="isReceived" value="false" class="btn-reject">沒收到</button>
+                }
+            </div>
+        }
+
+        @if (notification.NotificationType == "Payment Reminder" && notification.UserId == (int)Session["UserID"])
+        {
+            <div class="notification-actions">
+                <form action="@Url.Action("PairwiseSettlement", "Settle")" method="get">
+                    <input type="hidden" name="groupId" value="@notification.GroupId" />
+                    <button type="submit" name="accept" value="true" class="btn  btn-info">前往付款</button>
+                </form>
+            </div>
+
+        }
+
+
+
+        @if (notification.NotificationType == "Invitation" && notification.UserId == (int)Session["UserID"] && (!notification.IsRead.HasValue || !notification.IsRead.Value))
+        {
+            <div class="notification-actions">
+                @using (Html.BeginForm("HandleInvitation", "Group", FormMethod.Post))
+                {
+                    @Html.Hidden("notificationId", notification.NotificationId)
+                    <button type="submit" name="accept" value="true" class="btn-accept">接受</button>
+                    <button type="submit" name="accept" value="false" class="btn-reject">拒絕</button>
+                }
+            </div>
+        }
+    </div>
+
+}
+
+

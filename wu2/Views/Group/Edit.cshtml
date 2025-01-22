@@ -1,0 +1,137 @@
+﻿@model wu2.Models.Groups
+
+@{
+    ViewBag.Title = "編輯群組";
+    bool hasFullPermission = ViewBag.HasFullPermission != null && (bool)ViewBag.HasFullPermission;
+}
+
+<div class="container mt-5">
+    <div class="card mx-auto" style="max-width: 600px;">
+        <div class="card-header text-center">
+            <h2>編輯群組</h2>
+        </div>
+        <div class="card-body">
+            <!-- 錯誤訊息顯示區域 -->
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+            }
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @Html.ValidationSummary()
+                </div>
+            }
+
+            <!-- 權限提示 -->
+            <div class="alert alert-warning text-center">
+                根據組員權限，可編輯內容將不同
+            </div>
+
+            <!-- 表單區域 -->
+            @if (hasFullPermission)
+            {
+                using (Html.BeginForm("Edit", "Group", FormMethod.Post, new { enctype = "multipart/form-data", @class = "form-horizontal", id = "editGroupForm" }))
+                {
+                    @Html.HiddenFor(model => model.GroupId)
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.GroupName, "群組名稱", htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.GroupName, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                        @Html.ValidationMessageFor(model => model.GroupName, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("群組照片", htmlAttributes: new { @class = "control-label" })
+                        <div>
+                            <input type="file" name="GroupPhoto" id="GroupPhoto" class="form-control-file" accept="image/*" onchange="previewImage(event)" />
+                            @Html.ValidationMessage("GroupPhoto", "", new { @class = "text-danger" })
+                        </div>
+                        <div class="mt-3">
+                            <img id="preview" src="#" alt="照片預覽" class="img-thumbnail" style="display:none; max-width: 300px;" />
+                        </div>
+                    </div>
+
+                    <p>需大於總金額: <strong>@ViewBag.totalExpenses</strong></p>
+
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.Budget, "初始預算", htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.Budget, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入預算(選填) 若要輸入需大於上方金額" } })
+                        @Html.ValidationMessageFor(model => model.Budget, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">保存</button>
+                        @Html.ActionLink("返回", "Details", "Group", new { id = ViewBag.GroupId }, new { @class = "btn btn-outline-secondary btn-sm" })
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle"></i> 只有群組創建者可編輯。
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('editGroupForm').onsubmit = function (e) {
+            var fileInput = document.getElementById("GroupPhoto");
+            var fileName = fileInput.value.split('\\').pop();
+            var regex = /[^a-zA-Z0-9_\-\.]/;
+
+            if (regex.test(fileName)) {
+                alert("檔案名稱包含特殊字元，請重新命名檔案後再試。");
+                e.preventDefault();  // 阻止表單提交
+                return false;
+            }
+
+            var budgetInput = document.getElementById("Budget");
+            var budget = parseFloat(budgetInput.value);
+            var totalExpenses = parseFloat("@ViewBag.totalExpenses");
+
+            if (!isNaN(budget) && budget <= totalExpenses) {
+                alert("預算必須大於總金額！");
+                e.preventDefault();  // 阻止表單提交
+                return false;
+            }
+        };
+
+        // 圖片預覽功能
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function(){
+                var output = document.getElementById('preview');
+                output.src = reader.result;
+                output.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+    </script>
+}
+
+<style>
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+    }
+
+    .img-thumbnail {
+        margin-top: 10px;
+        border-radius: 10px;
+    }
+</style>

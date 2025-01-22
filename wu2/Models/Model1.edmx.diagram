@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="e76f73d76f8f4ec0b969e586b5441fad" Name="Diagram1" ZoomLevel="79">
+        <EntityTypeShape EntityType="wuModel.ActivityLogs" Width="1.5" PointX="5.25" PointY="28.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.Debts" Width="1.5" PointX="8.25" PointY="27.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.ExpenseDetails" Width="1.5" PointX="3" PointY="17.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.ExpensePayers" Width="1.5" PointX="6" PointY="17.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.Expenses" Width="1.5" PointX="5.25" PointY="32.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.GroupMembers" Width="1.5" PointX="5.25" PointY="24.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.Groups" Width="1.5" PointX="3" PointY="39.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.MessageReadStatus" Width="1.5" PointX="10.5" PointY="24.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.Messages" Width="1.5" PointX="8.25" PointY="33.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.Notices" Width="1.5" PointX="8.25" PointY="23.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.Notifications" Width="1.5" PointX="11.25" PointY="28.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="wuModel.Users" Width="1.5" PointX="0.75" PointY="15.875" IsExpanded="true" />
+        <AssociationConnector Association="wuModel.FK__ActivityL__Group__38996AB5" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__ActivityL__UserI__398D8EEE" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK_ActivityLogs_Expenses" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Debts__CreditorI__3D5E1FD2" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Debts__DebtorId__3E52440B" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Debts__GroupId__3C69FB99" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK_Debts_Expenses" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__ExpenseDe__Expen__30F848ED" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__ExpenseDe__UserI__31EC6D26" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__ExpensePa__Expen__4AB81AF0" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__ExpensePa__UserI__4BAC3F29" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Expenses__GroupI__2D27B809" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK_Expenses_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__GroupMemb__Group__29572725" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__GroupMemb__UserI__2A4B4B5E" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Groups__CreatorI__267ABA7A" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Messages__GroupI__07C12930" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Notices__GroupId__6E01572D" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Notificat__Group__35BCFE0A" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__MessageRe__Messa__0C85DE4D" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__MessageRe__UserI__0D7A0286" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Messages__UserId__08B54D69" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK_Messages_Users_ReceiverId" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Notices__Created__6EF57B66" ManuallyRouted="false" />
+        <AssociationConnector Association="wuModel.FK__Notificat__UserI__34C8D9D1" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

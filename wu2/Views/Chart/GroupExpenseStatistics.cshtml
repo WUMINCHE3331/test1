@@ -1,0 +1,473 @@
+﻿@model wu2.Models.GroupExpenseStatisticsViewModel
+
+@{
+    ViewBag.Title = "群組支出統計";
+}
+
+<h2>群組支出統計</h2>
+
+@*<div>
+        <h3>調試輸出</h3>
+        <p>Labels: @string.Join(", ", Model.Labels)</p>
+        <p>TotalExpenses: @string.Join(", ", Model.TotalExpenses)</p>
+        <p>TotalDebts: @string.Join(", ", Model.TotalDebts)</p>
+        <p>ExpenseTypes: @string.Join(", ", Model.ExpenseTypes)</p>
+        <p>TypeExpenses: @string.Join(", ", Model.TypeExpenses)</p>
+        <p>NetProfits: @string.Join(", ", Model.NetProfits)</p>
+        <p>PaymentMethods: @string.Join(", ", Model.Pay mentMethodTypes)</p>
+        <p>PaymentMethodCounts: @string.Join(", ", Model.PaymentMethodCounts)</p>
+    </div>*@
+
+<div class="card-container">
+    <!-- Card: 成員實際支出圖 -->
+    <div class="card">
+        <div class="chart-container">
+            <h3><i class="fas fa-chart-pie"></i> 成員實際支出圖</h3>
+            <canvas id="totalExpenseChart"></canvas>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>成員</th>
+                        <th>總支出 (NT$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Labels.Count; i++)
+                    {
+                        <tr>
+                            <td>@Model.Labels[i]</td>
+                            <td>@Model.TotalExpenses[i]</td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Card: 支出類型 -->
+    <div class="card">
+        <div class="chart-container">
+            <h3><i class="fas fa-chart-pie"></i> 支出類型</h3>
+            <canvas id="typeExpenseChart"></canvas>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>支出類型</th>
+                        <th>總金額 (NT$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.ExpenseTypes.Count; i++)
+                    {
+                        <tr>
+                            <td>@Model.ExpenseTypes[i]</td>
+                            <td>@Model.TypeExpenses[i]</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Card: 淨利圖表 -->
+    <div class="card">
+        <div class="chart-container">
+            <h3><i class="fas fa-chart-bar"></i> 淨利圖表</h3>
+            <canvas id="netProfitChart"></canvas>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>成員</th>
+                        <th>應收帳款 (NT$)</th>
+                        <th>應付帳款 (NT$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Labels.Count; i++)
+                    {
+                        <tr>
+                            <td>@Model.Labels[i]</td>
+                            <td>@(Model.NetProfits[i] >= 0 ? Model.NetProfits[i].ToString() : "-")</td>
+                            <td>@(Model.NetProfits[i] < 0 ? (-Model.NetProfits[i]).ToString() : "-")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Card: 付款方式 -->
+    <div class="card">
+        <div class="chart-container">
+            <h3><i class="fas fa-chart-bar"></i> 付款方式統計</h3>
+            <canvas id="paymentMethodChart"></canvas>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>付款方式</th>
+                        <th>次數</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pm in Model.PaymentMethodTypes.Zip(Model.PaymentMethodCounts, (type, count) => new { type, count }))
+                    {
+                        <tr>
+                            <td>@pm.type</td>
+                            <td>@pm.count</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .card {
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: auto;
+        margin: 20px;
+        width: 40%;
+        height: 40%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .chart-container, .table-container {
+        width: 100%;
+        padding: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f4f4f4;
+    }
+
+    h3 {
+        text-align: center;
+        font-size: 1.5em;
+        margin-bottom: 0;
+    }
+
+    @@media (max-width: 576px) {
+        .card-container {
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .card {
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: auto;
+            margin: 20px;
+            width: 80%;
+            height: 40%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chart-container, .table-container {
+            padding: 10px;
+        }
+
+        h3 {
+            font-size: 1.2em;
+        }
+
+        table {
+            font-size: 0.9em;
+        }
+
+        th, td {
+            padding: 6px;
+        }
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        function adjustCanvasResolution(canvas) {
+            var ctx = canvas.getContext('2d');
+            var dpr = window.devicePixelRatio || 1;
+            var rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+        }
+
+        var labels = @Html.Raw(Json.Encode(Model.Labels));
+        var totalExpenses = @Html.Raw(Json.Encode(Model.TotalExpenses));
+        var totalDebts = @Html.Raw(Json.Encode(Model.TotalDebts));
+        var expenseTypes = @Html.Raw(Json.Encode(Model.ExpenseTypes));
+        var typeExpenses = @Html.Raw(Json.Encode(Model.TypeExpenses));
+        var netProfits = @Html.Raw(Json.Encode(Model.NetProfits));
+        var paymentMethods = @Html.Raw(Json.Encode(Model.PaymentMethodTypes));
+        var paymentMethodCounts = @Html.Raw(Json.Encode(Model.PaymentMethodCounts));
+
+        var totalExpenseCanvas = document.getElementById('totalExpenseChart');
+        adjustCanvasResolution(totalExpenseCanvas);
+        var ctxTotalExpense = totalExpenseCanvas.getContext('2d');
+
+        var totalExpenseChart = new Chart(ctxTotalExpense, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '總支出',
+                    data: totalExpenses,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(100, 220, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(100, 220, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': NT$' + tooltipItem.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var typeExpenseCanvas = document.getElementById('typeExpenseChart');
+        adjustCanvasResolution(typeExpenseCanvas);
+        var ctxTypeExpense = typeExpenseCanvas.getContext('2d');
+
+        var typeExpenseChart = new Chart(ctxTypeExpense, {
+            type: 'pie',
+            data: {
+                labels: expenseTypes,
+                datasets: [{
+                    label: '支出類型',
+                    data: typeExpenses,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': NT$' + tooltipItem.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var netProfitCanvas = document.getElementById('netProfitChart');
+        adjustCanvasResolution(netProfitCanvas);
+        var ctxNetProfit = netProfitCanvas.getContext('2d');
+
+        var receivables = netProfits.map(value => value >= 0 ? value : 0);
+        var payables = netProfits.map(value => value < 0 ? value : 0); 
+
+        var netProfitChart = new Chart(ctxNetProfit, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '應收帳款',
+                        data: receivables,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: '應付帳款',
+                        data: payables,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y', 
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        stacked: true, 
+                        min: -Math.max(...netProfits.map(Math.abs)),
+                        max: Math.max(...netProfits.map(Math.abs)),
+                        title: {
+                            display: true,
+                            text: '金額 (NT$)' 
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        title: {
+                            display: true,
+                            text: '成員' 
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                var datasetLabel = tooltipItem.dataset.label || '';
+                                var value = tooltipItem.raw;
+                                return datasetLabel + ': NT$' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var paymentMethodCanvas = document.getElementById('paymentMethodChart');
+        adjustCanvasResolution(paymentMethodCanvas);
+        var ctxPaymentMethod = paymentMethodCanvas.getContext('2d');
+
+        var paymentMethodChart = new Chart(ctxPaymentMethod, {
+            type: 'bar',
+            data: {
+                labels: paymentMethods,
+                datasets: [{
+                    label: '付款次數',
+                    data: paymentMethodCounts,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '次數'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '付款方式'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                var datasetLabel = tooltipItem.dataset.label || '';
+                                var value = tooltipItem.raw;
+                                return datasetLabel + ': ' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        function generateChartImages() {
+            const totalExpenseCanvas = document.getElementById('totalExpenseChart');
+            const typeExpenseCanvas = document.getElementById('typeExpenseChart');
+            const netProfitCanvas = document.getElementById('netProfitChart');
+            const paymentMethodCanvas = document.getElementById('paymentMethodChart');
+
+            const totalExpenseImage = totalExpenseCanvas.toDataURL('image/png');
+            const typeExpenseImage = typeExpenseCanvas.toDataURL('image/png');
+            const netProfitImage = netProfitCanvas.toDataURL('image/png');
+            const paymentMethodImage = paymentMethodCanvas.toDataURL('image/png');
+
+ 
+            $.ajax({
+                url: '/Export/GeneratePdf',
+                type: 'POST',
+                data: {
+                    totalExpenseImage: totalExpenseImage,
+                    typeExpenseImage: typeExpenseImage,
+                    netProfitImage: netProfitImage,
+                    paymentMethodImage: paymentMethodImage,
+     
+                },
+                success: function (response) {
+                    window.location.href = response.filePath; 
+                }
+            });
+        }
+
+
+    });
+</script>

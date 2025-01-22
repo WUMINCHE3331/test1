@@ -1,0 +1,223 @@
+﻿@model wu2.Models.Expenses
+
+@{
+    ViewBag.Title = "支出詳細資訊";
+}
+
+<div class="row">
+    <!-- 支出詳細信息部分 -->
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading text-center">
+                <h3 class="panel-title">支出詳細信息</h3>
+            </div>
+            <div class="panel-body">
+                <table class="table table-striped table-bordered">
+                    <tr>
+                        <th>品項</th>
+                        <td>@Model.ExpenseItem</td>
+                    </tr>
+                    <tr>
+                        <th>總金額</th>
+                        <td>@Model.TotalAmount.ToString("C")</td>
+                    </tr>
+                    <tr>
+                        <th>消費類型</th>
+                        <td>@Model.ExpenseType</td>
+                    </tr>
+                    <tr>
+                        <th>付款方式</th>
+                        <td>@Model.PaymentMethod</td>
+                    </tr>
+                    <tr>
+                        <th>日期</th>
+                        <td>@Model.CreatedAt</td>
+                    </tr>
+                    <tr>
+                        <th>備註</th>
+                        <td>@(string.IsNullOrEmpty(Model.Note) ? "N/A" : Model.Note)</td>
+                    </tr>
+                    <tr>
+                        <th>照片</th>
+                        <td>
+                            @if (!string.IsNullOrEmpty(Model.Photo))
+                            {
+                                <img src="@Url.Content(Model.Photo)" alt="Profile Photo" class="img-thumbnail" style="max-width: 200px;" />
+                            }
+                            else
+                            {
+                                <p>N/A</p>
+                            }
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 詳細資訊卡片部分 -->
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading text-center">
+                <h3 class="panel-title">付款人與分攤人訊</h3>
+            </div>
+            <div class="panel-body">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">付款人</h5>
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>金額</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var payer in Model.ExpensePayers)
+                                {
+                                    <tr>
+                                        <td>@payer.Users.FullName </td>
+                                        <td>@payer.Amount.ToString("C")</td>
+                                    
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                        <h5 class="card-title">分攤人</h5>
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead>
+                                <tr>
+                                    <th>姓名</th>
+                                    <th>金額</th>
+                                    @*<th>備註</th>*@
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detail in Model.ExpenseDetails)
+                                {
+                                    <tr>
+                                        <td>@detail.Users.FullName</td>
+                                        <td>@detail.Amount.ToString("C")</td>
+                                        @*<td>@(string.IsNullOrEmpty(detail.Note) ? "N/A" : detail.Note)</td>*@
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p>
+    @Html.ActionLink("返回列表", "Index", new { groupId = Model.GroupId }, new { @class = "btn btn-default" })
+</p>
+
+<style>
+  
+    .row{
+        font-size:18px;
+    }
+    .panel {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .panel-heading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f7f7f7;
+        border-bottom: 1px solid #ddd;
+        padding: 10px 15px;
+        border-top-left-radius: 7px;
+        border-top-right-radius: 7px;
+    }
+
+    .panel-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .panel-body {
+        padding: 15px;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+        background-color:white
+    }
+
+        .table th,
+        .table td {
+            padding: 8px;
+            line-height: 1.5;
+            text-align: left;
+            border-top: 1px solid #ddd;
+        }
+
+    .table-bordered th,
+    .table-bordered td {
+        border: 1px solid #ddd !important;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+
+    .img-thumbnail {
+        display: block;
+        margin: 0 auto;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 15px;
+        margin-bottom: 0;
+        font-size: 14px;
+        font-weight: 400;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        user-select: none;
+        background-image: none;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+
+    .btn-default {
+        color: #333;
+        background-color: #fff;
+        border-color: #ccc;
+    }
+
+        .btn-default:hover {
+            background-color: #e6e6e6;
+            border-color: #adadad;
+        }
+
+    .card {
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 5px;
+    }
+
+    .card-title {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+    

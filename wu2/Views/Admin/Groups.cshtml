@@ -1,0 +1,22 @@
+﻿@model List<wu2.Models.Groups>
+
+<h2>所有群組</h2>
+
+<table>
+    <tr>
+        <th>群組名稱</th>
+        <th>創建日期</th>
+        <th>操作</th>
+    </tr>
+    @foreach (var group in Model)
+    {
+        <tr>
+            <td>@group.GroupName</td>
+            <td>@group.CreatedDate?.ToString("yyyy-MM-dd")</td>
+            <td>
+                <a href="@Url.Action("GroupDetails", "Admin", new { id = group.GroupId })">查看詳情</a>
+            </td>
+        </tr>
+    }
+</table>
+

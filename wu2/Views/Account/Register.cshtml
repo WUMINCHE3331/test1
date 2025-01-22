@@ -1,0 +1,236 @@
+﻿    @model wu2.Models.Users
+
+@{
+    ViewBag.Title = "Register";
+}@{
+    var clientId = "2005979321"; 
+    var redirectUri = Url.Action("Callback", "Line", null, Request.Url.Scheme);
+    var state = Guid.NewGuid().ToString("N"); 
+    var authorizationUrl = $"https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id={clientId}&redirect_uri={redirectUri}&state={state}&scope=profile%20openid%20email";
+}
+
+
+<div class="register">
+    <h2>註冊</h2>
+
+    @using (Html.BeginForm("Register", "Account", FormMethod.Post))
+    {
+        if (!string.IsNullOrEmpty(ViewBag.JoinLink))
+        {
+            @Html.Hidden("joinLink", (string)ViewBag.JoinLink)
+        }
+
+        <div class="form-group">
+            <label for="FullName" class="form-label">
+                <i class="fas fa-user"></i> <!-- 名稱圖標 -->
+            </label>
+            @Html.EditorFor(model => model.FullName, new { htmlAttributes = new { @class = "form-control", required = "required", @placeholder = "請輸入名稱" } })
+            @Html.ValidationMessageFor(model => model.FullName, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            <label for="Email" class="form-label">
+                <i class="fas fa-envelope"></i> <!-- 電子郵件圖標 -->
+            </label>
+            @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", type = "email", required = "required", @placeholder = "請輸入信箱" } })
+            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            <label for="PasswordHash" class="form-label">
+                <i class="fas fa-lock"></i> <!-- 密碼圖標 -->
+            </label>
+            @Html.EditorFor(model => model.PasswordHash, new { htmlAttributes = new { @class = "form-control", required = "required", type = "password", @placeholder = "請輸入密碼" } })
+            @Html.ValidationMessageFor(model => model.PasswordHash, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            <label for="ConfirmPassword" class="form-label">
+                <i class="fas fa-lock"></i> <!-- 確認密碼圖標 -->
+            </label>
+            @Html.EditorFor(model => model.ConfirmPassword, new { htmlAttributes = new { @class = "form-control", required = "required", type = "password", @placeholder = "再次輸入密碼" } })
+            @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
+        </div>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <button type="submit" class="btn btn-primary"style="font-weight: bold;">註冊</button>
+
+        <div class="social-login">
+            <a href="@Url.Action("Login", "TestGoogleLogin")" class="btn-google">
+                <i class="fab fa-google"></i> Google
+            </a>
+            <a href="@authorizationUrl" class="btn-line">
+                <i class="fab fa-line"></i> Line
+            </a>
+        </div>
+    }
+
+    <div class="footer-links">
+        <p>已經有帳號？<a href="@Url.Action("Login", "Account")" class="footer-link-text">登入</a></p>
+    </div>
+
+</div>
+
+<style>
+    /* Container styling */
+    .register {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        max-width:400px;
+        margin: auto;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    h2 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    /* Form Group with Icon */
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+        height: 45px;
+    }
+
+        .form-group label {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #aaa;
+        }
+
+    .form-control {
+        width: 100%;
+        height:100%;
+        padding: 10px 10px 10px 40px; /* 調整內間距以容納圖標 */
+        font-size: 16px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+        outline: none;
+        background-color: transparent;
+    }
+
+        .form-control:focus {
+            border-color: #6a1b9a;
+        }
+
+    /* Button styling */
+    /* Primary Blue Button Styling */
+    .btn-primary {
+        background-color: #76b1d8; /* 主題藍色 */
+        color: white;
+        border: none;
+        padding: 10px;
+        font-size: 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease; /* 過渡效果 */
+    }
+
+        .btn-primary:hover {
+            background-color: #4a90e2; /* 懸停時更深的藍色 */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* 添加輕微陰影效果 */
+        }
+        .btn-primary:active {
+            box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2); /* 點擊時按下的效果 */
+        }
+        .btn-primary:disabled {
+            background-color: #7abaff; /* 禁用時的淡藍色 */
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+
+    /* Validation Message Styling */
+    .text-danger {
+        color: #e74c3c;
+        font-size: 14px;
+        text-align: left;
+    }
+
+    /* Social login styling */
+    .social-login {
+        margin-top: 20px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+        .social-login a {
+            flex: 1;
+            padding: 10px;
+            margin: 0 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            color: inherit;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .social-login a i {
+                margin-right: 8px;
+            }
+
+            .social-login a:hover {
+                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+    /* Google button */
+    .btn-google {
+        color: #4285F4;
+    }
+
+        .btn-google i {
+            color: #4285F4;
+            font-size: 1.6rem;
+        }
+
+        .btn-google:hover {
+            background-color: #eef3fc;
+        }
+
+    /* Line button */
+    .btn-line {
+        color: #00c300;
+    }
+
+        .btn-line i {
+            color: #00c300;
+            font-size: 1.9rem;
+        }
+
+        .btn-line:hover {
+            background-color: #e6f9e6;
+        }
+
+    /* Footer links */
+    .footer-links {
+        margin-top: 20px;
+    }
+
+        .footer-links p {
+            font-size:1.1rem;
+            color: #666;
+        }
+
+    .footer-link-text {
+        color: #4a90e2;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+        .footer-link-text:hover {
+            text-decoration: underline;
+        }
+</style>
+<script src="https://kit.fontawesome.com/a076d05399.js"></script> <!-- 引入 Font Awesome 圖示庫 -->

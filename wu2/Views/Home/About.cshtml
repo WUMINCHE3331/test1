@@ -1,0 +1,454 @@
+﻿
+<style>
+    /* 全局樣式 */
+
+
+    /* 容器 */
+    .about-container {
+        width: 100%;
+        background: #fff;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    /* 標題 */
+    .container h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    /* 小故事段落 */
+    .story {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        margin-bottom: 1.5rem;
+        color: #555;
+    }
+
+    /* 卡片區塊 */
+    .card {
+        background: #f9f9f9;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .card p {
+            color: #777;
+            line-height: 1.6;
+        }
+
+    /* 動畫效果 */
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    /* 按鈕樣式 */
+    .btn-container {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        background-color: #74b9ff;
+        color: white;
+        padding: 0.8rem 2rem;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        .btn:hover {
+            background-color: #0984e3;
+        }
+    /* 時間軸樣式 */
+    .timeline {
+        margin-top: 2rem;
+        padding: 1rem;
+        border-left: 3px solid #74b9ff;
+        position: relative;
+    }
+
+        .timeline ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .timeline li {
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 2rem;
+        }
+
+    .timeline-content {
+        background: #f9f9f9;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+        .timeline-content h4 {
+            margin: 0;
+            color: #333;
+        }
+</style>
+
+<style>
+    /* 容器樣式 */
+.hover-icon-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+
+
+/* 預設圖片（灰色地球） */
+.icon-default {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 1;
+}
+
+/* Hover 圖片（彩色地球） */
+.icon-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+
+/* 懸停時的效果 */
+.hover-icon-container:hover .icon-default {
+    opacity: 0; /* 灰色圖標淡出 */
+}
+
+.hover-icon-container:hover .icon-hover {
+    opacity: 1; /* 彩色圖標淡入 */
+}
+
+/* 文字樣式 */
+.icon-text {
+    margin-top: 8px;
+    font-size: 16px;
+    color: #333;
+    text-align: center;
+}
+
+</style>
+
+<div class="about-container">
+    <h1>About JustSplit</h1>
+    <p class="story">
+        JustSplit 是一群大學生，在大學最後一個暑假，奉獻新鮮的肝，做的一個簡單分帳網站，希望您喜歡！
+        如果出遊或聚餐時總是為分錢而煩惱的話！快動動你的手指，讓我們協助您分帳吧！
+    </p>
+    <div class="horizontal-timeline-container">
+        <h3 class="timeline-title">開發歷程</h3>
+        <div class="horizontal-timeline" id="timeline">
+            <div class="timeline-item">
+                <div class="timeline-icon" style="background-color: #76b1d8;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>2024 年 1 月～2 月</h4>
+                    <p>JustSplit 團隊成立，開始構思並設計分帳系統。</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon" style="background-color: #f39c12;">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>2024 年 3 月</h4>
+                    <p>產生專案計畫書，規劃系統架構與網站動向。</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon" style="background-color: #3498db;">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>2024 年 4 月</h4>
+                    <p>撰寫系統需求及設計規格書，並開始開發。</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon" style="background-color: #1abc9c;">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>2024 年 5 月</h4>
+                    <p>完成開發文件，系統開發進行中。</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon" style="background-color: #e74c3c;">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>2024 年 6 月</h4>
+                    <p>完成網站第一版，進行測試及修正。</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon" style="background-color: #9b59b6;">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>2024 年 7 月</h4>
+                    <p>網站第二版正式上線，準備 Line 環境。</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon" style="background-color: #2ecc71;">
+                    <i class="fas fa-plug"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>2024 年 8 月</h4>
+                    <p>導入 Webhook 技術，結合 Google 和 Line 登入。</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon" style="background-color: #e67e22;">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>2024 年 9 月</h4>
+                    <p>LineBot 正式上線，持續更新和改進。</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-icon" style="background-color: #34495e;">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <div class="timeline-content">
+                    <h4>2024 年 10 月～今</h4>
+                    <p>持續更新中！</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const timeline = document.getElementById('timeline');
+        let scrollAmount = 0;
+        const scrollStep = 220; // 每次滾動的距離
+        const scrollInterval = 4000; // 每隔 2 秒滾動一次
+
+        function autoScroll() {
+            scrollAmount += scrollStep;
+            if (scrollAmount >= timeline.scrollWidth - timeline.clientWidth) {
+                scrollAmount = 0; // 滾動到末尾後回到開頭
+            }
+            timeline.scrollTo({
+                left: scrollAmount,
+                behavior: 'smooth',
+            });
+        }
+
+        // 自動滾動
+        setInterval(autoScroll, scrollInterval);
+
+    </script>
+    <style>
+        /* 基本容器樣式 */
+        .horizontal-timeline-container {
+            max-width: 1200px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        .timeline-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        /* 水平時間軸 */
+        .horizontal-timeline {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px 0;
+            gap: 20px;
+            scroll-snap-type: x mandatory;
+            border-top: 3px solid #76b1d8;
+            scrollbar-width: thin;
+            scrollbar-color: #76b1d8 #f5f5f5;
+        }
+
+            /* 自訂滾動條樣式 */
+            .horizontal-timeline::-webkit-scrollbar {
+                height: 8px;
+            }
+
+            .horizontal-timeline::-webkit-scrollbar-track {
+                background: #f5f5f5;
+            }
+
+            .horizontal-timeline::-webkit-scrollbar-thumb {
+                background-color: #76b1d8;
+                border-radius: 10px;
+            }
+
+        /* 時間軸項目 */
+        .timeline-item {
+            flex: 0 0 200px;
+            text-align: center;
+            scroll-snap-align: center;
+        }
+
+        /* 圓形圖示 */
+        .timeline-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 時間軸內容 */
+        .timeline-content {
+            margin-top: 10px;
+        }
+
+            .timeline-content h4 {
+                font-size: 1.2rem;
+                color: #333;
+            }
+
+            .timeline-content p {
+                font-size: 0.9rem;
+                color: #666;
+            }
+    </style>
+    <div class="card">
+        <h3 class="text-center">JustSplit 的命名由來小故事</h3>
+        <p>
+            在一間繁忙的咖啡廳裡，幾位大學朋友聚在一起慶祝期末考結束。突然，他們面臨一個問題：誰要負責結帳？
+            每個人點的餐點不一樣，有人只點了咖啡，有人還點了甜點，分帳變得很麻煩。
+            於是，他們靈機一動：「Just Split it!」—— 就這樣，JustSplit 誕生了，象徵簡單、直接、有效率的分帳方式！
+        </p>
+    </div>
+
+    <div class="card">
+        <h3 class="text-center">我們的願景</h3>
+        <p>
+            在 18～25 歲的年輕人中，隨著現代消費模式的改變，許多情形無法分開結帳。
+            JustSplit 將透過 WebHook 技術，融入 LINE 等平台，無需下載新軟體，即可輕鬆享受分帳服務。
+        </p>
+    </div>
+
+    @*<div class="timeline">
+            <h3 class="text-center">開發歷程</h3>
+            <ul>
+                <li>
+                    <div class="timeline-content">
+                        <h4>2024 年 1 月底～2 月初</h4>
+                        <p>JustSplit 團隊成立，開始構思並設計分帳系統。</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="timeline-content">
+                        <h4>2024 年 3 月</h4>
+                        <p>產生專案計畫書，並開始規劃系統架構和網站動向，程式開發前置步驟。</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="timeline-content">
+                        <h4>2024 年 4 月</h4>
+                        <p>開始開發系統，撰寫系統需求及設計規格書。</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="timeline-content">
+                        <h4>2024 年 5 月</h4>
+                        <p>完成開發文件，系統開發中⋯</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="timeline-content">
+                        <h4>2024 年 6 月</h4>
+                        <p>完成網站第一版，進行測試，進行修正，並撰寫測試報告書。</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="timeline-content">
+                        <h4>2024 年 7 月</h4>
+                        <p>網站第二版正式上線，開始進行 Line 環境前置作業。</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="timeline-content">
+                        <h4>2024 年 8 月</h4>
+                        <p>正式導入 Webhook 技術，並結合 Google、Line 第三方登入功能。</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="timeline-content">
+                        <h4>2024 年 9 月</h4>
+                        <p>LineBot 服務正式上線，持續更新和改進。</p>
+                    </div>
+                </li>
+                <li>
+                    <div class="timeline-content">
+                        <h4>2024 年 10 月～今</h4>
+                        <p>持續更新中！</p>
+                    </div>
+                </li>
+            </ul>
+        </div>*@
+
+
+    <div class="btn-container">
+        <button class="btn">了解更多</button>
+    </div>
+</div>
+

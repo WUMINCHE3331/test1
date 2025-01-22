@@ -1,0 +1,17 @@
+# 編譯後的檔案
+bin/
+obj/
+
+# NuGet 資料夾
+packages/
+
+# 本地設定檔案
+*.user
+*.suo
+
+# 系統檔案
+*.log
+*.DS_Store
+Thumbs.db
+# Visual Studio 的臨時檔案
+.vs/

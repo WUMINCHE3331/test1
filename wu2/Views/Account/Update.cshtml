@@ -1,0 +1,300 @@
+﻿
+@model wu2.Models.UserViewModel
+
+<div class="profile-container">
+    <div class="profile-header">
+        <img id="profile-image-preview" src="@(string.IsNullOrEmpty(Model.ProfilePhoto) ? Url.Content("~/UserProfilePhotos/defaultPerson.jpg") : Url.Content(Model.ProfilePhoto))" alt="Profile Picture" class="profile-pic">
+    </div>
+    @{
+        // 當前登入的使用者 ID
+        var currentUserId = (int)Session["UserID"];
+    }
+
+    @using (Html.BeginForm("Update", "Account", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="flex">
+            <div class="inputBox">
+                <span>姓名:</span>
+                <input type="text" name="FullName" value="@Model.FullName" placeholder="名稱"  readonly class="box" />
+                @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
+
+                <span>信箱:</span>
+                <input type="email" name="Email" value="@Model.Email" class="box" readonly />
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                @if (currentUserId == Model.UserId)
+                {
+                    <span>帳戶:</span>
+                    <input type="text" name="BankAccount" value="@Model.BankAccount" placeholder="尚未設定" class="box" />
+                    @Html.ValidationMessageFor(m => m.BankAccount, "", new { @class = "text-danger" })
+
+                    <span>電話:</span>
+                    <input type="text" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="尚未設定" class="box" />
+                    @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })}
+                else
+                {
+                    <span>帳戶:</span>
+                    <input type="text" name="BankAccount" value="@Model.BankAccount" placeholder="尚未設定" readonly class="box" />
+                    @Html.ValidationMessageFor(m => m.BankAccount, "", new { @class = "text-danger" })
+
+                    <span>電話:</span>
+                    <input type="text" name="PhoneNumber" value="@Model.PhoneNumber" placeholder="尚未設定" readonly class="box" />
+                    @Html.ValidationMessageFor(m => m.PhoneNumber, "", new { @class = "text-danger" })}
+                
+
+
+            </div>
+
+            @if (currentUserId == Model.UserId)  // 判斷是否為當前登入的使用者
+            {
+                <div class="inputBox">
+                    <span>舊密碼:</span>
+                    <input type="password" name="OldPassword" value="@Model.OldPassword" class="box" />
+                    @Html.ValidationMessageFor(m => m.OldPassword, "", new { @class = "text-danger" })
+
+                    <span>新密碼:</span>
+                    <input type="password" name="NewPassword" placeholder="設定新密碼" class="box" />
+                    @Html.ValidationMessageFor(m => m.NewPassword, "", new { @class = "text-danger" })
+
+                    <span>新密碼:</span>
+                    <input type="password" name="ConfirmPassword" placeholder="確認設定新密碼" class="box" />
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+
+                    <span>更新照片:</span>
+                    <input type="file" name="ProfilePhoto" id="profile-pic" accept="image/jpg, image/jpeg, image/png" class="box" />
+                    @Html.ValidationMessageFor(m => m.ProfilePhoto, "", new { @class = "text-danger" })
+                </div>
+            }
+            <span>註冊:@Model.RegistrationDate</span>
+        </div>
+        <div class="button-group">
+            @if (currentUserId == Model.UserId)  // 當前使用者是頁面擁有者，顯示「更新」和「返回」
+            {
+                <input type="submit" value="更新資訊" class="btn btn-update" />
+                <a href="@Url.Action("Index", "Home")" class="btn btn-back">返回</a>
+            }
+            else  // 如果是訪客，顯示「返回上一頁」按鈕
+            {
+                <a href="javascript:history.back()" class="btn btn-back  ">返回上一頁</a>
+            }
+        </div>
+    }
+</div>
+
+<style>
+    /* 基本樣式 */
+    .user-role {
+        display: flex;
+        align-items: center;
+        gap: 8px; /* 控制圖示與文字間距 */
+        font-size: 1.2rem;
+    }
+
+    /* 手機版，只顯示圖示 */
+    @@media (max-width: 768px) {
+        .user-role strong {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .user-role strong::after {
+                content: ''; /* 隱藏文字 */
+            }
+    }
+
+    .profile-container {
+        background: #fff;
+        padding: 20px 40px;
+        margin: 2rem auto;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+    }
+
+    span {
+        text-align: left;
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-pic {
+        height: 100px;
+        width: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .flex {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .inputBox {
+        flex: 1;
+        min-width: calc(50% - 20px);
+    }
+
+        .inputBox span {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 16px;
+        }
+
+        .inputBox input[type="text"],
+        .inputBox input[type="email"],
+        .inputBox input[type="password"],
+        .inputBox input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 2px solid #eee;
+            border-radius: 5px;
+            background-color: var(--light-blue);
+            font-size: 16px;
+            color: var(--dark);
+            font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
+        }
+
+            .inputBox input[type="text"]:focus,
+            .inputBox input[type="email"]:focus,
+            .inputBox input[type="password"]:focus,
+            .inputBox input[type="file"]:focus {
+                border-color: var(--blue); 
+                outline: none;
+            }
+
+
+
+        .inputBox input[type="file"] {
+            padding: 6px 10px; 
+            line-height: 1.5; 
+        }
+
+    .btn-update {
+        padding: 10px 20px;
+        border: none;
+        background-color: #007bff;
+        color: #fff;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+        .btn-update:hover {
+            background-color: #0056b3;
+        }
+
+    .btn-back {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 20px;
+        background-color: #dc3545;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+        .btn-back:hover {
+            background-color: #c82333;
+        }
+
+    .button-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .text-danger {
+        color: #ff0000;
+        font-size: 12px;
+        text-align: left;
+    }
+
+    @@media (max-width: 576px) {
+        .profile-container {
+            padding: 15px 20px;
+            margin: 1rem auto;
+        }
+
+        .flex {
+            flex-direction: column;
+        }
+
+        .inputBox {
+            min-width: 100%;
+        }
+
+        .profile-pic {
+            height: 120px;
+            width: 120px;
+        }
+
+        .btn-update,
+        .btn-back {
+            font-size: 14px;
+            padding: 8px 15px;
+        }
+    }
+</style>
+<script>
+        // 如果 TempData["SuccessMessage"] 存在成功
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                Swal.fire({
+                    title: 'Success!',
+                    text: '@TempData["SuccessMessage"]',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                });
+            </text>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                Swal.fire({
+                    title: 'Error!',
+                    text: '@TempData["ErrorMessage"]',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            </text>
+        }
+        document.getElementById("profile-pic").onchange = function () {
+        var file = this.files[0];
+        if (file.size > 10485760) { // 10 MB
+            alert("檔案太大，請選擇小於 10 MB 的檔案。");
+            this.value = ""; // 清空選擇的檔案
+        }
+    };
+
+</script>
+<script>
+    // 監聽 input 的變化事件
+    document.getElementById('profile-pic').addEventListener('change', function (event) {
+        var input = event.target;
+
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                // 獲取預覽區域的 img 標籤，並將 src 設定為選擇的圖片
+                document.getElementById('profile-image-preview').src = e.target.result;
+            };
+
+            // 讀取圖片文件並轉換為 Data URL
+            reader.readAsDataURL(input.files[0]);
+        }
+    });
+
+</script>

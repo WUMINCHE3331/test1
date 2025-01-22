@@ -1,0 +1,1412 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="wuModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ActivityLogs">
+          <Key>
+            <PropertyRef Name="ActivityLogId" />
+          </Key>
+          <Property Name="ActivityLogId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GroupId" Type="int" />
+          <Property Name="UserId" Type="int" />
+          <Property Name="ActivityType" Type="nvarchar" MaxLength="50" />
+          <Property Name="ActivityDetails" Type="nvarchar" MaxLength="255" />
+          <Property Name="Date" Type="datetime" Nullable="false" />
+          <Property Name="ExpenseId" Type="int" />
+        </EntityType>
+        <EntityType Name="Debts">
+          <Key>
+            <PropertyRef Name="DebtId" />
+          </Key>
+          <Property Name="DebtId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GroupId" Type="int" Nullable="false" />
+          <Property Name="CreditorId" Type="int" Nullable="false" />
+          <Property Name="DebtorId" Type="int" Nullable="false" />
+          <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedAt" Type="datetime" />
+          <Property Name="IsPaid" Type="bit" Nullable="false" />
+          <Property Name="ExpenseId" Type="int" />
+          <Property Name="LastRemindTime" Type="datetime" />
+          <Property Name="IsPending" Type="bit" />
+          <Property Name="IsConfirmed" Type="bit" />
+        </EntityType>
+        <EntityType Name="ExpenseDetails">
+          <Key>
+            <PropertyRef Name="ExpenseDetailId" />
+          </Key>
+          <Property Name="ExpenseDetailId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ExpenseId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="Note" Type="nvarchar" MaxLength="255" />
+          <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="Proportion" Type="decimal" Precision="5" Scale="2" />
+        </EntityType>
+        <EntityType Name="ExpensePayers">
+          <Key>
+            <PropertyRef Name="ExpensePayerId" />
+          </Key>
+          <Property Name="ExpensePayerId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ExpenseId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Expenses">
+          <Key>
+            <PropertyRef Name="ExpenseId" />
+          </Key>
+          <Property Name="ExpenseId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GroupId" Type="int" Nullable="false" />
+          <Property Name="TotalAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ExpenseType" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="ExpenseItem" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="PaymentMethod" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Note" Type="nvarchar" MaxLength="255" />
+          <Property Name="Photo" Type="nvarchar" MaxLength="255" />
+          <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="CreatedBy" Type="int" />
+          <Property Name="LastTime" Type="datetime" />
+        </EntityType>
+        <EntityType Name="GroupMembers">
+          <Key>
+            <PropertyRef Name="GroupMemberId" />
+          </Key>
+          <Property Name="GroupMemberId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GroupId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Role" Type="nvarchar" MaxLength="50" />
+          <Property Name="JoinedDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Groups">
+          <Key>
+            <PropertyRef Name="GroupId" />
+          </Key>
+          <Property Name="GroupId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GroupName" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="CreatorId" Type="int" Nullable="false" />
+          <Property Name="Budget" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="Currency" Type="nvarchar" MaxLength="10" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="Description" Type="nvarchar" MaxLength="255" />
+          <Property Name="GroupsPhoto" Type="nvarchar" MaxLength="255" />
+          <Property Name="IsArchived" Type="bit" Nullable="false" />
+          <Property Name="JoinLink" Type="nvarchar" MaxLength="255" />
+          <Property Name="ChatId" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="MessageReadStatus">
+          <Key>
+            <PropertyRef Name="MessageReadStatusId" />
+          </Key>
+          <Property Name="MessageReadStatusId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MessageId" Type="int" />
+          <Property Name="UserId" Type="int" />
+          <Property Name="IsRead" Type="bit" />
+          <Property Name="ReadAt" Type="datetime" />
+        </EntityType>
+        <EntityType Name="Messages">
+          <Key>
+            <PropertyRef Name="MessageId" />
+          </Key>
+          <Property Name="MessageId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GroupId" Type="int" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Content" Type="nvarchar(max)" />
+          <Property Name="CreatedAt" Type="datetime" Nullable="false" />
+          <Property Name="ReceiverId" Type="int" />
+        </EntityType>
+        <EntityType Name="Notices">
+          <Key>
+            <PropertyRef Name="NoticeId" />
+          </Key>
+          <Property Name="NoticeId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="GroupId" Type="int" />
+          <Property Name="Title" Type="nvarchar" MaxLength="255" />
+          <Property Name="Content" Type="text" />
+          <Property Name="CreatedAt" Type="datetime" />
+          <Property Name="CreatedBy" Type="int" />
+          <Property Name="IsCurrent" Type="bit" />
+        </EntityType>
+        <EntityType Name="Notifications">
+          <Key>
+            <PropertyRef Name="NotificationId" />
+          </Key>
+          <Property Name="NotificationId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="GroupId" Type="int" />
+          <Property Name="NotificationType" Type="nvarchar" MaxLength="50" />
+          <Property Name="Message" Type="nvarchar" MaxLength="255" />
+          <Property Name="IsRead" Type="bit" />
+          <Property Name="Date" Type="datetime" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="50" />
+          <Property Name="RelatedDebtId" Type="int" />
+          <Property Name="RelatedExpenseId" Type="int" />
+          <Property Name="IsCancelled" Type="bit" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Email" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="PasswordHash" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="FullName" Type="nvarchar" MaxLength="255" />
+          <Property Name="BankAccount" Type="nvarchar" MaxLength="255" />
+          <Property Name="PhoneNumber" Type="nvarchar" MaxLength="20" />
+          <Property Name="Role" Type="nvarchar" MaxLength="50" />
+          <Property Name="RegistrationDate" Type="datetime" />
+          <Property Name="ProfilePhoto" Type="nvarchar" MaxLength="255" />
+          <Property Name="TokenExpiration" Type="datetime" />
+          <Property Name="PasswordResetToken" Type="nvarchar(max)" />
+          <Property Name="ConfirmPassword" Type="nvarchar" MaxLength="255" />
+          <Property Name="LineUserId" Type="nvarchar" MaxLength="50" />
+          <Property Name="GoogleId" Type="nvarchar" MaxLength="50" />
+        </EntityType>
+        <Association Name="FK__ActivityL__Group__38996AB5">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="0..1" />
+          <End Role="ActivityLogs" Type="Self.ActivityLogs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="ActivityLogs">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ActivityL__UserI__398D8EEE">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="ActivityLogs" Type="Self.ActivityLogs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="ActivityLogs">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Debts__CreditorI__3D5E1FD2">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Debts" Type="Self.Debts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Debts">
+              <PropertyRef Name="CreditorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Debts__DebtorId__3E52440B">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Debts" Type="Self.Debts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Debts">
+              <PropertyRef Name="DebtorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Debts__GroupId__3C69FB99">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="1" />
+          <End Role="Debts" Type="Self.Debts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="Debts">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ExpenseDe__Expen__30F848ED">
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="1" />
+          <End Role="ExpenseDetails" Type="Self.ExpenseDetails" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Expenses">
+              <PropertyRef Name="ExpenseId" />
+            </Principal>
+            <Dependent Role="ExpenseDetails">
+              <PropertyRef Name="ExpenseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ExpenseDe__UserI__31EC6D26">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="ExpenseDetails" Type="Self.ExpenseDetails" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="ExpenseDetails">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ExpensePa__Expen__4AB81AF0">
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="1" />
+          <End Role="ExpensePayers" Type="Self.ExpensePayers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Expenses">
+              <PropertyRef Name="ExpenseId" />
+            </Principal>
+            <Dependent Role="ExpensePayers">
+              <PropertyRef Name="ExpenseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ExpensePa__UserI__4BAC3F29">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="ExpensePayers" Type="Self.ExpensePayers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="ExpensePayers">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Expenses__GroupI__2D27B809">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="1" />
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="Expenses">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__GroupMemb__Group__29572725">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="1" />
+          <End Role="GroupMembers" Type="Self.GroupMembers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="GroupMembers">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__GroupMemb__UserI__2A4B4B5E">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="GroupMembers" Type="Self.GroupMembers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="GroupMembers">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Groups__CreatorI__267ABA7A">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Groups" Type="Self.Groups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Groups">
+              <PropertyRef Name="CreatorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__MessageRe__Messa__0C85DE4D">
+          <End Role="Messages" Type="Self.Messages" Multiplicity="0..1" />
+          <End Role="MessageReadStatus" Type="Self.MessageReadStatus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Messages">
+              <PropertyRef Name="MessageId" />
+            </Principal>
+            <Dependent Role="MessageReadStatus">
+              <PropertyRef Name="MessageId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__MessageRe__UserI__0D7A0286">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="MessageReadStatus" Type="Self.MessageReadStatus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="MessageReadStatus">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Messages__GroupI__07C12930">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="0..1" />
+          <End Role="Messages" Type="Self.Messages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="Messages">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Messages__UserId__08B54D69">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Messages" Type="Self.Messages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Messages">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Notices__Created__6EF57B66">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Notices" Type="Self.Notices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Notices">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Notices__GroupId__6E01572D">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="0..1" />
+          <End Role="Notices" Type="Self.Notices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="Notices">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Notificat__Group__35BCFE0A">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="0..1" />
+          <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="Notifications">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Notificat__UserI__34C8D9D1">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Notifications">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ActivityLogs_Expenses">
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="0..1" />
+          <End Role="ActivityLogs" Type="Self.ActivityLogs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Expenses">
+              <PropertyRef Name="ExpenseId" />
+            </Principal>
+            <Dependent Role="ActivityLogs">
+              <PropertyRef Name="ExpenseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Debts_Expenses">
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="0..1" />
+          <End Role="Debts" Type="Self.Debts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Expenses">
+              <PropertyRef Name="ExpenseId" />
+            </Principal>
+            <Dependent Role="Debts">
+              <PropertyRef Name="ExpenseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Expenses_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Expenses">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Messages_Users_ReceiverId">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Messages" Type="Self.Messages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Messages">
+              <PropertyRef Name="ReceiverId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="wuModelStoreContainer">
+          <EntitySet Name="ActivityLogs" EntityType="Self.ActivityLogs" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Debts" EntityType="Self.Debts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ExpenseDetails" EntityType="Self.ExpenseDetails" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ExpensePayers" EntityType="Self.ExpensePayers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Expenses" EntityType="Self.Expenses" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GroupMembers" EntityType="Self.GroupMembers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Groups" EntityType="Self.Groups" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MessageReadStatus" EntityType="Self.MessageReadStatus" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Messages" EntityType="Self.Messages" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Notices" EntityType="Self.Notices" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Notifications" EntityType="Self.Notifications" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__ActivityL__Group__38996AB5" Association="Self.FK__ActivityL__Group__38996AB5">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="ActivityLogs" EntitySet="ActivityLogs" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ActivityL__UserI__398D8EEE" Association="Self.FK__ActivityL__UserI__398D8EEE">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ActivityLogs" EntitySet="ActivityLogs" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Debts__CreditorI__3D5E1FD2" Association="Self.FK__Debts__CreditorI__3D5E1FD2">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Debts" EntitySet="Debts" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Debts__DebtorId__3E52440B" Association="Self.FK__Debts__DebtorId__3E52440B">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Debts" EntitySet="Debts" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Debts__GroupId__3C69FB99" Association="Self.FK__Debts__GroupId__3C69FB99">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Debts" EntitySet="Debts" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ExpenseDe__Expen__30F848ED" Association="Self.FK__ExpenseDe__Expen__30F848ED">
+            <End Role="Expenses" EntitySet="Expenses" />
+            <End Role="ExpenseDetails" EntitySet="ExpenseDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ExpenseDe__UserI__31EC6D26" Association="Self.FK__ExpenseDe__UserI__31EC6D26">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ExpenseDetails" EntitySet="ExpenseDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ExpensePa__Expen__4AB81AF0" Association="Self.FK__ExpensePa__Expen__4AB81AF0">
+            <End Role="Expenses" EntitySet="Expenses" />
+            <End Role="ExpensePayers" EntitySet="ExpensePayers" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ExpensePa__UserI__4BAC3F29" Association="Self.FK__ExpensePa__UserI__4BAC3F29">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ExpensePayers" EntitySet="ExpensePayers" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Expenses__GroupI__2D27B809" Association="Self.FK__Expenses__GroupI__2D27B809">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Expenses" EntitySet="Expenses" />
+          </AssociationSet>
+          <AssociationSet Name="FK__GroupMemb__Group__29572725" Association="Self.FK__GroupMemb__Group__29572725">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="GroupMembers" EntitySet="GroupMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK__GroupMemb__UserI__2A4B4B5E" Association="Self.FK__GroupMemb__UserI__2A4B4B5E">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="GroupMembers" EntitySet="GroupMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Groups__CreatorI__267ABA7A" Association="Self.FK__Groups__CreatorI__267ABA7A">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Groups" EntitySet="Groups" />
+          </AssociationSet>
+          <AssociationSet Name="FK__MessageRe__Messa__0C85DE4D" Association="Self.FK__MessageRe__Messa__0C85DE4D">
+            <End Role="Messages" EntitySet="Messages" />
+            <End Role="MessageReadStatus" EntitySet="MessageReadStatus" />
+          </AssociationSet>
+          <AssociationSet Name="FK__MessageRe__UserI__0D7A0286" Association="Self.FK__MessageRe__UserI__0D7A0286">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="MessageReadStatus" EntitySet="MessageReadStatus" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Messages__GroupI__07C12930" Association="Self.FK__Messages__GroupI__07C12930">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Messages" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Messages__UserId__08B54D69" Association="Self.FK__Messages__UserId__08B54D69">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Messages" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Notices__Created__6EF57B66" Association="Self.FK__Notices__Created__6EF57B66">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Notices" EntitySet="Notices" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Notices__GroupId__6E01572D" Association="Self.FK__Notices__GroupId__6E01572D">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Notices" EntitySet="Notices" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Notificat__Group__35BCFE0A" Association="Self.FK__Notificat__Group__35BCFE0A">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Notifications" EntitySet="Notifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Notificat__UserI__34C8D9D1" Association="Self.FK__Notificat__UserI__34C8D9D1">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Notifications" EntitySet="Notifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ActivityLogs_Expenses" Association="Self.FK_ActivityLogs_Expenses">
+            <End Role="Expenses" EntitySet="Expenses" />
+            <End Role="ActivityLogs" EntitySet="ActivityLogs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Debts_Expenses" Association="Self.FK_Debts_Expenses">
+            <End Role="Expenses" EntitySet="Expenses" />
+            <End Role="Debts" EntitySet="Debts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Expenses_Users" Association="Self.FK_Expenses_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Expenses" EntitySet="Expenses" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Messages_Users_ReceiverId" Association="Self.FK_Messages_Users_ReceiverId">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Messages" EntitySet="Messages" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="wuModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="ActivityLogs">
+          <Key>
+            <PropertyRef Name="ActivityLogId" />
+          </Key>
+          <Property Name="ActivityLogId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GroupId" Type="Int32" />
+          <Property Name="UserId" Type="Int32" />
+          <Property Name="ActivityType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="ActivityDetails" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ExpenseId" Type="Int32" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__ActivityL__Group__38996AB5" FromRole="ActivityLogs" ToRole="Groups" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__ActivityL__UserI__398D8EEE" FromRole="ActivityLogs" ToRole="Users" />
+          <NavigationProperty Name="Expenses" Relationship="Self.FK_ActivityLogs_Expenses" FromRole="ActivityLogs" ToRole="Expenses" />
+        </EntityType>
+        <EntityType Name="Debts">
+          <Key>
+            <PropertyRef Name="DebtId" />
+          </Key>
+          <Property Name="DebtId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GroupId" Type="Int32" Nullable="false" />
+          <Property Name="CreditorId" Type="Int32" Nullable="false" />
+          <Property Name="DebtorId" Type="Int32" Nullable="false" />
+          <Property Name="Amount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedAt" Type="DateTime" Precision="3" />
+          <Property Name="IsPaid" Type="Boolean" Nullable="false" />
+          <Property Name="ExpenseId" Type="Int32" />
+          <Property Name="LastRemindTime" Type="DateTime" Precision="3" />
+          <Property Name="IsPending" Type="Boolean" />
+          <Property Name="IsConfirmed" Type="Boolean" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__Debts__CreditorI__3D5E1FD2" FromRole="Debts" ToRole="Users" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK__Debts__DebtorId__3E52440B" FromRole="Debts" ToRole="Users" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__Debts__GroupId__3C69FB99" FromRole="Debts" ToRole="Groups" />
+          <NavigationProperty Name="Expenses" Relationship="Self.FK_Debts_Expenses" FromRole="Debts" ToRole="Expenses" />
+        </EntityType>
+        <EntityType Name="ExpenseDetails">
+          <Key>
+            <PropertyRef Name="ExpenseDetailId" />
+          </Key>
+          <Property Name="ExpenseDetailId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ExpenseId" Type="Int32" Nullable="false" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Amount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="Note" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <Property Name="Proportion" Type="Decimal" Precision="5" Scale="2" />
+          <NavigationProperty Name="Expenses" Relationship="Self.FK__ExpenseDe__Expen__30F848ED" FromRole="ExpenseDetails" ToRole="Expenses" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__ExpenseDe__UserI__31EC6D26" FromRole="ExpenseDetails" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="ExpensePayers">
+          <Key>
+            <PropertyRef Name="ExpensePayerId" />
+          </Key>
+          <Property Name="ExpensePayerId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ExpenseId" Type="Int32" Nullable="false" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Amount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <NavigationProperty Name="Expenses" Relationship="Self.FK__ExpensePa__Expen__4AB81AF0" FromRole="ExpensePayers" ToRole="Expenses" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__ExpensePa__UserI__4BAC3F29" FromRole="ExpensePayers" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Expenses">
+          <Key>
+            <PropertyRef Name="ExpenseId" />
+          </Key>
+          <Property Name="ExpenseId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GroupId" Type="Int32" Nullable="false" />
+          <Property Name="TotalAmount" Type="Decimal" Precision="18" Scale="2" Nullable="false" />
+          <Property Name="ExpenseType" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ExpenseItem" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PaymentMethod" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Note" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Photo" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="LastTime" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="ActivityLogs" Relationship="Self.FK_ActivityLogs_Expenses" FromRole="Expenses" ToRole="ActivityLogs" />
+          <NavigationProperty Name="Debts" Relationship="Self.FK_Debts_Expenses" FromRole="Expenses" ToRole="Debts" />
+          <NavigationProperty Name="ExpenseDetails" Relationship="Self.FK__ExpenseDe__Expen__30F848ED" FromRole="Expenses" ToRole="ExpenseDetails" />
+          <NavigationProperty Name="ExpensePayers" Relationship="Self.FK__ExpensePa__Expen__4AB81AF0" FromRole="Expenses" ToRole="ExpensePayers" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__Expenses__GroupI__2D27B809" FromRole="Expenses" ToRole="Groups" />
+          <NavigationProperty Name="Users" Relationship="Self.FK_Expenses_Users" FromRole="Expenses" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="GroupMembers">
+          <Key>
+            <PropertyRef Name="GroupMemberId" />
+          </Key>
+          <Property Name="GroupMemberId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GroupId" Type="Int32" Nullable="false" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Role" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="JoinedDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__GroupMemb__Group__29572725" FromRole="GroupMembers" ToRole="Groups" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__GroupMemb__UserI__2A4B4B5E" FromRole="GroupMembers" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Groups">
+          <Key>
+            <PropertyRef Name="GroupId" />
+          </Key>
+          <Property Name="GroupId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GroupName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CreatorId" Type="Int32" Nullable="false" />
+          <Property Name="Budget" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="Currency" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="GroupsPhoto" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="IsArchived" Type="Boolean" Nullable="false" />
+          <Property Name="JoinLink" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="ChatId" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ActivityLogs" Relationship="Self.FK__ActivityL__Group__38996AB5" FromRole="Groups" ToRole="ActivityLogs" />
+          <NavigationProperty Name="Debts" Relationship="Self.FK__Debts__GroupId__3C69FB99" FromRole="Groups" ToRole="Debts" />
+          <NavigationProperty Name="Expenses" Relationship="Self.FK__Expenses__GroupI__2D27B809" FromRole="Groups" ToRole="Expenses" />
+          <NavigationProperty Name="GroupMembers" Relationship="Self.FK__GroupMemb__Group__29572725" FromRole="Groups" ToRole="GroupMembers" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__Groups__CreatorI__267ABA7A" FromRole="Groups" ToRole="Users" />
+          <NavigationProperty Name="Messages" Relationship="Self.FK__Messages__GroupI__07C12930" FromRole="Groups" ToRole="Messages" />
+          <NavigationProperty Name="Notices" Relationship="Self.FK__Notices__GroupId__6E01572D" FromRole="Groups" ToRole="Notices" />
+          <NavigationProperty Name="Notifications" Relationship="Self.FK__Notificat__Group__35BCFE0A" FromRole="Groups" ToRole="Notifications" />
+        </EntityType>
+        <EntityType Name="MessageReadStatus">
+          <Key>
+            <PropertyRef Name="MessageReadStatusId" />
+          </Key>
+          <Property Name="MessageReadStatusId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MessageId" Type="Int32" />
+          <Property Name="UserId" Type="Int32" />
+          <Property Name="IsRead" Type="Boolean" />
+          <Property Name="ReadAt" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="Messages" Relationship="Self.FK__MessageRe__Messa__0C85DE4D" FromRole="MessageReadStatus" ToRole="Messages" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__MessageRe__UserI__0D7A0286" FromRole="MessageReadStatus" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Messages">
+          <Key>
+            <PropertyRef Name="MessageId" />
+          </Key>
+          <Property Name="MessageId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GroupId" Type="Int32" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedAt" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ReceiverId" Type="Int32" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__Messages__GroupI__07C12930" FromRole="Messages" ToRole="Groups" />
+          <NavigationProperty Name="MessageReadStatus" Relationship="Self.FK__MessageRe__Messa__0C85DE4D" FromRole="Messages" ToRole="MessageReadStatus" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__Messages__UserId__08B54D69" FromRole="Messages" ToRole="Users" />
+          <NavigationProperty Name="Users1" Relationship="Self.FK_Messages_Users_ReceiverId" FromRole="Messages" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Notices">
+          <Key>
+            <PropertyRef Name="NoticeId" />
+          </Key>
+          <Property Name="NoticeId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="GroupId" Type="Int32" />
+          <Property Name="Title" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedAt" Type="DateTime" Precision="3" />
+          <Property Name="CreatedBy" Type="Int32" />
+          <Property Name="IsCurrent" Type="Boolean" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__Notices__GroupId__6E01572D" FromRole="Notices" ToRole="Groups" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__Notices__Created__6EF57B66" FromRole="Notices" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Notifications">
+          <Key>
+            <PropertyRef Name="NotificationId" />
+          </Key>
+          <Property Name="NotificationId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="GroupId" Type="Int32" />
+          <Property Name="NotificationType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Message" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="IsRead" Type="Boolean" />
+          <Property Name="Date" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="RelatedDebtId" Type="Int32" />
+          <Property Name="RelatedExpenseId" Type="Int32" />
+          <Property Name="IsCancelled" Type="Boolean" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__Notificat__Group__35BCFE0A" FromRole="Notifications" ToRole="Groups" />
+          <NavigationProperty Name="Users" Relationship="Self.FK__Notificat__UserI__34C8D9D1" FromRole="Notifications" ToRole="Users" />
+        </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FullName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="BankAccount" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="Role" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="RegistrationDate" Type="DateTime" Precision="3" />
+          <Property Name="ProfilePhoto" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="TokenExpiration" Type="DateTime" Precision="3" />
+          <Property Name="PasswordResetToken" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="ConfirmPassword" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="LineUserId" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="GoogleId" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ActivityLogs" Relationship="Self.FK__ActivityL__UserI__398D8EEE" FromRole="Users" ToRole="ActivityLogs" />
+          <NavigationProperty Name="Debts" Relationship="Self.FK__Debts__CreditorI__3D5E1FD2" FromRole="Users" ToRole="Debts" />
+          <NavigationProperty Name="Debts1" Relationship="Self.FK__Debts__DebtorId__3E52440B" FromRole="Users" ToRole="Debts" />
+          <NavigationProperty Name="ExpenseDetails" Relationship="Self.FK__ExpenseDe__UserI__31EC6D26" FromRole="Users" ToRole="ExpenseDetails" />
+          <NavigationProperty Name="ExpensePayers" Relationship="Self.FK__ExpensePa__UserI__4BAC3F29" FromRole="Users" ToRole="ExpensePayers" />
+          <NavigationProperty Name="Expenses" Relationship="Self.FK_Expenses_Users" FromRole="Users" ToRole="Expenses" />
+          <NavigationProperty Name="GroupMembers" Relationship="Self.FK__GroupMemb__UserI__2A4B4B5E" FromRole="Users" ToRole="GroupMembers" />
+          <NavigationProperty Name="Groups" Relationship="Self.FK__Groups__CreatorI__267ABA7A" FromRole="Users" ToRole="Groups" />
+          <NavigationProperty Name="MessageReadStatus" Relationship="Self.FK__MessageRe__UserI__0D7A0286" FromRole="Users" ToRole="MessageReadStatus" />
+          <NavigationProperty Name="Messages" Relationship="Self.FK__Messages__UserId__08B54D69" FromRole="Users" ToRole="Messages" />
+          <NavigationProperty Name="Messages1" Relationship="Self.FK_Messages_Users_ReceiverId" FromRole="Users" ToRole="Messages" />
+          <NavigationProperty Name="Notices" Relationship="Self.FK__Notices__Created__6EF57B66" FromRole="Users" ToRole="Notices" />
+          <NavigationProperty Name="Notifications" Relationship="Self.FK__Notificat__UserI__34C8D9D1" FromRole="Users" ToRole="Notifications" />
+        </EntityType>
+        <Association Name="FK__ActivityL__Group__38996AB5">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="0..1" />
+          <End Role="ActivityLogs" Type="Self.ActivityLogs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="ActivityLogs">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ActivityL__UserI__398D8EEE">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="ActivityLogs" Type="Self.ActivityLogs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="ActivityLogs">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ActivityLogs_Expenses">
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="0..1" />
+          <End Role="ActivityLogs" Type="Self.ActivityLogs" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Expenses">
+              <PropertyRef Name="ExpenseId" />
+            </Principal>
+            <Dependent Role="ActivityLogs">
+              <PropertyRef Name="ExpenseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Debts__CreditorI__3D5E1FD2">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Debts" Type="Self.Debts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Debts">
+              <PropertyRef Name="CreditorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Debts__DebtorId__3E52440B">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Debts" Type="Self.Debts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Debts">
+              <PropertyRef Name="DebtorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Debts__GroupId__3C69FB99">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="1" />
+          <End Role="Debts" Type="Self.Debts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="Debts">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Debts_Expenses">
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="0..1" />
+          <End Role="Debts" Type="Self.Debts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Expenses">
+              <PropertyRef Name="ExpenseId" />
+            </Principal>
+            <Dependent Role="Debts">
+              <PropertyRef Name="ExpenseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ExpenseDe__Expen__30F848ED">
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="1" />
+          <End Role="ExpenseDetails" Type="Self.ExpenseDetails" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Expenses">
+              <PropertyRef Name="ExpenseId" />
+            </Principal>
+            <Dependent Role="ExpenseDetails">
+              <PropertyRef Name="ExpenseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ExpenseDe__UserI__31EC6D26">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="ExpenseDetails" Type="Self.ExpenseDetails" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="ExpenseDetails">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ExpensePa__Expen__4AB81AF0">
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="1" />
+          <End Role="ExpensePayers" Type="Self.ExpensePayers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Expenses">
+              <PropertyRef Name="ExpenseId" />
+            </Principal>
+            <Dependent Role="ExpensePayers">
+              <PropertyRef Name="ExpenseId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__ExpensePa__UserI__4BAC3F29">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="ExpensePayers" Type="Self.ExpensePayers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="ExpensePayers">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Expenses__GroupI__2D27B809">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="1" />
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="Expenses">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Expenses_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Expenses" Type="Self.Expenses" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Expenses">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__GroupMemb__Group__29572725">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="1" />
+          <End Role="GroupMembers" Type="Self.GroupMembers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="GroupMembers">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__GroupMemb__UserI__2A4B4B5E">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="GroupMembers" Type="Self.GroupMembers" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="GroupMembers">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Groups__CreatorI__267ABA7A">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Groups" Type="Self.Groups" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Groups">
+              <PropertyRef Name="CreatorId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Messages__GroupI__07C12930">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="0..1" />
+          <End Role="Messages" Type="Self.Messages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="Messages">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Notices__GroupId__6E01572D">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="0..1" />
+          <End Role="Notices" Type="Self.Notices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="Notices">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Notificat__Group__35BCFE0A">
+          <End Role="Groups" Type="Self.Groups" Multiplicity="0..1" />
+          <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Groups">
+              <PropertyRef Name="GroupId" />
+            </Principal>
+            <Dependent Role="Notifications">
+              <PropertyRef Name="GroupId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__MessageRe__Messa__0C85DE4D">
+          <End Role="Messages" Type="Self.Messages" Multiplicity="0..1" />
+          <End Role="MessageReadStatus" Type="Self.MessageReadStatus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Messages">
+              <PropertyRef Name="MessageId" />
+            </Principal>
+            <Dependent Role="MessageReadStatus">
+              <PropertyRef Name="MessageId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__MessageRe__UserI__0D7A0286">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="MessageReadStatus" Type="Self.MessageReadStatus" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="MessageReadStatus">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Messages__UserId__08B54D69">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Messages" Type="Self.Messages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Messages">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Messages_Users_ReceiverId">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Messages" Type="Self.Messages" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Messages">
+              <PropertyRef Name="ReceiverId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Notices__Created__6EF57B66">
+          <End Role="Users" Type="Self.Users" Multiplicity="0..1" />
+          <End Role="Notices" Type="Self.Notices" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Notices">
+              <PropertyRef Name="CreatedBy" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Notificat__UserI__34C8D9D1">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Notifications" Type="Self.Notifications" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="UserId" />
+            </Principal>
+            <Dependent Role="Notifications">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="wuEntities1" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ActivityLogs" EntityType="Self.ActivityLogs" />
+          <EntitySet Name="Debts" EntityType="Self.Debts" />
+          <EntitySet Name="ExpenseDetails" EntityType="Self.ExpenseDetails" />
+          <EntitySet Name="ExpensePayers" EntityType="Self.ExpensePayers" />
+          <EntitySet Name="Expenses" EntityType="Self.Expenses" />
+          <EntitySet Name="GroupMembers" EntityType="Self.GroupMembers" />
+          <EntitySet Name="Groups" EntityType="Self.Groups" />
+          <EntitySet Name="MessageReadStatus" EntityType="Self.MessageReadStatus" />
+          <EntitySet Name="Messages" EntityType="Self.Messages" />
+          <EntitySet Name="Notices" EntityType="Self.Notices" />
+          <EntitySet Name="Notifications" EntityType="Self.Notifications" />
+          <EntitySet Name="Users" EntityType="Self.Users" />
+          <AssociationSet Name="FK__ActivityL__Group__38996AB5" Association="Self.FK__ActivityL__Group__38996AB5">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="ActivityLogs" EntitySet="ActivityLogs" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ActivityL__UserI__398D8EEE" Association="Self.FK__ActivityL__UserI__398D8EEE">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ActivityLogs" EntitySet="ActivityLogs" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ActivityLogs_Expenses" Association="Self.FK_ActivityLogs_Expenses">
+            <End Role="Expenses" EntitySet="Expenses" />
+            <End Role="ActivityLogs" EntitySet="ActivityLogs" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Debts__CreditorI__3D5E1FD2" Association="Self.FK__Debts__CreditorI__3D5E1FD2">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Debts" EntitySet="Debts" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Debts__DebtorId__3E52440B" Association="Self.FK__Debts__DebtorId__3E52440B">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Debts" EntitySet="Debts" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Debts__GroupId__3C69FB99" Association="Self.FK__Debts__GroupId__3C69FB99">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Debts" EntitySet="Debts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Debts_Expenses" Association="Self.FK_Debts_Expenses">
+            <End Role="Expenses" EntitySet="Expenses" />
+            <End Role="Debts" EntitySet="Debts" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ExpenseDe__Expen__30F848ED" Association="Self.FK__ExpenseDe__Expen__30F848ED">
+            <End Role="Expenses" EntitySet="Expenses" />
+            <End Role="ExpenseDetails" EntitySet="ExpenseDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ExpenseDe__UserI__31EC6D26" Association="Self.FK__ExpenseDe__UserI__31EC6D26">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ExpenseDetails" EntitySet="ExpenseDetails" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ExpensePa__Expen__4AB81AF0" Association="Self.FK__ExpensePa__Expen__4AB81AF0">
+            <End Role="Expenses" EntitySet="Expenses" />
+            <End Role="ExpensePayers" EntitySet="ExpensePayers" />
+          </AssociationSet>
+          <AssociationSet Name="FK__ExpensePa__UserI__4BAC3F29" Association="Self.FK__ExpensePa__UserI__4BAC3F29">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="ExpensePayers" EntitySet="ExpensePayers" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Expenses__GroupI__2D27B809" Association="Self.FK__Expenses__GroupI__2D27B809">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Expenses" EntitySet="Expenses" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Expenses_Users" Association="Self.FK_Expenses_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Expenses" EntitySet="Expenses" />
+          </AssociationSet>
+          <AssociationSet Name="FK__GroupMemb__Group__29572725" Association="Self.FK__GroupMemb__Group__29572725">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="GroupMembers" EntitySet="GroupMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK__GroupMemb__UserI__2A4B4B5E" Association="Self.FK__GroupMemb__UserI__2A4B4B5E">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="GroupMembers" EntitySet="GroupMembers" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Groups__CreatorI__267ABA7A" Association="Self.FK__Groups__CreatorI__267ABA7A">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Groups" EntitySet="Groups" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Messages__GroupI__07C12930" Association="Self.FK__Messages__GroupI__07C12930">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Messages" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Notices__GroupId__6E01572D" Association="Self.FK__Notices__GroupId__6E01572D">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Notices" EntitySet="Notices" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Notificat__Group__35BCFE0A" Association="Self.FK__Notificat__Group__35BCFE0A">
+            <End Role="Groups" EntitySet="Groups" />
+            <End Role="Notifications" EntitySet="Notifications" />
+          </AssociationSet>
+          <AssociationSet Name="FK__MessageRe__Messa__0C85DE4D" Association="Self.FK__MessageRe__Messa__0C85DE4D">
+            <End Role="Messages" EntitySet="Messages" />
+            <End Role="MessageReadStatus" EntitySet="MessageReadStatus" />
+          </AssociationSet>
+          <AssociationSet Name="FK__MessageRe__UserI__0D7A0286" Association="Self.FK__MessageRe__UserI__0D7A0286">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="MessageReadStatus" EntitySet="MessageReadStatus" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Messages__UserId__08B54D69" Association="Self.FK__Messages__UserId__08B54D69">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Messages" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Messages_Users_ReceiverId" Association="Self.FK_Messages_Users_ReceiverId">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Messages" EntitySet="Messages" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Notices__Created__6EF57B66" Association="Self.FK__Notices__Created__6EF57B66">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Notices" EntitySet="Notices" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Notificat__UserI__34C8D9D1" Association="Self.FK__Notificat__UserI__34C8D9D1">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Notifications" EntitySet="Notifications" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="wuModelStoreContainer" CdmEntityContainer="wuEntities1">
+          <EntitySetMapping Name="ActivityLogs">
+            <EntityTypeMapping TypeName="wuModel.ActivityLogs">
+              <MappingFragment StoreEntitySet="ActivityLogs">
+                <ScalarProperty Name="ActivityLogId" ColumnName="ActivityLogId" />
+                <ScalarProperty Name="GroupId" ColumnName="GroupId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="ActivityType" ColumnName="ActivityType" />
+                <ScalarProperty Name="ActivityDetails" ColumnName="ActivityDetails" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="ExpenseId" ColumnName="ExpenseId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Debts">
+            <EntityTypeMapping TypeName="wuModel.Debts">
+              <MappingFragment StoreEntitySet="Debts">
+                <ScalarProperty Name="DebtId" ColumnName="DebtId" />
+                <ScalarProperty Name="GroupId" ColumnName="GroupId" />
+                <ScalarProperty Name="CreditorId" ColumnName="CreditorId" />
+                <ScalarProperty Name="DebtorId" ColumnName="DebtorId" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="UpdatedAt" ColumnName="UpdatedAt" />
+                <ScalarProperty Name="IsPaid" ColumnName="IsPaid" />
+                <ScalarProperty Name="ExpenseId" ColumnName="ExpenseId" />
+                <ScalarProperty Name="LastRemindTime" ColumnName="LastRemindTime" />
+                <ScalarProperty Name="IsPending" ColumnName="IsPending" />
+                <ScalarProperty Name="IsConfirmed" ColumnName="IsConfirmed" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ExpenseDetails">
+            <EntityTypeMapping TypeName="wuModel.ExpenseDetails">
+              <MappingFragment StoreEntitySet="ExpenseDetails">
+                <ScalarProperty Name="ExpenseDetailId" ColumnName="ExpenseDetailId" />
+                <ScalarProperty Name="ExpenseId" ColumnName="ExpenseId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="Proportion" ColumnName="Proportion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ExpensePayers">
+            <EntityTypeMapping TypeName="wuModel.ExpensePayers">
+              <MappingFragment StoreEntitySet="ExpensePayers">
+                <ScalarProperty Name="ExpensePayerId" ColumnName="ExpensePayerId" />
+                <ScalarProperty Name="ExpenseId" ColumnName="ExpenseId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Amount" ColumnName="Amount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Expenses">
+            <EntityTypeMapping TypeName="wuModel.Expenses">
+              <MappingFragment StoreEntitySet="Expenses">
+                <ScalarProperty Name="ExpenseId" ColumnName="ExpenseId" />
+                <ScalarProperty Name="GroupId" ColumnName="GroupId" />
+                <ScalarProperty Name="TotalAmount" ColumnName="TotalAmount" />
+                <ScalarProperty Name="ExpenseType" ColumnName="ExpenseType" />
+                <ScalarProperty Name="ExpenseItem" ColumnName="ExpenseItem" />
+                <ScalarProperty Name="PaymentMethod" ColumnName="PaymentMethod" />
+                <ScalarProperty Name="Note" ColumnName="Note" />
+                <ScalarProperty Name="Photo" ColumnName="Photo" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="LastTime" ColumnName="LastTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GroupMembers">
+            <EntityTypeMapping TypeName="wuModel.GroupMembers">
+              <MappingFragment StoreEntitySet="GroupMembers">
+                <ScalarProperty Name="GroupMemberId" ColumnName="GroupMemberId" />
+                <ScalarProperty Name="GroupId" ColumnName="GroupId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="JoinedDate" ColumnName="JoinedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Groups">
+            <EntityTypeMapping TypeName="wuModel.Groups">
+              <MappingFragment StoreEntitySet="Groups">
+                <ScalarProperty Name="GroupId" ColumnName="GroupId" />
+                <ScalarProperty Name="GroupName" ColumnName="GroupName" />
+                <ScalarProperty Name="CreatorId" ColumnName="CreatorId" />
+                <ScalarProperty Name="Budget" ColumnName="Budget" />
+                <ScalarProperty Name="Currency" ColumnName="Currency" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="GroupsPhoto" ColumnName="GroupsPhoto" />
+                <ScalarProperty Name="IsArchived" ColumnName="IsArchived" />
+                <ScalarProperty Name="JoinLink" ColumnName="JoinLink" />
+                <ScalarProperty Name="ChatId" ColumnName="ChatId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MessageReadStatus">
+            <EntityTypeMapping TypeName="wuModel.MessageReadStatus">
+              <MappingFragment StoreEntitySet="MessageReadStatus">
+                <ScalarProperty Name="MessageReadStatusId" ColumnName="MessageReadStatusId" />
+                <ScalarProperty Name="MessageId" ColumnName="MessageId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="IsRead" ColumnName="IsRead" />
+                <ScalarProperty Name="ReadAt" ColumnName="ReadAt" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Messages">
+            <EntityTypeMapping TypeName="wuModel.Messages">
+              <MappingFragment StoreEntitySet="Messages">
+                <ScalarProperty Name="MessageId" ColumnName="MessageId" />
+                <ScalarProperty Name="GroupId" ColumnName="GroupId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="ReceiverId" ColumnName="ReceiverId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Notices">
+            <EntityTypeMapping TypeName="wuModel.Notices">
+              <MappingFragment StoreEntitySet="Notices">
+                <ScalarProperty Name="NoticeId" ColumnName="NoticeId" />
+                <ScalarProperty Name="GroupId" ColumnName="GroupId" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Content" ColumnName="Content" />
+                <ScalarProperty Name="CreatedAt" ColumnName="CreatedAt" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="IsCurrent" ColumnName="IsCurrent" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Notifications">
+            <EntityTypeMapping TypeName="wuModel.Notifications">
+              <MappingFragment StoreEntitySet="Notifications">
+                <ScalarProperty Name="NotificationId" ColumnName="NotificationId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="GroupId" ColumnName="GroupId" />
+                <ScalarProperty Name="NotificationType" ColumnName="NotificationType" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="IsRead" ColumnName="IsRead" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="RelatedDebtId" ColumnName="RelatedDebtId" />
+                <ScalarProperty Name="RelatedExpenseId" ColumnName="RelatedExpenseId" />
+                <ScalarProperty Name="IsCancelled" ColumnName="IsCancelled" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="wuModel.Users">
+              <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="FullName" ColumnName="FullName" />
+                <ScalarProperty Name="BankAccount" ColumnName="BankAccount" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="Role" ColumnName="Role" />
+                <ScalarProperty Name="RegistrationDate" ColumnName="RegistrationDate" />
+                <ScalarProperty Name="ProfilePhoto" ColumnName="ProfilePhoto" />
+                <ScalarProperty Name="TokenExpiration" ColumnName="TokenExpiration" />
+                <ScalarProperty Name="PasswordResetToken" ColumnName="PasswordResetToken" />
+                <ScalarProperty Name="ConfirmPassword" ColumnName="ConfirmPassword" />
+                <ScalarProperty Name="LineUserId" ColumnName="LineUserId" />
+                <ScalarProperty Name="GoogleId" ColumnName="GoogleId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="無" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

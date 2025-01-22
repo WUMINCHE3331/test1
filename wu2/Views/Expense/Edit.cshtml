@@ -1,0 +1,432 @@
+﻿@model wu2.Models.ExpenseViewModel
+@{
+    ViewBag.Title = "編輯支出";
+}
+@{
+    List<string> expenseTypes = new List<string> { "餐飲", "交通", "娛樂", "購物", "其他", "自行輸入" };
+    List<string> PaymentMethod = new List<string> { "現金", "信用卡", "LinePay", "街口支付", "其他" };
+    var maxDateTime = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
+}@if (ViewBag.MaxDateTime != null)
+{
+    <p>最大時間: @ViewBag.MaxDateTime</p>
+}
+
+<h2>編輯支出</h2>
+@Html.ActionLink("返回群組", "Details", "Group", new { id = ViewBag.GroupId }, new { @class = "btn btn-secondary  btn-sm" })
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+@{
+    var groupBudget = TempData["GroupBudget"] as decimal?;
+    var totalExpenses = TempData["TotalExpenses"] as decimal?;
+
+    var currency = TempData["Currency"] as string; // 如果设置了 `Currency`
+}
+@if (groupBudget.HasValue)
+{
+    <p><strong>剩餘預算:</strong> @(groupBudget.Value - (totalExpenses ?? 0)) @currency</p>
+}
+else
+{
+    <p><strong>剩餘預算:</strong> 未設置</p>
+}
+@using (Html.BeginForm("Edit", "Expense", FormMethod.Post, new { enctype = "multipart/form-data", id = "expenseForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => model.ExpenseId)
+    @Html.HiddenFor(model => model.GroupId)
+
+    <div class="form-horizontal">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Date, htmlAttributes: new { @class = "control-label col-md-4 required-field" })
+                            <div class="col-md-9">
+                                <input type="datetime-local"
+                                       id="Date"
+                                       name="Date"
+                                       class="form-control"
+                                       value="@(Model.Date.HasValue ? Model.Date.Value.ToString("yyyy-MM-ddTHH:mm") : "")"
+                                       max="@maxDateTime"
+                                       required="required" />
+                                @Html.ValidationMessageFor(model => model.Date, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ExpenseItem, htmlAttributes: new { @class = " required-field control-label col-md-4" })
+                            <div class="col-md-8">
+                                @Html.EditorFor(model => model.ExpenseItem, new { htmlAttributes = new { @class = "form-control ", placeholder = "支出項目", required = "required" } })
+                                @Html.ValidationMessageFor(model => model.ExpenseItem, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TotalAmount, htmlAttributes: new { @class = "control-label col-md-4 required-field" })
+                            <div class="col-md-8">
+                                @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "form-control ", @id = "total-amount", placeholder = "總金額", required = "required", @type = "number", @oninput = "this.value = this.value.replace(/[^0-9.]/g, '');" } })
+                                @Html.ValidationMessageFor(model => model.TotalAmount, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ExpenseType, htmlAttributes: new { @class = "control-label col-md-4 required-field" })
+                            <div class="col-md-5">
+                                @if (Model.IsCustomExpenseType)
+                                {
+                                    <!-- 如果是自訂類型，顯示文本框讓用戶輸入 -->
+                                    <input type="text" class="form-control" id="expenseTypeInput" name="CustomExpenseType" value="@Model.CustomExpenseType" />
+                                    <select id="expenseTypeDropdown" class="form-control" style="display:none;">
+                                        @foreach (var item in expenseTypes)
+                                        {
+                                            <option value="@item">@item</option>
+                                        }
+                                    </select>
+                                }
+                                else
+                                {
+                                    <!-- 如果不是自訂類型，顯示下拉選單 -->
+                                    @Html.DropDownListFor(model => model.ExpenseType, new SelectList(expenseTypes, Model.ExpenseType), new { @class = "form-control required-field", id = "expenseTypeDropdown" })
+                                    <input type="text" class="form-control" id="expenseTypeInput" name="CustomExpenseType" placeholder="Other..." style="display:none;" />
+                                }
+                                @Html.ValidationMessageFor(model => model.ExpenseType, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PaymentMethod, htmlAttributes: new { @class = "control-label col-md-4 required-field" })
+                            <div class="col-md-5">
+                                @Html.DropDownListFor(model => model.PaymentMethod, new SelectList(PaymentMethod), new { @class = "form-control required-field", required = "required" })
+                                @Html.ValidationMessageFor(model => model.PaymentMethod, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Note, htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-10">
+                                @Html.TextAreaFor(model => model.Note, new { @class = "form-control", placeholder = "備註" })
+                                @Html.ValidationMessageFor(model => model.Note, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Photo, htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-10">
+                                <input type="file" name="Photo" />
+                                @Html.ValidationMessageFor(model => model.Photo, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.PaidBy, "誰付錢", htmlAttributes: new { @class = "control-label col-md-4 required-field" })
+                            <div class="col-md-4">
+                                <p>付款剩餘金額: <span id="remaining-paid-amount" class="remaining-amount">0</span></p>
+                            </div>
+                            <div id="PaidBy" class="col-md-4">
+                                @for (int i = 0; i < ViewBag.Users.Count; i++)
+                                {
+                                    var user = ViewBag.Users[i];
+                                    var isChecked = Model.PaidBy.Any(p => p.UserId == user.UserId);
+                                    var amount = Model.PaidBy.FirstOrDefault(p => p.UserId == user.UserId)?.Amount ?? 0;
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" name="PaidBy[@i].IsChecked" value="true" class="paid-by-checkbox" @(isChecked ? "checked" : "" ) data-user-id="@user.UserId" />
+                                            @user.FullName
+                                        </label>
+                                        <div class="d-flex align-items-center">
+                                            <input type="hidden" name="PaidBy[@i].UserId" value="@user.UserId" />
+                                            <input type="number" id="paidAmount_@user.UserId" name="PaidBy[@i].Amount" step="0.001" placeholder="金額" class="form-control amount-input-paid" style="width: 130px; margin-right: 10px;" value="@amount" data-user-id="@user.UserId" @(isChecked ? "" : "disabled") />
+                                            <input type="number" id="portionPaid_@user.UserId" name="PaidBy[@i].Portion" step="0.01" placeholder="比例" class="form-control portion-input-paid" style="width: 60px; margin-right: 10px;" data-user-id="@user.UserId" @(isChecked ? "" : "disabled") />
+                                        </div>
+                                    </div>
+                                }
+                                @Html.ValidationMessageFor(model => model.PaidBy, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.Label("分給誰", htmlAttributes: new { @class = "control-label col-md-4 required-field" })
+                            <div class="col-md-4">
+                                <p>分配剩餘金額: <span id="remaining-split-amount" class="remaining-amount">0</span></p>
+                            </div>
+                            <div id="split-amounts" class="col-md-8">
+                                @for (int i = 0; i < ViewBag.Users.Count; i++)
+                                {
+                                    var user = ViewBag.Users[i];
+                                    var isChecked = Model.SplitDetails.Any(s => s.UserId == user.UserId);
+                                    var amount = Model.SplitDetails.FirstOrDefault(s => s.UserId == user.UserId)?.Amount ?? 0;
+                                    var note = Model.SplitDetails.FirstOrDefault(s => s.UserId == user.UserId)?.Note ?? "";
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" name="SplitDetails[@i].IsChecked" class="split-by-checkbox" value="true" @(isChecked ? "checked" : "") data-user-id="@user.UserId" />
+                                            @user.FullName
+                                        </label>
+                                        <div class="d-flex align-items-center">
+                                            <input type="hidden" name="SplitDetails[@i].UserId" value="@user.UserId" />
+                                            <input type="number" id="splitAmount_@user.UserId" name="SplitDetails[@i].Amount" step="0.001" data-user-id="@user.UserId" class="form-control amount-input" style="width: 130px; margin-right: 10px;" placeholder="金額" value="@amount" @(isChecked ? "" : "disabled") />
+                                            <input type="number" id="portion_@user.UserId" name="SplitDetails[@i].Portion" step="0.01" data-user-id="@user.UserId" class="form-control portion-input" style="width: 60px; margin-right: 10px;" placeholder="比例" @(isChecked ? "" : "disabled") />
+                                            <input type="hidden" name="SplitDetails[@i].Note" id="note_@user.UserId" class="form-control" placeholder="備註" rows="1" style=" width: 150px;" @(isChecked ? "" : "disabled") @note />
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+
+                        <button type="submit" class="btn btn-primary" style="float:right">保存更改</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+    </div>
+}
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const totalAmountInput = document.getElementById("total-amount");
+        const paidByCheckboxes = document.querySelectorAll(".paid-by-checkbox");
+        const splitByCheckboxes = document.querySelectorAll(".split-by-checkbox");
+        const portionInputs = document.querySelectorAll(".portion-input");
+        const portionPaidInputs = document.querySelectorAll(".portion-input-paid");
+        const amountInputsPaid = document.querySelectorAll(".amount-input-paid");
+        const amountInputs = document.querySelectorAll(".amount-input");
+        const remainingPaidAmountSpan = document.getElementById("remaining-paid-amount");
+        const remainingSplitAmountSpan = document.getElementById("remaining-split-amount");
+        updatePortionByAmount();
+        function calculateRemainingAmount(amountInputs, remainingAmountSpan) {
+            let totalAmount = parseFloat(totalAmountInput.value) || 0;
+            let totalPaidAmount = 0;
+
+            amountInputs.forEach(input => {
+                totalPaidAmount += parseFloat(input.value) || 0;
+            });
+
+            let remainingAmount = totalAmount - totalPaidAmount;
+            remainingAmountSpan.textContent = remainingAmount.toFixed(2);
+
+            if (remainingAmount < 0) {
+                remainingAmountSpan.classList.add('over-budget');
+            } else {
+                remainingAmountSpan.classList.remove('over-budget');
+            }
+        }
+
+        $(document).ready(function () {
+            // 如果初始是自訂類型，顯示文本框
+            if ($('#expenseTypeInput').val()) {
+                $('#expenseTypeDropdown').hide();
+                $('#expenseTypeInput').show();
+            }
+
+            $('#expenseTypeDropdown').change(function () {
+                if ($(this).val() === "自行輸入") {
+                    $('#expenseTypeInput').show();
+                    $('#expenseTypeDropdown').hide();
+                }
+            });
+
+            $('#expenseTypeInput').on('blur', function () {
+                if ($(this).val().trim() === "") {
+                    $('#expenseTypeInput').hide();
+                    $('#expenseTypeDropdown').show();
+                }
+            });
+        });
+
+
+        function clearInputFields(checkboxes, inputSelector, additionalSelectors = []) {
+            checkboxes.forEach(checkbox => {
+                let userId = checkbox.dataset.userId;
+                let amountInput = document.getElementById(`${inputSelector}_${userId}`);
+                amountInput.disabled = !checkbox.checked;
+                if (!checkbox.checked) {
+                    amountInput.value = "";
+                }
+                additionalSelectors.forEach(selector => {
+                    let additionalInput = document.getElementById(`${selector}_${userId}`);
+                    additionalInput.disabled = !checkbox.checked;
+                    if (!checkbox.checked) {
+                        additionalInput.value = "";
+                    }
+                });
+            });
+        }
+
+        function updatePaidByAmounts() {
+            let totalAmount = parseFloat(totalAmountInput.value) || 0;
+            let selectedCheckboxes = Array.from(paidByCheckboxes).filter(cb => cb.checked);
+            let selectedCount = selectedCheckboxes.length;
+
+            if (selectedCount > 0 && totalAmount >= 0) {
+                let amountPerPerson = (totalAmount / selectedCount).toFixed(2);
+
+                selectedCheckboxes.forEach(checkbox => {
+                    let userId = checkbox.dataset.userId;
+                    let amountInput = document.getElementById(`paidAmount_${userId}`);
+                    amountInput.value = amountPerPerson;
+                });
+            }
+
+            clearInputFields(paidByCheckboxes, 'paidAmount', ['portionPaid']);
+            updatePortionByAmount(); // 新增的調用
+            calculateRemainingAmount(amountInputsPaid, remainingPaidAmountSpan);
+        }
+
+        function updateSplitByAmounts() {
+            let totalAmount = parseFloat(totalAmountInput.value) || 0;
+            let selectedCheckboxes = Array.from(splitByCheckboxes).filter(cb => cb.checked);
+            let selectedCount = selectedCheckboxes.length;
+
+            if (selectedCount > 0 && totalAmount >= 0) {
+                let amountPerPerson = (totalAmount / selectedCount).toFixed(2);
+
+                selectedCheckboxes.forEach(checkbox => {
+                    let userId = checkbox.dataset.userId;
+                    let amountInput = document.getElementById(`splitAmount_${userId}`);
+                    if (amountInput) {
+                        amountInput.value = amountPerPerson;
+                    }
+                });
+            }
+
+            clearInputFields(splitByCheckboxes, 'splitAmount', ['portion', 'note']);
+            updatePortionByAmount();
+            calculateRemainingAmount(amountInputs, remainingSplitAmountSpan);
+        }
+
+
+        function updateAmountsByPortion() {
+            let totalAmount = parseFloat(totalAmountInput.value) || 0;
+
+            portionPaidInputs.forEach(input => {
+                let portion = parseFloat(input.value) || 0;
+                let userId = input.dataset.userId;
+                let amountInput = document.getElementById(`paidAmount_${userId}`);
+
+                if (portion > 0 && totalAmount >= 0) {
+                    let calculatedAmount = ((portion / 100) * totalAmount).toFixed(2);
+                    amountInput.value = calculatedAmount;
+                } else {
+                    amountInput.value = "";
+                }
+            });
+
+            portionInputs.forEach(input => {
+                let portion = parseFloat(input.value) || 0;
+                let userId = input.dataset.userId;
+                let amountInput = document.getElementById(`splitAmount_${userId}`);
+
+                if (portion > 0 && totalAmount >= 0) {
+                    let calculatedAmount = ((portion / 100) * totalAmount).toFixed(2);
+                    amountInput.value = calculatedAmount;
+                } else {
+                    amountInput.value = "";
+                }
+            });
+            calculateRemainingAmount(amountInputsPaid, remainingPaidAmountSpan);
+            calculateRemainingAmount(amountInputs, remainingSplitAmountSpan);
+        }
+
+
+        function updatePortionByAmount() {
+            let totalAmount = parseFloat(totalAmountInput.value) || 0;
+
+            amountInputsPaid.forEach(input => {
+                let amount = parseFloat(input.value) || 0;
+                let userId = input.dataset.userId;
+                let portionInput = document.getElementById(`portionPaid_${userId}`);
+
+                if (portionInput) {
+                    if (amount > 0 && totalAmount > 0) {
+                        let calculatedPortion = ((amount / totalAmount) * 100).toFixed(1);
+                        portionInput.value = calculatedPortion;
+                    } else {
+                        portionInput.value = "";
+                    }
+                }
+            });
+
+            amountInputs.forEach(input => {
+                let amount = parseFloat(input.value) || 0;
+                let userId = input.dataset.userId;
+                let portionInput = document.getElementById(`portion_${userId}`);
+
+                if (portionInput) {
+                    if (amount > 0 && totalAmount > 0) {
+                        let calculatedPortion = ((amount / totalAmount) * 100).toFixed(1);
+                        portionInput.value = calculatedPortion;
+                    } else {
+                        portionInput.value = "";
+                    }
+                }
+            });
+            calculateRemainingAmount(amountInputsPaid, remainingPaidAmountSpan);
+            calculateRemainingAmount(amountInputs, remainingSplitAmountSpan);
+        }
+
+        totalAmountInput.addEventListener("input", function () {
+            updatePaidByAmounts();
+            updateSplitByAmounts();
+
+        });
+
+        paidByCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", updatePaidByAmounts);
+        });
+
+        splitByCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", updateSplitByAmounts);
+        });
+
+        portionPaidInputs.forEach(input => {
+            input.addEventListener("input", updateAmountsByPortion);
+        });
+
+        portionInputs.forEach(input => {
+            input.addEventListener("input", updateAmountsByPortion);
+        });
+
+        amountInputsPaid.forEach(input => {
+            input.addEventListener("input", updatePortionByAmount);
+        });
+
+        amountInputs.forEach(input => {
+            input.addEventListener("input", updatePortionByAmount);
+        });
+
+    });
+</script>
+
+<style>
+    .form-group .control-label {
+        display: flex;
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .over-budget {
+        color: red;
+        font-weight: bold;
+    }
+</style>

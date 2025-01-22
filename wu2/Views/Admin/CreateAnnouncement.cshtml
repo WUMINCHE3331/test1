@@ -1,0 +1,23 @@
+﻿@model wu2.Models.Notices
+
+<h2>發布公告</h2>
+
+@using (Html.BeginForm("CreateAnnouncement", "Admin", FormMethod.Post))
+{
+    <div>
+        <label>標題</label>
+        @Html.TextBoxFor(m => m.Title)
+    </div>
+    <div>
+        <label>內容</label>
+        @Html.TextAreaFor(m => m.Content)
+    </div>
+    <button type="submit" class="btn btn-primary">新增公告</button>
+   
+using (Html.BeginForm("DeleteAnnouncement", "Admin", FormMethod.Post))
+    {
+        <button type="submit" class="btn btn-danger">刪除公告</button>
+    }
+}
+
+

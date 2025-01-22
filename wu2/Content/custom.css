@@ -1,0 +1,30 @@
+﻿@media (max-width:576px) {
+    .navbar-collapse {
+        display: flex;
+        flex-direction:row;
+        background-color: ghostwhite;
+        padding: 20px;
+        border-radius: 5px;
+        position: fixed;
+        right: 0;
+        top: 50px;  
+        width: 250px;
+      
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    .navbar-nav {
+        flex-direction: column;
+        margin-top: 10px;
+    }
+
+        .navbar-nav .nav-item {
+            margin-bottom: 10px;
+        }
+
+    .navbar-toggler {
+        margin-left: auto;
+    }
+}

@@ -1,0 +1,147 @@
+﻿@model IEnumerable<wu2.Models.PairwiseDebtViewModel>
+@{
+    ViewBag.Title = "結帳";
+}
+
+<h2 class="text-center">債務結算</h2>
+
+@Html.ActionLink("總債務表", "MemberDebtOverview", "Expense", new { groupId = ViewBag.GroupId }, new { @class = "btn btn-info" })
+@Html.ActionLink("圖表", "GroupExpenseStatistics", "Chart", new { groupId = ViewBag.GroupId }, new { @class = "btn btn-info" })
+
+@{
+    ViewBag.Title = "結帳";
+    int currentUserId = ViewBag.currentUserId;
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" id="roundOffCheckbox" checked>
+    <label class="form-check-label" for="roundOffCheckbox">
+        四捨五入
+    </label>
+</div>
+@{string GetProfilePhoto(string profilePhoto)
+    {
+        return !string.IsNullOrEmpty(profilePhoto) ? Url.Content(profilePhoto) : Url.Content("~/UserProfilePhotos/defaultPerson.jpg");
+    } }
+@if (Model != null && Model.Any())
+{
+    foreach (var pairwiseDebt in Model)
+    {
+        var isCurrentUserDebtor = pairwiseDebt.DebtorId == currentUserId;
+        var isCurrentUserCreditor = pairwiseDebt.CreditorId == currentUserId;
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <span class="debtor-name">
+                        @pairwiseDebt.DebtorName <span class="text-muted">(@pairwiseDebt.DebtorEmail)</span> 欠了
+                        <span class="text-danger amount" data-amount="@pairwiseDebt.Amount">$@pairwiseDebt.Amount</span>
+                        給 <span class="creditor-name">@pairwiseDebt.CreditorName</span><span class="text-muted">(@pairwiseDebt.CreditorEmail) </span>
+                    </span>
+                </h5>
+                <p class="card-text">
+                    <span class="text-primary">債務人：</span> <img src="@GetProfilePhoto(pairwiseDebt.DebtorPhoto)" alt="Profile Photo" style="width:40px; height:40px; border-radius:50%;" /><span class="debtor-name">@pairwiseDebt.DebtorName </span> <br />
+                    <span class="text-primary">債權人：</span> <img src="@GetProfilePhoto(pairwiseDebt.CreditorPhoto)" alt="Profile Photo" style="width:40px; height:40px; border-radius:50%;" /><span class="creditor-name">@pairwiseDebt.CreditorName</span>
+                </p>
+                <div class="d-flex justify-content-between">
+                    @if (isCurrentUserDebtor)
+                    {
+                        using (Html.BeginForm("MarkAsPaid", "Settle", FormMethod.Post, new { id = "formPaid_" + @pairwiseDebt.DebtId }))
+                        {
+                            @Html.Hidden("debtorId", pairwiseDebt.DebtorId)
+                            @Html.Hidden("creditorId", pairwiseDebt.CreditorId)
+                            @Html.Hidden("amount", pairwiseDebt.Amount, new { @class = "amount-hidden" })
+                            <input type="hidden" name="groupId" value="@ViewBag.GroupId" /> <!-- 直接设置隐藏字段的值 -->
+                            @Html.Hidden("roundOff", "false", new { id = "roundOffInput" }) <!-- 新增隐藏字段 -->
+                            <button type="submit" class="btn btn-success">完成付款</button>
+                        }
+                    }
+                    @if (isCurrentUserCreditor)
+                    {
+                        using (Html.BeginForm("SendReminder", "Settle", FormMethod.Post, new { id = "formReminder_" + @pairwiseDebt.DebtId }))
+                        {
+                            @Html.Hidden("debtorId", pairwiseDebt.DebtorId)
+                            @Html.Hidden("creditorId", pairwiseDebt.CreditorId)
+                            @Html.Hidden("amount", pairwiseDebt.Amount, new { @class = "amount-hidden" })
+                            <input type="hidden" name="groupId" value="@ViewBag.GroupId" /> <!-- 直接设置隐藏字段的值 -->
+                            @Html.Hidden("roundOff", "false", new { id = "roundOffInput" }) <!-- 新增隐藏字段 -->
+                            <button type="submit" class="btn btn-warning">提醒付款</button>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> 尚未有任何債務。
+    </div>
+}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const roundOffCheckbox = document.getElementById("roundOffCheckbox");
+        const forms = document.querySelectorAll("form");
+
+        function updateAmounts() {
+            const amounts = document.querySelectorAll(".amount");
+            amounts.forEach(amountElem => {
+                let amount = parseFloat(amountElem.dataset.amount);
+                if (roundOffCheckbox.checked) {
+                    amountElem.textContent = "NT$" + Math.round(amount);
+                } else {
+                    amountElem.textContent = "NT$" + amount.toFixed(2);
+                }
+            });
+        }
+
+        roundOffCheckbox.addEventListener("change", function () {
+            updateAmounts();
+        });
+
+        forms.forEach(form => {
+            form.addEventListener("submit", function (event) {
+                const roundOff = roundOffCheckbox.checked;
+                const amountElems = form.querySelectorAll(".amount");
+                const hiddenAmounts = form.querySelectorAll(".amount-hidden");
+
+                amountElems.forEach((amountElem, index) => {
+                    let amount = parseFloat(amountElem.dataset.amount);
+                    if (roundOff) {
+                        hiddenAmounts[index].value = Math.round(amount);
+                    } else {
+                        hiddenAmounts[index].value = amount.toFixed(2);
+                    }
+                });
+
+                const roundOffInput = form.querySelector("input[name='roundOff']");
+                if (roundOffInput) {
+                    roundOffInput.value = roundOff;
+                } else {
+                    const newRoundOffInput = document.createElement("input");
+                    newRoundOffInput.type = "hidden";
+                    newRoundOffInput.name = "roundOff";
+                    newRoundOffInput.value = roundOff;
+                    form.appendChild(newRoundOffInput);
+                }
+            });
+        });
+
+        updateAmounts();
+    });
+
+</script>

@@ -1,0 +1,156 @@
+﻿@model IEnumerable<wu2.Models.DebtViewModel>
+
+@{
+    ViewBag.Title = "債務表";
+}
+
+<h2>債務表</h2>
+@Html.ActionLink("返回群組", "Details", "Group", new { id = ViewBag.GroupId }, new { @class = "btn btn-secondary" })
+@*@Html.ActionLink("帳單列表", "Index", "Expense", new { groupId = ViewBag.GroupId }, new { @class = "btn btn-secondary" })*@
+@Html.ActionLink("整體債務", "MemberDebtOverview", "Expense", new { groupId = ViewBag.GroupId }, new { @class = "btn btn-secondary" })
+@{
+    int counter = 1; // 計數器初始
+
+}
+<style>
+    .link-no-underline {
+        text-decoration: none;
+        padding: 0;
+        margin: 0;
+        font-weight: bold;
+    }
+</style>
+@if (Model != null && Model.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>債權人</th>
+
+                <th>金額</th>
+                <th>債務人</th>
+                <th>支付狀態</th>
+                <th>創建時間</th>
+                <th>更新日期</th>
+                @*<th>來源帳目</th>*@
+                @*<th>支付狀態</th>*@
+
+                @*<th>操作</th>*@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var debt in Model)
+            {
+                <tr>
+
+
+                    <td>@debt.CreditorName</td>
+
+                    <td>
+                        <span class="link-no-underline">
+                            @Html.ActionLink("$ " + debt.Amount.ToString(), "Details", "Expense", new { id = debt.ExpenseId }, new { @class = "link-no-underline" })
+                        </span>
+                    </td>
+                    <td>@debt.DebtorName</td>
+                    <td>@(debt.IsPaid ? "已支付" : "未支付")</td>
+                    <td>@debt.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+
+                    <td>@(debt.UpdatedAt.HasValue ? debt.UpdatedAt.Value.ToString("yyyy-MM-dd HH:mm") : "尚未更新")</td>
+
+                    @*<td>@Html.ActionLink("查看來源帳目", "Details", "Expense", new { id = debt.ExpenseId }, new { @class = "btn btn-link" })</td>*@
+                    @*<td>@(debt.IsConfirmed.HasValue ? "已支付" : "尚未支付")</td>*@
+
+
+                    @*<td>
+            @if (!debt.IsPaid)
+            {
+                using (Html.BeginForm("MarkAsPaid", "Expense", FormMethod.Post))
+                {
+                    @Html.Hidden("id", debt.DebtId)
+                    @Html.Hidden("groupId", debt.GroupId)
+                    <input type="submit" value="標記已支付" class="btn btn-primary" />
+                }
+            }
+        </td>*@
+                </tr>
+                counter++; 
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> 尚未有任何債務。
+    </div>
+}
+<style>
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .table th {
+            background-color: #f2f2f2;
+        }
+
+    .btn {
+        padding: 10px 20px;
+        margin: 5px;
+        text-decoration: none;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+    }
+
+    .btn-link {
+        background-color: transparent;
+        color: #007bff;
+        text-decoration: underline;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+    }
+
+    /* 移动设备样式 */
+    @@media (max-width:576px) {
+        .table {
+            display: block;
+            overflow-x: auto;
+        }
+
+            .table th, .table td {
+                padding: 10px 5px;
+                font-size: 14px;
+            }
+
+        .btn {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        h2 {
+            font-size: 24px;
+        }
+    }
+</style>

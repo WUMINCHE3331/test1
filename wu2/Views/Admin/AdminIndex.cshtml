@@ -1,0 +1,43 @@
+﻿@model wu2.Models.AdminIndexViewModel
+
+@{
+    ViewBag.Title = "Admin Dashboard";
+}
+
+
+
+<div>
+    <h2>所有群組</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>群組名稱</th>
+                <th>創建日期</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var group in Model.Groups)
+            {
+                <tr>
+                    <td>@group.GroupName</td>
+                    <td>@group.CreatedDate</td>
+                    <td>
+                        <a href="@Url.Action("GroupDetails", "Admin", new { id = group.GroupId })" class="btn btn-primary btn-sm">查看詳情</a>
+                        <a href="@Url.Action("Edit", "Group", new { id = group.GroupId })" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-cog"></i> 設定
+                        </a>
+                        <a href="@Url.Action("AddMember", "Admin", new { groupId = group.GroupId })" class="btn btn-success btn-sm">
+                            <i class="fas fa-user-plus"></i> 添加成員
+                        </a>
+                        <a href="@Url.Action("Details", "Group", new { Id = group.GroupId })" class="btn btn-success btn-sm">
+                            <i class="fas fa-cog"></i> 群組資訊
+                        </a>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

@@ -1,0 +1,189 @@
+﻿@model wu2.Models.InviteViewModel
+
+@{
+    ViewBag.Title = "邀請組員";
+    var invitationResult = ViewBag.InvitationResult; // 設置 ViewBag 中的結果
+}
+
+<div class="center-wrapper">
+    <div class="invite-container">
+        <!-- 標題部分 -->
+        <h2 class="invite-title">邀請組員</h2>
+
+        <div class="text-right mb-3">
+            <a href="@Url.Action("AddMember", "Admin", new { groupId = Model.GroupId })" class="btn btn-success btn-sm">
+                <i class="fas fa-user-plus"></i>虛擬組員
+            </a>
+        </div>
+
+        <!-- 提示信息 -->
+        <p class="alert alert-secondary">依據權限，只有創建者與管理員才可以進行邀請</p>
+
+        <!-- 結果顯示區域 -->
+        @if (!string.IsNullOrEmpty(invitationResult))
+        {
+            <div class="alert alert-info">@Html.Raw(invitationResult)</div>
+        }
+
+        <!-- 邀請表單 -->
+        @using (Html.BeginForm("Invite", "Group", FormMethod.Post))
+        {
+            @Html.HiddenFor(model => model.GroupId)
+            <div class="form-row" id="field-container">
+                <div class="col-md-6 field-test mb-3">
+                    <!-- 電子郵件輸入 -->
+                    <div class="form-group">
+                        @Html.TextBox("Emails[]", null, new { @class = "form-control", placeholder = "輸入信箱", required = "required" })
+                        <span class="text-danger error-message"></span>
+                    </div>
+
+                    <!-- 權限選擇 -->
+                    <div class="form-group">
+                        @{
+                            string currentUserRole = ViewBag.UserRole;
+                            bool isAdminOrCreator = currentUserRole == "Creator";
+                        }
+                        <select class="form-control" name="Roles[]" id="roleSelect" required>
+
+                            <option value="Editor">編輯者</option>
+                            <option value="Viewer">檢視者</option>
+                            @if (isAdminOrCreator)
+                            {
+                                <option value="Admin"> 管理員</option>
+                            }
+                        </select>
+                        <span class="text-danger error-message"></span>
+                    </div>
+                    <button type="button" class="btn btn-primary add-field-btn"><i class="fas fa-plus"></i></button>
+                    <!-- 添加欄位按鈕 -->
+
+                </div>
+            </div>
+
+            <div class="form-group text-right mt-4">
+                <button type="submit" class="btn btn-primary">提交</button>
+                @Html.ActionLink("返回群組", "MyGroups", null, new { @class = "btn btn-secondary ml-2" })
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // 添加表單的按鈕點擊事件
+            $(document).on('click', '.add-field-btn', function () {
+                var currentField = $('#field-container').find('.field-test:last');
+                var emailInput = currentField.find('input[type="text"]');
+                var emailValue = emailInput.val();
+                var roleInput = currentField.find('select');
+                var roleValue = roleInput.val();
+
+                // 移除先前的錯誤信息
+                currentField.find('.error-message').remove();
+
+                if (emailValue && roleValue) {
+                    // 複製表單的HTML
+                    var newField = currentField.clone();
+
+                    // 清空複製表單中的輸入值
+                    newField.find('input').val('');
+
+                    // 將新表單附加到 field-container
+                    $('#field-container').append(newField);
+                    // 移除所有字段中的添加按鈕
+                    $('#field-container').find('.add-field-btn').remove();
+
+                    // 為最新字段添加添加按鈕
+                    newField.append('<button type="button" class="btn btn-primary add-field-btn"><i class="fas fa-plus"></i></button>');
+                } else {
+                    if (!emailValue) {
+                        emailInput.after('<span class="text-danger error-message">請輸入電子郵件</span>');
+                    }
+                    if (!roleValue) {
+                        roleInput.after('<span class="text-danger error-message">請選擇權限</span>');
+                    }
+                }
+            });
+
+            // 移除表單的按鈕點擊事件
+            $(document).on('click', '.remove-field-btn', function () {
+                $(this).closest('.field-test').remove();
+            });
+        });
+    </script>
+}
+
+<style>
+    .center-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* 保持頁面高度，確保內容始終垂直居中 */
+        padding: 20px;
+    }
+
+    .invite-container {
+        background-color: #f8f9fa; /* 背景顏色 */
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 陰影效果 */
+        max-width: 600px; /* 控制最大寬度 */
+        width: 100%;
+    }
+
+    .invite-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        font-size: 16px;
+    }
+
+    .btn {
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .add-field-btn {
+        background-color: #007bff;
+        color: white;
+        border-radius: 8px;
+        padding: 8px 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+        .add-field-btn:hover {
+            background-color: #0056b3;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            transform: scale(1.05);
+        }
+
+    .text-danger {
+        color: red;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .alert {
+        font-size: 14px;
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 5px;
+    }
+</style>

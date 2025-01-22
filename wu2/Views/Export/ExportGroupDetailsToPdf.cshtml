@@ -1,0 +1,334 @@
+﻿@model wu2.Models.GroupDetailsViewModel
+
+@{
+    Layout = null;
+
+    string GetProfilePhoto(string profilePhoto)
+    {
+        return !string.IsNullOrEmpty(profilePhoto)
+            ? Url.Content(profilePhoto)
+            : Url.Content("~/UserProfilePhotos/defaultPerson.jpg");
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@Model.GroupName 的詳細內容</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        tr {
+            page-break-inside: avoid;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #2980b9;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3498db;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        thead {
+            display: table-header-group; 
+        }
+
+        td, p {
+            color: #34495e;
+            font-size: 20px;
+        }
+
+        .profile-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>@Model.GroupName 的詳細內容</h1>
+
+        <h2>群組資訊</h2>
+        <div class="group-info" style="display:flex">
+            <div>
+                <img src="@GetProfilePhoto(Model.GroupPhoto)" style="width: 30px; height: 30px;" alt="Group Photo" class="group-photo" />
+            </div>
+            <div>
+                <p><strong>貨幣:</strong> @Model.Currency</p>
+                <p><strong>建立日期:</strong> @Model.CreateDate.ToString("yyyy-MM-dd")</p>
+                <p><strong>預算:</strong> @Model.Budget @Model.Currency</p>
+            </div>
+        </div>
+        <div>
+            <h2>成員列表</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>頭貼</th>
+                        <th>姓名</th>
+                        <th>Email</th>
+                        <th>角色</th>
+                        <th>加入日期</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var member in Model.Members)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@GetProfilePhoto(member.ProfilePhoto)" alt="頭貼" class="profile-photo" />
+                            </td>
+                            <td>@member.FullName</td>
+                            <td>@member.Email</td>
+                            <td>@member.Role</td>
+                            <td>@string.Format("{0:yyyy-MM-dd}", member.JoinedDate)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <h2>支出詳情</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>支出項目</th>
+                    <th>建立者</th>
+                    <th>類型</th>
+                    <th>金額</th>
+                    <th>支付方式</th>
+                    <th>備註</th>
+                    <th>照片</th>
+                    <th>日期</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var expense in Model.Expenses)
+                {
+                    <tr>
+                        <td>@expense.ExpenseItem</td>
+                        <td>@expense.CreatedByName</td>
+                        <td>@expense.ExpenseType</td>
+                        <td>@expense.TotalAmount</td>
+                        <td>@expense.PaymentMethod</td>
+                        <td>@expense.Note</td>
+
+                        <td>
+                            @if (!string.IsNullOrEmpty(expense.Photo))
+                            {
+                                <img src="@Url.Content(expense.Photo)" alt="Expense Photo" class="img-thumbnail" style="max-width: 200px;" />
+                            }
+                            else
+                            {
+                                <span>無圖片</span>
+                            }
+                        </td>
+                        <td>@string.Format("{0:yyyy-MM-dd}", expense.Date)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <!-- 調試輸出 -->
+        <!--<div class="debug-info">
+            <p>Labels: @string.Join(", ", Model.MemberExpenses.Select(e => e.FullName))</p>
+            <p>TotalExpenses: @string.Join(", ", Model.MemberExpenses.Select(e => e.TotalAmount))</p>
+        </div>-->
+        <h2>成員總支出</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>總支出</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var expense in Model.MemberExpenses)
+                    {
+                        <tr>
+                            <td>@expense.FullName</td>
+                            <td>@expense.TotalAmount.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="chart-container">
+            <canvas id="expensePieChart"></canvas>
+        </div>
+        <h2>成員之間的欠款</h2>
+        @foreach (var pairwiseDebt in Model.DebtSettlements)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <span class="debtor-name">
+                            @pairwiseDebt.DebtorName <span class="text-muted">(@pairwiseDebt.DebtorEmail)</span> 欠了
+                            <span class="text-danger amount" data-amount="@pairwiseDebt.Amount">$@pairwiseDebt.Amount</span>
+                            給 <span class="creditor-name">@pairwiseDebt.CreditorName</span><span class="text-muted">(@pairwiseDebt.CreditorEmail) </span>
+                        </span>
+                    </h5>
+                    <p class="card-text">
+                        <span class="text-primary">債務人：</span><span class="debtor-name">@pairwiseDebt.DebtorName</span> <br />
+                        <span class="text-primary">債權人：</span><span class="creditor-name">@pairwiseDebt.CreditorName</span>
+                    </p>
+                </div>
+            </div>
+        }
+
+    
+
+    </div>
+    <style>
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+        }
+
+        .card-text {
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .text-primary {
+            color: #007bff;
+        }
+
+        .text-danger {
+            color: #dc3545;
+        }
+
+        .debtor-name,
+        .creditor-name {
+            font-weight: bold;
+        }
+
+        .amount {
+            font-weight: bold;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var ctx = document.getElementById('expensePieChart').getContext('2d');
+
+            var labels = @Html.Raw(Json.Encode(Model.MemberExpenses.Select(e => e.FullName)));
+            var data = @Html.Raw(Json.Encode(Model.MemberExpenses.Select(e => e.TotalAmount)));
+            console.log('Labels:', labels);
+            console.log('Data:', data);
+
+            if (labels.length && data.length) {
+                var myPieChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 206, 86, 0.2)',
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(153, 102, 255, 0.2)',
+                                'rgba(255, 159, 64, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.label + ': NT$' + tooltipItem.raw.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                console.error('Labels or Data is missing');
+            }
+        });
+    </script>
+</body>
+</html>

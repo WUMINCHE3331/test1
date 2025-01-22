@@ -1,0 +1,93 @@
+﻿@model IEnumerable<wu2.Models.ActivityLogs>
+@{string TranslateRole(string role)
+    {
+        switch (role?.ToLower())
+        {
+            case "creator":
+                return "創建者";
+            case "admin":
+                return "管理員";
+            case "editor":
+                return "編輯者";
+            case "viewer":
+                return "查看者";
+            default:
+                return "N/A";
+        }
+    } }
+<h2>群組變更紀錄</h2>
+@Html.ActionLink("返回群組", "Details", "Group", new { id = ViewBag.GroupId }, new { @class = "btn btn-secondary" })
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>日期</th>
+                <th>用戶</th>
+                <th>活動</th>
+                <th>類型</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in Model)
+            {
+                <tr class="activity-log">
+                    <td>@log.Date.ToString("g")</td>
+                    <td>@log.Users.FullName</td>
+                    <td style="word-wrap: break-word;">
+                        <!-- 添加样式以自动换行 -->
+                        @if (log.ActivityType == "新增帳目" || log.ActivityType == "編輯帳目")
+                        {
+                            <a href="@Url.Action("Details", "Expense", new { id = log.ExpenseId })">@log.ActivityDetails</a>
+                        }
+                        else
+                        {
+                            @Html.Raw(log.ActivityDetails)
+                        }
+                    </td>
+                    <td>@log.ActivityType</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<style>
+    .new-activity {
+        background-color: #ffcccc;
+        font-weight: bold;
+    }
+
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+        border-collapse: collapse;
+    }
+
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+            background-color: skyblue;
+        }
+
+
+    .read-activity {
+        background-color: #ffffff;
+        font-weight: normal;
+    }
+
+    .table th, .table td {
+        font-size: 1.0em;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+
+    th {
+        background-color: #f8f9fa;
+    }
+</style>

@@ -1,0 +1,100 @@
+﻿
+
+    <!-- CSS -->
+    <style>
+
+
+        .sponsor-container {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+            .sponsor-container h1 {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+                color: #333;
+            }
+
+            .sponsor-container p {
+                font-size: 1.2rem;
+                line-height: 1.8;
+                color: #555;
+            }
+        .account-number {
+            font-weight: bold; /* 帳號文字加粗 */
+            color: #4a90e2; /* 顯眼的主色 */
+           margin:auto;
+        }
+        .donation-options {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+            .donation-options p {
+                margin: 0; /* 移除段落的預設邊距 */
+                font-size: 1.2rem; /* 調整文字大小 */
+                color: #333; /* 深色文字提升可讀性 */
+  
+            }
+
+            .donation-options a {
+                background-color: #74b9ff;
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: 30px;
+                text-decoration: none;
+                font-size: 1.4rem;
+                transition: background-color 0.3s;
+            }
+
+                .donation-options a:hover {
+                    background-color: #0984e3;
+                }
+
+        .thank-you {
+            margin-top: 2rem;
+            font-size: 1.1rem;
+            color: #2ecc71;
+        }
+    
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+
+    <div class="sponsor-container">
+        <h1>贊助我們</h1>
+        <p>
+            如果您喜歡 JustSplit 並希望支持我們的開發與維護，歡迎透過以下方式贊助我們。
+            您的每一分支持都是我們繼續前進的動力！
+        </p>      
+        <div class="account"><p>虛擬帳號：<span class="account-number">123-123456789</span></p>
+        </div>
+
+        <div class="donation-options">
+
+            <a href="#">銀行轉帳</a>
+            <a href="#">線上支付</a>
+        </div>
+
+        <div class="thank-you">
+            <p>感謝您的支持！讓我們一起讓 JustSplit 變得更好。</p>
+        </div>
+    </div>

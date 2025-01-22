@@ -1,0 +1,22 @@
+﻿
+@model wu2.Models.Groups
+
+<h2>群組詳細資訊 - @Model.GroupName</h2>
+
+<div>
+    <h3>成員列表</h3>
+    <ul>
+        @foreach (var member in Model.GroupMembers)
+        {
+            <li>@member.Users.FullName (@member.Role)</li>
+        }
+    </ul>
+
+    <h3>帳目內容</h3>
+    <ul>
+        @foreach (var expense in Model.Expenses)
+        {
+            <li>@expense.ExpenseItem - @expense.TotalAmount @Model.Currency</li>
+        }
+    </ul>
+</div>

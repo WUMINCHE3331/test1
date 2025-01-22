@@ -1,0 +1,34 @@
+﻿
+@model IEnumerable<wu2.Models.Expenses>
+@{string GetProfilePhoto(string profilePhoto)
+    {
+        return !string.IsNullOrEmpty(profilePhoto) ? Url.Content(profilePhoto) : Url.Content("~/UserProfilePhotos/defaultPerson.jpg");
+    } }
+<div class="expense-container">
+    <h2 class="title">群組支出列表</h2>
+
+    <div class="total-expenses">
+        <strong>筆數:</strong> @Model.Count() 筆;
+        <strong>總支出：</strong> @(@ViewBag.TotalExpenses != null ? @ViewBag.TotalExpenses.ToString("N0") + " $" : "0元")
+    </div>
+
+    <div class="expense-list">
+        @foreach (var item in Model)
+        {
+            <div class="expense-item" onclick="window.location.href='@Url.Action("Details", new { id = @item.ExpenseId })'">
+                <div class="expense-left">
+                    <img src="@GetProfilePhoto(item.Users.ProfilePhoto)" class="creator-photo" alt="@item.Users.FullName">
+                    <div class="expense-info">
+                        <h5 class="mb-2">@item.ExpenseType: @item.ExpenseItem</h5>
+                        <p class="expense-date">@String.Format("{0:MMMM dd, yyyy h:mm tt}", item.CreatedAt)</p>
+                    </div>
+                </div>
+                <div class="expense-right">
+                    <span class="expense-amount" data-originalamount="@item.TotalAmount.ToString("F2")">
+                        $@item.TotalAmount.ToString("F2")
+                    </span>
+                </div>
+            </div>
+        }
+    </div>
+</div>
