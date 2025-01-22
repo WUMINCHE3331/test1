@@ -93,7 +93,7 @@ namespace wu2.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // 确保模型为空以便于视图初始化
+         
             return View(new Notices());
         }
 
@@ -108,23 +108,23 @@ namespace wu2.Controllers
             if (ModelState.IsValid)
             {
                 model.CreatedAt = DateTime.Now;
-                model.CreatedBy = GetCurrentUser().UserId; // 假设 User 表中有 UserId 字段
+                model.CreatedBy = GetCurrentUser().UserId; 
 
-                // 删除已有的 root 角色公告
+              
                 var existingRootAnnouncement = entities.Notices.FirstOrDefault(a => a.Users.Role == "root");
                 if (existingRootAnnouncement != null)
                 {
                     entities.Notices.Remove(existingRootAnnouncement);
                 }
 
-                // 添加新公告
+              
                 entities.Notices.Add(model);
                 entities.SaveChanges();
 
                 return RedirectToAction("AdminIndex", "Admin");
             }
 
-            // 如果模型无效，返回视图以显示验证错误
+        
             return View(model);
         }
         [HttpPost]
@@ -135,7 +135,7 @@ namespace wu2.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // 查找并删除现有公告
+       
             var existingAnnouncement = entities.Notices.FirstOrDefault();
             if (existingAnnouncement != null)
             {
@@ -143,7 +143,7 @@ namespace wu2.Controllers
                 entities.SaveChanges();
             }
 
-            return RedirectToAction("AdminIndex", "Admin"); // 或其他适当的页面
+            return RedirectToAction("AdminIndex", "Admin");
         }
 
         private bool IsAdmin()
@@ -161,7 +161,7 @@ namespace wu2.Controllers
         }
 
 
-        // 显示添加成员的页面
+        
         public ActionResult AddMember(int groupId)
         {
             var group = entities.Groups.Find(groupId);
@@ -174,7 +174,7 @@ namespace wu2.Controllers
             return View();
         }
 
-        // 处理添加成员的请求
+       
         [HttpPost]
         public ActionResult AddMember(int groupId, string email, string fullName)
         {
@@ -185,21 +185,20 @@ namespace wu2.Controllers
                 {
                     return HttpNotFound();
                 }
-                // 查找或创建用户
+           
                 var user = entities.Users.FirstOrDefault(u => u.Email == email);
                 if (user == null)
                 {
-                    // 生成唯一名称
+           
                     string uniqueName = string.IsNullOrWhiteSpace(fullName) ? "BOT!!" + Guid.NewGuid().ToString("N").Substring(0, 3) : fullName+"虛擬";
 
-                    // 如果用户不存在，创建一个新用户
+               
                     user = new Users
                     {
                         Email = "@"+Guid.NewGuid(),
-                        PasswordHash = "1", // 请确保在生产环境中使用适当的密码加密
+                        PasswordHash = "1",
                         FullName = uniqueName
-                        // 使用输入的名称或生成的唯一名称
-                       
+                    
                     };
                     entities.Users.Add(user);
                     entities.SaveChanges();
@@ -212,7 +211,7 @@ namespace wu2.Controllers
                 }
                 else
                 {
-                    // 将用户添加到群组
+                   
                     entities.GroupMembers.Add(new GroupMembers { GroupId = groupId, UserId = user.UserId, Role = "Editor" ,JoinedDate = DateTime.Now});
                     entities.SaveChanges();
                     TempData["SuccessMessage"] = "組員加入成功";

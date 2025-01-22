@@ -90,7 +90,7 @@ namespace wu2.Controllers
             ViewBag.ExpenseTypeData = expenseTypeData;
             ViewBag.GroupExpenseData = groupExpenseData;
             
-            var currentUser = entities.Users.Find(userId);  // 获取当前用户信息
+            var currentUser = entities.Users.Find(userId);  
             var rootNotice = entities.Notices.FirstOrDefault(a => a.Users.Role == "Root");  // 查找由 Root 发布的公告
             // 從數據庫中取得用戶和公告信息
             var viewModel = new DashboardViewModel
@@ -103,15 +103,15 @@ namespace wu2.Controllers
         .Select(e => new SimplifiedExpenseViewModel
         {
             ExpenseId = e.ExpenseId,
-            CreatedByName = e.Users.FullName,  // 从 Users 表获取创建者姓名
-            TotalAmount = e.TotalAmount,  // 总金额 
+            CreatedByName = e.Users.FullName, 
+            TotalAmount = e.TotalAmount,  
             item =e.ExpenseItem,
             ExpenseType =e.ExpenseType,
             Createat = e.CreatedAt.Value,
             ExpenseMembers = e.ExpenseDetails.Select(d => new ExpenseMemberViewModel
             {
-                FullName = d.Users.FullName,  // 成员姓名
-                Photo = d.Users.ProfilePhoto  // 成员照片
+                FullName = d.Users.FullName,  
+                Photo = d.Users.ProfilePhoto
             }).ToList()
         }).ToList();
             return View(viewModel);

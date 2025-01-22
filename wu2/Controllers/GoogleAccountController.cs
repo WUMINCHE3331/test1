@@ -19,10 +19,10 @@
         
             public void LoginWithGoogle()
             {
-                // 触发 Google OAuth2 登录
+            
                 HttpContext.GetOwinContext().Authentication.Challenge(
                     new AuthenticationProperties { RedirectUri = "/" },
-                    "Google");  // 注意这里使用字符串 "Google" 来表示 Google 登录
+                    "Google");  
             }
         public async Task<ActionResult> ExternalLoginCallback(string returnUrl)
         {
@@ -31,8 +31,8 @@
                 var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
                 if (loginInfo == null)
                 {
-                    // 登录信息为空，可能是用户取消了登录或者认证过程出现了问题
-                    TempData["Error"] = "登录信息为空，请重新尝试登录。";
+          
+                    TempData["Error"] = "重新登入";
                     return RedirectToAction("Login", "Account");
                 }
 
@@ -41,12 +41,12 @@
                 var name = loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Name);
                 var pictureUrl = loginInfo.ExternalIdentity.Claims.FirstOrDefault(c => c.Type == "picture")?.Value;
 
-                // 检查数据库中是否已有该用户
+  
                 var user = db.Users.SingleOrDefault(u => u.GoogleId == googleId);
 
                 if (user == null)
                 {
-                    // 如果用户不存在，则进行注册
+               
                     user = new Users
                     {
                         Email = email,
@@ -54,7 +54,7 @@
                         GoogleId = googleId,
                         ProfilePhoto = pictureUrl,
                         RegistrationDate = DateTime.Now,
-                        Role = "Member" // 默认角色为 User，或根据需要设定
+                        Role = "Member" 
                     };
 
                     db.Users.Add(user);
@@ -68,37 +68,37 @@
                     db.SaveChanges();
                 }
 
-                // 设置 Session 变量
+              
                 Session["UserId"] = user.UserId;
                 Session["Email"] = user.Email;
                 Session["FullName"] = user.FullName;
                 Session["Role"] = user.Role;
                 Session["ProfilePhotoPath"] = user.ProfilePhoto;
 
-                // 登录用户
+            
                 AuthenticationManager.SignIn(new AuthenticationProperties { IsPersistent = true }, loginInfo.ExternalIdentity);
 
                 return RedirectToLocal(returnUrl);
             }
             catch (Exception ex)
             {
-                // 记录错误日志
+        
                 System.Diagnostics.Debug.WriteLine("ExternalLoginCallback error: " + ex.Message);
 
-                // 将错误信息展示给用户
-                TempData["Error"] = "登录过程中发生错误，请稍后再试。";
+            
+                TempData["Error"] = "登入過程發生錯誤";
                 return RedirectToAction("Login", "Account");
             }
         }
 
-        // 用于处理用户注销
+
         public ActionResult Logout()
             {
                 AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
                 return RedirectToAction("Index", "Home");
             }
 
-            // 重定向到本地 URL 帮助方法
+          
             private ActionResult RedirectToLocal(string returnUrl)
             {
                 if (Url.IsLocalUrl(returnUrl))

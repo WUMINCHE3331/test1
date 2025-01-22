@@ -118,7 +118,6 @@ namespace wu2.Controllers
             {
                 int currentUserId = (int)Session["UserID"];
 
-                // 标记个人消息为已读，排除自己发送的消息
                 var personalUnreadMessages = db.MessageReadStatus
                     .Where(mrs => mrs.Messages.UserId == userId
                                && mrs.Messages.ReceiverId == currentUserId
@@ -152,7 +151,7 @@ namespace wu2.Controllers
             {
                 int currentUserId = (int)Session["UserID"];
 
-                // 标记群组消息为已读，排除自己发送的消息
+         
                 var groupUnreadMessages = db.MessageReadStatus
                     .Where(mrs => mrs.Messages.GroupId == groupId
                                && mrs.UserId == currentUserId
@@ -166,7 +165,7 @@ namespace wu2.Controllers
                     readStatus.ReadAt = DateTime.Now;
                 }
 
-                // 标记个人消息为已读，排除自己发送的消息
+               
                 var personalUnreadMessages = db.MessageReadStatus
                     .Where(mrs => mrs.Messages.UserId == userId
                                && mrs.Messages.ReceiverId == currentUserId

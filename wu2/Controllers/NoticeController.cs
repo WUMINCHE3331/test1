@@ -109,18 +109,18 @@ namespace wu2.Controllers
         [HttpPost]
         public ActionResult DeleteNotice(int id)
         {
-            // 从数据库中获取公告对象
+           
             var notice = Entities.Notices.Find(id);
 
-            // 检查公告对象是否存在
+
             if (notice == null)
             {
                 TempData["ErrorMessage"] = "找不到相關公告紀錄";
-                // 使用硬编码的GroupId重定向到群组列表
+              
                 return RedirectToAction("MyGroups", "Group");
             }
 
-            // 执行删除操作
+    
             int groupId = notice.GroupId ?? 0;
             Entities.Notices.Remove(notice);
             Entities.SaveChanges();

@@ -30,7 +30,7 @@ using System.Data.Entity;
 
 namespace wu2.Controllers
 {
-    public class LineBotController : Controller // 使用 MVC 的 Controller 类
+    public class LineBotController : Controller //
     {
         private readonly string _channelAccessToken = "kn3aVDXBvl0HDP+8u+4MvWsHdnoJHJapXEux6xuXlBBpCPRRZXJWMbI7tJiE4J2K3Zz7zW93hkrxVzIr43r8NKC5p48vo0WS5tsI+73Jd4Ya2ujxu7SiiygmKzP9sxy/hgCUw6w+STl2wZO0LJAJeQdB04t89/1O/w1cDnyilFU=";
         private readonly LineMessagingClient _lineMessagingClient;
@@ -39,7 +39,7 @@ namespace wu2.Controllers
         wuEntities1 db = new wuEntities1();
         public LineBotController()
         {
-            // 使用你的 Channel Access Token 创建客户端
+          
             _lineMessagingClient = new LineMessagingClient(_channelAccessToken);
         }
         [HttpPost]
@@ -52,7 +52,7 @@ namespace wu2.Controllers
 
                 foreach (var ev in events)
                 {
-                    // 处理机器人加入群组的事件
+                    
                     if (ev is JoinEvent joinEvent)
                     {
                         await HandleJoinEventAsync(joinEvent);
@@ -61,7 +61,7 @@ namespace wu2.Controllers
                     {
                         await HandleMemberJoinEventAsync(memberJoinedEvent);
                     }
-                    // 处理普通消息事件
+                 
                     else if (ev is MessageEvent messageEvent)
                     {
 
@@ -121,21 +121,20 @@ namespace wu2.Controllers
                             }
                             if (userMessage == "消費統計")
                             {
-                                // 获取群组ID
+                        
                                 int groupId = GetGroupIdForUserInChat(userId, chatId);
                                 if (groupId == 0)
                                 {
                                     var errorMessage = new TextMessage("您還未加入任何群組。");
                                     await _lineMessagingClient.ReplyMessageAsync(messageEvent.ReplyToken, new List<ISendMessage> { errorMessage });
                                 }
-                                // 获取群组支出数据和未支付账目数据
+                           
                                 var expenses = GetGroupExpenses(groupId);
                                 var debts = GetGroupDebts(groupId);
-                                // 查找该用户的群组 ID                        
-                                // 调用统计方法，发送统计信息
+                              
                                 await SendGroupSummaryAsTextAsync(_lineMessagingClient, replyToken, expenses, debts, groupId);
                             }
-                            // 如果用户发送的消息是“債務提醒”
+                          
                             if (userMessage == "債務提醒")
                             {
                                 int groupId = GetGroupIdForUserInChat(userId, chatId);
@@ -145,7 +144,7 @@ namespace wu2.Controllers
                                     await _lineMessagingClient.ReplyMessageAsync(messageEvent.ReplyToken, new List<ISendMessage> { errorMessage });
                                 }
 
-                                // 调用函数，查询当前用户的欠款人，并发送提醒
+                             
                                 await SendReminderMessagesToDebtorsAsync(user.UserId, replyToken, groupId);
                             }
                         // 判斷使用者是否發送了 "下載報表" 關鍵字
@@ -207,16 +206,16 @@ namespace wu2.Controllers
 
                                 var pairwiseDebts = CalculatePairwiseDebts(groupId);
 
-                                // 发送结算结果
+                              
                                 await SendDetailedSettlementAsTextAsync(_lineMessagingClient, replyToken, pairwiseDebts, groupId);
                             }
 
                             if (userMessage == "帳目列表")
                             {
-                                // 查找该用户的群组 ID
+                           
                                 int groupId = GetGroupIdForUserInChat(userId, chatId);
 
-                                // 如果没有找到群组，返回相应的错误消息
+                           
                                 if (groupId == 0)
                                 {
                                     var errorMessage = new TextMessage("您還未加入任何群組。");
@@ -224,10 +223,10 @@ namespace wu2.Controllers
                                 }
                                 else
                                 {
-                                    // 获取群组的账目列表
+                           
                                     List<Expenses> expenses = GetGroupExpenses(groupId);
 
-                                    // 发送账目列表
+                               
                                     await SendAccountSummaryAsFlexMessageAsync(_lineMessagingClient, messageEvent.ReplyToken, expenses);
                                 }
                             }
@@ -716,9 +715,6 @@ namespace wu2.Controllers
                 var response = await client.PostAsync("https://api.line.me/v2/bot/message/push", content);
             }
         }
-
-
-        // 计算净结余（净收入/净支出）
         public List<PairwiseDebtViewModel> CalculatePairwiseDebts(int groupId)
         {
             var members = db.GroupMembers
@@ -739,22 +735,22 @@ namespace wu2.Controllers
                 {
                     if (debtor.UserId != creditor.UserId && !processedDebts.Contains((debtor.UserId, creditor.UserId)))
                     {
-                        // 计算 debtor 欠 creditor 的总金额
+                   
                         var debtorToCreditor = debts
                             .Where(d => d.DebtorId == debtor.UserId && d.CreditorId == creditor.UserId)
                             .Sum(d => d.Amount);
 
-                        // 计算 creditor 欠 debtor 的总金额
+             
                         var creditorToDebtor = debts
                             .Where(d => d.DebtorId == creditor.UserId && d.CreditorId == debtor.UserId)
                             .Sum(d => d.Amount);
 
-                        // 计算净债务，正值表示 debtor 仍然欠 creditor，负值表示 creditor 仍然欠 debtor
+                        
                         var netDebt = debtorToCreditor - creditorToDebtor;
 
                         if (netDebt > 0)
                         {
-                            // Debtor 仍然欠 Creditor
+                       
                             pairwiseDebts.Add(new PairwiseDebtViewModel
                             {
                                 DebtorName = debtor.FullName,
@@ -763,13 +759,13 @@ namespace wu2.Controllers
                                 DebtId = debts.FirstOrDefault(d => d.DebtorId == debtor.UserId && d.CreditorId == creditor.UserId)?.DebtId ?? 0
                             });
 
-                            // 標記這筆债务已處理
+                      
                             processedDebts.Add((debtor.UserId, creditor.UserId));
-                            processedDebts.Add((creditor.UserId, debtor.UserId));  // 标记相反的组合为已处理
+                            processedDebts.Add((creditor.UserId, debtor.UserId));  
                         }
                         else if (netDebt < 0)
                         {
-                            // Creditor 反而欠 Debtor
+                        
                             pairwiseDebts.Add(new PairwiseDebtViewModel
                             {
                                 DebtorName = creditor.FullName,
@@ -778,11 +774,11 @@ namespace wu2.Controllers
                                 DebtId = debts.FirstOrDefault(d => d.DebtorId == creditor.UserId && d.CreditorId == debtor.UserId)?.DebtId ?? 0
                             });
 
-                            // 標記這筆债务已處理
+                       
                             processedDebts.Add((debtor.UserId, creditor.UserId));
-                            processedDebts.Add((creditor.UserId, debtor.UserId));  // 标记相反的组合为已处理
+                            processedDebts.Add((creditor.UserId, debtor.UserId));  
                         }
-                        // 如果 netDebt == 0，表示双方债务相抵消，无需记录。
+                    
                     }
                 }
             }
@@ -793,38 +789,38 @@ namespace wu2.Controllers
 
         private async Task SendReminderMessagesToDebtorsAsync(int creditorId, string replyToken, int groupId)
         {
-            // 计算相抵后的债务
+          
             var pairwiseDebts = CalculatePairwiseDebts(groupId);
             var group = db.Groups.Where(d=>d.GroupId ==groupId).FirstOrDefault();
-            // 过滤出当前 creditorId 相关的债务记录
+         
             var relevantDebts = pairwiseDebts
                 .Where(d => db.Users.Any(u => u.UserId == creditorId && u.FullName == d.CreditorName))
                 .ToList();
 
             if (!relevantDebts.Any())
             {
-                // 如果没有欠款，回复一条消息告知用户没有未支付的欠款
+               
                 var noDebtMessage = new TextMessage("目前沒有未支付的欠款。");
                 await _lineMessagingClient.ReplyMessageAsync(replyToken, new List<ISendMessage> { noDebtMessage });
                 return;
             }
 
-            // 向每个债务人发送催款消息
+     
             foreach (var debt in relevantDebts)
             {
-                // 找到债务人和债权人
+                
                 var debtor = db.Users.FirstOrDefault(u => u.FullName == debt.DebtorName);
                 var creditorName = db.Users.FirstOrDefault(d => d.UserId == creditorId);
 
-                // 确认债务人存在并且债务人有LineUserId
+               
                 if (debtor != null && !string.IsNullOrEmpty(debtor.LineUserId))
                 {
-                    // 创建催款消息
+                
                     var reminderMessage = new TextMessage($"⚠️  {creditorName.FullName}提醒您欠款 {debt.Amount:F0} 元，請盡快支付，來自 {group.GroupName} 前往繳費🔗： https://liff.line.me/2006127909-ObP6XZR9/Settle/PairwiseSettlement?groupId={groupId}");
                     
                     try
                     {
-                        // 向债务人发送催款消息
+                        
                         await _lineMessagingClient.PushMessageAsync(debtor.LineUserId, new List<ISendMessage> { reminderMessage });
                         Console.WriteLine($"催款消息已發送給: {debtor.FullName}");
                     }
@@ -835,19 +831,17 @@ namespace wu2.Controllers
                 }
             }
 
-            // 构建汇总消息
             var summaryMessage = new StringBuilder();
             summaryMessage.AppendLine("💰 欠款提醒 💰");
             summaryMessage.AppendLine("----------------------");
 
             foreach (var debt in relevantDebts)
-            {
-                // 加入欠款信息
+            {           
                 summaryMessage.AppendLine($"{debt.DebtorName} 欠{debt.CreditorName} {debt.Amount:F0} 元，請盡快支付。");
             }
             summaryMessage.AppendLine($"🔗： https://liff.line.me/2006127909-ObP6XZR9/Settle/PairwiseSettlement?groupId={groupId}");
 
-            // 发送汇总消息到聊天室
+
             var replyMessage = new TextMessage(summaryMessage.ToString());
             await _lineMessagingClient.ReplyMessageAsync(replyToken, new List<ISendMessage> { replyMessage });
         }
@@ -1083,7 +1077,7 @@ namespace wu2.Controllers
 
         public void GenerateChart(List<Expenses> expenses, string filePath)
         {
-            // 统计每种类型的账目总金额
+      
             var expenseData = expenses
                 .GroupBy(e => e.ExpenseType)
                 .Select(g => new { Type = g.Key, TotalAmount = g.Sum(e => e.TotalAmount) })
@@ -1130,19 +1124,19 @@ namespace wu2.Controllers
 
             foreach (var expense in sortedExpenses)
             {
-                // 获取付款人列表
+            
                 var payers = expense.ExpensePayers.Select(p => p.Users.FullName).ToList();
                 var payerNames = string.Join(", ", payers);
                 var creatorName = db.Users
-     .Where(u => u.UserId == expense.CreatedBy)  // 查找 CreatedBy 对应的用户
-     .Select(u => u.FullName)  // 获取用户的 FullName
-     .FirstOrDefault();  // 如果找不到，返回 null
+     .Where(u => u.UserId == expense.CreatedBy) 
+     .Select(u => u.FullName)  
+     .FirstOrDefault(); 
 
-                // 获取分攤人列表 (ExpenseDetails)
+       
                 var splitters = expense.ExpenseDetails.Select(ed => ed.Users.FullName).ToList();
                 var splitterNames = string.Join(", ", splitters);
 
-                // 如果没有照片，使用默认图片
+                
                 var photoUrl = string.IsNullOrEmpty(expense.Photo)
                 ? $"{localhost}/Images/沒照片.png"
                 : $"{localhost}{expense.Photo}";
@@ -1152,14 +1146,14 @@ namespace wu2.Controllers
                     Hero = new ImageComponent
                     {
                         BackgroundColor = "#F5F5F5",
-                        Url = photoUrl,  // 设置账目照片 URL
+                        Url = photoUrl, 
                         Size = ComponentSize.Full,
                         AspectRatio = AspectRatio._1_1,
                         AspectMode = AspectMode.Cover,
                     },
                     Body = new BoxComponent
                     {
-                        BackgroundColor = "#F5F5F5", // 设置卡片的背景颜色（浅灰色）
+                        BackgroundColor = "#F5F5F5", 
                         Layout = BoxLayout.Vertical,
                         Contents = new List<IFlexComponent>
                 {
@@ -1193,14 +1187,14 @@ namespace wu2.Controllers
                                 Text = $"付款人: {payerNames}",
                                 Size = ComponentSize.Sm,
                                 Color = "#888888",
-                                Flex = 1  // 设置 Flex，使两段文字均匀分布
+                                Flex = 1 
                             },
                             new TextComponent
                             {
                                 Text = $"分攤人: {splitterNames}",
                                 Size = ComponentSize.Sm,
                                 Color = "#888888",
-                                Flex = 1  // 设置 Flex，使两段文字均匀分布
+                                Flex = 1 
                             }
                         }
                     },      new SeparatorComponent
@@ -1218,14 +1212,14 @@ namespace wu2.Controllers
                                 Text = $"類型: {expense.ExpenseType}",
                                 Size = ComponentSize.Sm,
                                 Color = "#888888",
-                                Flex = 1  // 设置 Flex，使两段文字均匀分布
+                                Flex = 1  
                             },
                             new TextComponent
                             {
                              Text = $"支付: {expense.PaymentMethod}",
                                 Size = ComponentSize.Sm,
                                 Color = "#888888",
-                                Flex = 1  // 设置 Flex，使两段文字均匀分布
+                                Flex = 1
                             }
                         }
                     },
@@ -1240,14 +1234,14 @@ namespace wu2.Controllers
                           Text = $"日期: {expense.CreatedAt?.ToString("yyyy-MM-dd")}",
                                 Size = ComponentSize.Sm,
                                 Color = "#888888",
-                                Flex = 1  // 设置 Flex，使两段文字均匀分布
+                                Flex = 1 
                             },
                             new TextComponent
                             {
                              Text = $"建立者: {creatorName}",
                                 Size = ComponentSize.Sm,
                                 Color = "#888888",
-                                Flex = 1  // 设置 Flex，使两段文字均匀分布
+                                Flex = 1  
                             }
                         }
                     },
@@ -1261,8 +1255,8 @@ namespace wu2.Controllers
                         Contents = new List<IFlexComponent>
                 {
                     new ButtonComponent
-                    {   Style = ButtonStyle.Primary,  // 设置按钮样式
-                        Color = "#007BFF",  // 设置按钮底色（蓝色）
+                    {   Style = ButtonStyle.Primary, 
+                        Color = "#007BFF",  
                   
                         Action = new UriTemplateAction("帳目詳情", $"https://liff.line.me/2006127909-ObP6XZR9/expense/details/{expense.ExpenseId}")
                     }
@@ -1287,7 +1281,7 @@ namespace wu2.Controllers
             await client.ReplyMessageAsync(replyToken, new List<ISendMessage> { flexMessage });
         }
 
-        // 发送 Flex Message 的方法
+
         private async Task SendFlexMessageAsync(LineMessagingClient client, string replyToken)
         {
             var bubble = new BubbleContainer
@@ -1523,85 +1517,6 @@ namespace wu2.Controllers
                 }
             }
         }
-
-        //private async Task<string> JoinGroupAsync(string lineUserId, string chatId)
-        //{
-        //    // 1. 使用 LineMessagingClient 的 GetProfileAsync 方法來獲取使用者的名稱
-        //    var userProfile = await _lineMessagingClient.GetUserProfileAsync(lineUserId);
-        //    var userDisplayName = userProfile.DisplayName;  // 使用者的 LINE 顯示名稱
-
-        //    // 2. 檢查用戶是否已經存在於 Users 表
-        //    var user = db.Users.FirstOrDefault(u => u.LineUserId == lineUserId);
-
-        //    // 3. 如果用戶不存在，新增用戶資料
-        //    if (user == null)
-        //    {
-        //        user = new Users
-        //        {
-        //            LineUserId = lineUserId,
-        //            ProfilePhoto = userProfile.PictureUrl,
-        //            FullName = userDisplayName,
-        //            RegistrationDate = DateTime.Now,
-        //            Email = $"{lineUserId}@example.com",  // 預設的 email
-        //            PasswordHash = "defaultPassword123",  // 生成預設密碼哈希
-        //        };
-
-        //        db.Users.Add(user);
-        //        await db.SaveChangesAsync();
-        //    }
-
-        //    // 4. 動態生成群組名稱，使用 chatId 來保證唯一性
-        //    string groupName = $"{userDisplayName}的專案群組";  // 使用 ChatId 生成唯一的群組名稱
-
-        //    // 5. 檢查該聊天室唯一群組是否已經存在
-        //    // 5. 檢查群組是否已經存在
-        //    var group = db.Groups.FirstOrDefault(g => g.ChatId == chatId);
-
-        //    // 6. 如果群組不存在，創建一個新群組
-        //    if (group == null)
-        //    {
-        //        group = new Groups
-        //        {
-        //            GroupName = groupName,
-        //            CreatorId = user.UserId,
-        //            Currency = "TWD",
-        //            CreatedDate = DateTime.Now,
-        //            JoinLink = Guid.NewGuid().ToString(),
-        //            Description = "自動創建的群組",
-        //            ChatId = chatId  // 保存群组的 chatId
-        //        };
-
-        //        db.Groups.Add(group);
-        //        await db.SaveChangesAsync();
-        //    }
-        //    var existingMembers = db.GroupMembers.Where(gm => gm.GroupId == group.GroupId).ToList();
-        //    var role = existingMembers.Count == 0 ? "Creator" : "Editor";
-        //    // 7. 檢查該用戶是否已經加入該群組
-        //    var isMemberExists = db.GroupMembers.Any(gm => gm.GroupId == group.GroupId && gm.UserId == user.UserId);
-
-        //    if (isMemberExists)
-        //    {
-        //        // 用戶已經在群組中，回傳相應訊息
-        //        return $"您已經在群組：{group.GroupName} 中";
-        //    }
-
-        //    // 8. 如果不是成員，將其加入群組
-        //    var groupMember = new GroupMembers
-        //    {
-        //        GroupId = group.GroupId,
-        //        UserId = user.UserId,
-        //        Role = role,
-        //        JoinedDate = DateTime.Now
-        //    };
-
-        //    db.GroupMembers.Add(groupMember);
-        //    await db.SaveChangesAsync();
-
-        //    return $"您已成功加入群組：{group.GroupName} ";
-        //}
-
-
-
         private async Task HandleMemberJoinEventAsync(MemberJoinEvent memberJoinedEvent)
         {
             foreach (var member in memberJoinedEvent.Joined.Members)
@@ -1626,7 +1541,7 @@ namespace wu2.Controllers
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Error handling member join event: {ex.Message}");
-                    // 记录错误日志或处理错误
+                    
                 }
             }
         }
@@ -1639,51 +1554,10 @@ namespace wu2.Controllers
                 new TextMessage("大家好很高興加入，嘗試呼叫關鍵字 地瓜 使用更多功能")
             };
             await _lineMessagingClient.ReplyMessageAsync(joinEvent.ReplyToken, replyMessage);
-        }// 处理机器人加入群组的事件
-
-
-
-
-        private async Task SendButtonsTemplateAsync(string replyToken)
-        {
-            var buttonsTemplate = new ButtonsTemplate(
-                text: "選擇一個選項",
-                title: "這是標題",
-
-                actions: new List<ITemplateAction>
-                {
-                    new MessageTemplateAction("選項 1", "選項 1"),
-
-                    new PostbackTemplateAction("選項 2", "選項 2")
-                });
-
-            var templateMessage = new TemplateMessage("這是標題", buttonsTemplate);
-            await _lineMessagingClient.ReplyMessageAsync(replyToken, new List<ISendMessage> { templateMessage });
         }
 
-        private async Task SendConfirmTemplateAsync(string replyToken)
-        {
-            var confirmTemplate = new ConfirmTemplate(
-                text: "您要加入记账群组吗？",
-                actions: new List<ITemplateAction>
-                {
-            new PostbackTemplateAction("是", "JOIN_GROUP"),
-            new PostbackTemplateAction("否", "CANCEL_JOIN")
-                }
-            );
 
-            var templateMessage = new TemplateMessage("加入群组确认", confirmTemplate);
 
-            try
-            {
-                await _lineMessagingClient.ReplyMessageAsync(replyToken, new List<ISendMessage> { templateMessage });
-                Debug.WriteLine("Confirm template sent successfully.");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error sending confirm template: {ex.Message}");
-            }
-        }
 
 
     }

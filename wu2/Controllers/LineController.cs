@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Newtonsoft.Json.Linq;
-using wu2.Models; // 确保引入你的数据库模型命名空间
+using wu2.Models;
 using System.Web.Security;
 using System.Data.Entity.Validation;
 using Newtonsoft.Json;
@@ -18,39 +18,38 @@ namespace YourNamespace.Controllers
     public class LineController : Controller
     {
         private readonly HttpClient httpClient;
-        private readonly wuEntities1 dbContext; // 你的数据库上下文
+        private readonly wuEntities1 dbContext; 
 
         public LineController()
         {
             this.httpClient = new HttpClient();
-            this.dbContext = new wuEntities1(); // 初始化你的数据库上下文
+            this.dbContext = new wuEntities1(); 
         }
-        //用户访问 /LoginWithLine
+  
         [HttpPost]
         public async Task<ActionResult> ProcessLiffData(string userId, string displayName)
         {
-            // 从数据库中检查用户是否已存在
+          
             var existingUser = dbContext.Users.FirstOrDefault(u => u.LineUserId == userId);
             if (existingUser != null)
             {
-                // 用户已存在，更新信息并设置会话
+                
                 existingUser.FullName = displayName;
                 dbContext.Entry(existingUser).State = EntityState.Modified;
                 await dbContext.SaveChangesAsync();
 
-                // 设置 SESSION
+             
                 Session["UserId"] = existingUser.UserId;
                 Session["FullName"] = existingUser.FullName;
                 Session["ProfilePhotoPath"] = existingUser.ProfilePhoto;
 
-                // 登录用户
+        
                 FormsAuthentication.SetAuthCookie(existingUser.Email, false);
                 return Json(new { success = true });
             }
             else
             {
-                // 用户不存在，可能需要执行注册或引导用户完成其他必要步骤
-                // 返回适当的状态或引导用户到注册页面
+            
                 return Json(new { success = false, message = "User not found or needs registration" });
             }
         }
@@ -58,32 +57,30 @@ namespace YourNamespace.Controllers
         [HttpGet]
         public ActionResult LoginWithLine()
         {
-            var clientId = "2005979321"; // 你的 Channel ID
+            var clientId = "2005979321"; 
             var redirectUri = Url.Action("Callback", "Line", null, Request.Url.Scheme);
-            var state = Guid.NewGuid().ToString("N"); // 生成一个随机的状态值防止 CSRF
+            var state = Guid.NewGuid().ToString("N"); 
 
             var authorizationUrl = $"https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id={clientId}&redirect_uri={redirectUri}&state={state}&scope=profile%20openid%20email%20phone";
 
-            // 使用日志记录 URL
+    
             Console.WriteLine("Authorization URL: " + authorizationUrl);
 
             return Redirect(authorizationUrl);
         }
 
-        // 其他代码保持不变...
+      
         public ActionResult SetEmailAndPassword()
         {
-            var model = new SetContactInfoViewModel(); // 确保模型已实例化
+            var model = new SetContactInfoViewModel();
 
-            // 检查 Session 是否存在，并确保必要的数据已保存
             if (Session == null || Session["UserProfile"] == null || Session["IdToken"] == null)
             {
-                // 记录日志或给出提示，说明 Session 数据不可用或已过期
+              
                 return new HttpStatusCodeResult(500, "Session is not available or has expired.");
             }
 
-            // 返回视图让用户输入邮箱和密码
-            return View(model); // 传递模型实例
+            return View(model); 
         }
 
         [HttpPost]
@@ -94,27 +91,26 @@ namespace YourNamespace.Controllers
                 return View(model);
             }
 
-            // 检查数据库中是否存在相同的邮箱
+         
             var emailExists = dbContext.Users.Any(u => u.Email == model.Email);
 
             if (emailExists)
             {
-                // 如果邮箱已存在，设置 ViewBag 并返回视图
                 ViewBag.EmailExists = true;
                 return View(model);
             }
 
-            // 从 Session 中获取 userProfile 和 idToken
+     
             var userProfile = Session["UserProfile"] as JObject;
             var idToken = Session["IdToken"] as string;
 
-            // 检查 userProfile 和 idToken 是否为 null
+          
             if (userProfile == null || idToken == null)
             {
                 return new HttpStatusCodeResult(500, "Session expired or invalid");
             }
 
-            // 获取 LineUserId
+    
             var lineUserId = userProfile["userId"]?.ToString();
 
             if (string.IsNullOrEmpty(lineUserId))
@@ -122,7 +118,6 @@ namespace YourNamespace.Controllers
                 return new HttpStatusCodeResult(500, "LineUserId is null or invalid.");
             }
 
-            // 使用用户输入的邮箱和密码来更新用户资料
             var user = new Users
             {
                 Email = model.Email,
@@ -137,16 +132,16 @@ namespace YourNamespace.Controllers
             dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
 
-            // 清除 session 中的临时数据
+           
             Session.Remove("UserProfile");
             Session.Remove("IdToken");
 
-            // 设置 SESSION
+        
             Session["UserId"] = user.UserId;
             Session["FullName"] = user.FullName;
             Session["ProfilePhotoPath"] = user.ProfilePhoto;
 
-            // 登录用户
+       
             FormsAuthentication.SetAuthCookie(model.Email, false);
 
             return RedirectToAction("Index", "Home");
@@ -155,33 +150,32 @@ namespace YourNamespace.Controllers
         [HttpPost]
         public async Task<ActionResult> UseDefaultEmailAndPassword()
         {
-            // 从 Session 中获取 userProfile 和 idToken
+        
             var userProfile = Session["UserProfile"] as JObject;
             var idToken = Session["IdToken"] as string;
 
-            // 检查 userProfile 和 idToken 是否为 null
+           
             if (userProfile == null || idToken == null)
             {
                 return new HttpStatusCodeResult(500, "Session expired or invalid");
             }
 
-            // 生成随机邮箱和密码
+
             var email = GenerateRandomEmail();
             var password = GenerateRandomPassword();
 
-            // 使用随机邮箱和密码来更新用户资料
+         
             var user = await UpdateUserProfile(userProfile, idToken, password, email);
 
-            // 清除 session 中的临时数据
+           
             Session.Remove("UserProfile");
             Session.Remove("IdToken");
 
-            // 设置 SESSION
             Session["UserId"] = user.UserId;
             Session["FullName"] = user.FullName;
             Session["ProfilePhotoPath"] = user.ProfilePhoto;
 
-            // 登录用户
+  
             FormsAuthentication.SetAuthCookie(email, false);
 
             return RedirectToAction("Index", "Home");
@@ -328,8 +322,8 @@ namespace YourNamespace.Controllers
                 ["grant_type"] = "authorization_code",
                 ["code"] = code,
                 ["redirect_uri"] = redirectUri,
-                ["client_id"] = "2005979321", // 你的 Channel ID
-                ["client_secret"] = "1f438e4c179b1634f6a8791a84e38dc1" // 你的 Channel Secret
+                ["client_id"] = "2005979321", 
+                ["client_secret"] = "1f438e4c179b1634f6a8791a84e38dc1"
             };
 
             var requestContent = new FormUrlEncodedContent(tokenRequestParameters);
@@ -380,29 +374,29 @@ namespace YourNamespace.Controllers
             var pictureUrl = userProfile["pictureUrl"]?.ToString();
             var lineUserId = userProfile["userId"]?.ToString() ?? Guid.NewGuid().ToString();
 
-            // 检查用户是否已存在
+    
             var user = dbContext.Users.FirstOrDefault(u => u.LineUserId == lineUserId);
 
             if (user != null)
             {
-                // 如果用户存在，更新用户信息
-                user.FullName = displayName; // 存储到 FullName 字段
-                user.ProfilePhoto = pictureUrl; // 存储到 ProfilePhoto 字段
-                user.PasswordResetToken = idToken; // 存储到 PasswordResetToken 字段
-                user.TokenExpiration = DateTime.Now.AddHours(1); // 设定令牌过期时间
+         
+                user.FullName = displayName; 
+                user.ProfilePhoto = pictureUrl; 
+                user.PasswordResetToken = idToken;
+                user.TokenExpiration = DateTime.Now.AddHours(1); 
             }
             else
             {
-                // 如果用户不存在，则创建新用户
+               
                 user = new Users
                 {
                     Email = email,
                     LineUserId = lineUserId,
-                    FullName = displayName, // 存储到 FullName 字段
-                    ProfilePhoto = pictureUrl, // 存储到 ProfilePhoto 字段
-                    PasswordResetToken = idToken, // 存储到 PasswordResetToken 字段
+                    FullName = displayName,
+                    ProfilePhoto = pictureUrl, 
+                    PasswordResetToken = idToken,
                     RegistrationDate = DateTime.Now,
-                    PasswordHash = password // 存储到 PasswordHash 字段
+                    PasswordHash = password 
                 };
 
                 dbContext.Users.Add(user);
@@ -419,7 +413,7 @@ namespace YourNamespace.Controllers
                     foreach (var validationError in validationErrors.ValidationErrors)
                     {
                         Console.WriteLine($"Property: {validationError.PropertyName} Error: {validationError.ErrorMessage}");
-                        // 或者使用Logger将错误信息记录到日志文件中
+                     
                     }
                 }
                 throw;

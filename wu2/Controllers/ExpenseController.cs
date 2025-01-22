@@ -251,30 +251,30 @@ namespace wu2.Controllers
                     SendNotification(detail.UserId, model.GroupId, false, "ExpenseCreate", message, expense.ExpenseId);
                 }
             }
-            // 计算和记录债务
+            // 計算紀錄debt
             int expenseId = expense.ExpenseId;
             var userDebts = new Dictionary<int, decimal>();
 
-            // 计算每个用户的净债务
+            // 計算每個用戶的淨債務
             foreach (var split in splitDetailsDict)
             {
                 if (!userDebts.ContainsKey(split.Key))
                     userDebts[split.Key] = 0;
-                userDebts[split.Key] -= split.Value;  // 用户需要支付的金额
+                userDebts[split.Key] -= split.Value;  // 用戶需要支付的金額
             }
             foreach (var payer in paidByDict)
             {
                 if (!userDebts.ContainsKey(payer.Key))
                     userDebts[payer.Key] = 0;
-                userDebts[payer.Key] += payer.Value;  // 用户已经支付的金额
+                userDebts[payer.Key] += payer.Value;  // 用户已經支付的金額
             }
 
 
 
-            // 使用临时集合存储待添加的债务
+            // 使用臨時集合儲存帶添加的債務
             var debtsToAdd = new List<Debts>();
 
-            // 正确计算债务：多支付者（债权人）需要得到钱，少支付者（债务人）需要支付钱
+            // 多支付者（債權人）需要得到錢，少支付者（債務人）需要支付錢
             foreach (var userDebt in userDebts.Where(d => d.Value > 0).ToList())
             {
                 foreach (var debtor in userDebts.Where(d => d.Value < 0).ToList())
@@ -289,7 +289,7 @@ namespace wu2.Controllers
                         CreatedAt = DateTime.Now,
                         IsPaid = false,
 
-                        ExpenseId = expense.ExpenseId,  // 关联的ExpenseId
+                        ExpenseId = expense.ExpenseId,  
 
 
                     };
@@ -378,7 +378,7 @@ namespace wu2.Controllers
                         .Where(gm => gm.GroupId == model.GroupId)
                         .Select(gm => gm.Users)
                         .ToList();
-            // 获取当前群组信息
+       
             var group = entities.Groups.FirstOrDefault(g => g.GroupId == model.GroupId);
             if (group == null)
             {
@@ -403,7 +403,7 @@ namespace wu2.Controllers
                 return View(model);
             }
 
-            // 计算总支出并加上即将新增的支出
+          
             var totalExpenses = GetTotalGroupExpenses(model.GroupId) + model.TotalAmount;
             ViewBag.TotalExpenses = totalExpenses;
             ViewBag.Budget = group.Budget;
@@ -548,13 +548,13 @@ namespace wu2.Controllers
             }
 
 
-            // 计算和记录债务
+         
             var paidByDict = model.PaidBy.ToDictionary(p => p.UserId, p => p.Amount);
             var splitDetailsDict = model.SplitDetails.ToDictionary(s => s.UserId, s => s.Amount);
 
             var userDebts = new Dictionary<int, decimal>();
 
-            // 计算每个用户的净债务
+        
             foreach (var split in splitDetailsDict)
             {
                 if (!userDebts.ContainsKey(split.Key))
@@ -567,13 +567,8 @@ namespace wu2.Controllers
                     userDebts[payer.Key] = 0;
                 userDebts[payer.Key] += payer.Value;  // 用户已经支付的金额
             }
-
-
-
-            // 使用临时集合存储待添加的债务
             var debtsToAdd = new List<Debts>();
 
-            // 正确计算债务：多支付者（债权人）需要得到钱，少支付者（债务人）需要支付钱
             foreach (var userDebt in userDebts.Where(d => d.Value > 0).ToList())
             {
                 foreach (var debtor in userDebts.Where(d => d.Value < 0).ToList())
@@ -588,7 +583,7 @@ namespace wu2.Controllers
                         CreatedAt = DateTime.Now,
                         IsPaid = false,
 
-                        ExpenseId = expense.ExpenseId,  // 关联的ExpenseId
+                        ExpenseId = expense.ExpenseId, 
 
 
                     };
@@ -635,7 +630,7 @@ namespace wu2.Controllers
 
             }
 
-            // 添加所有债务到数据库
+            
             entities.Debts.AddRange(debtsToAdd);
             LogActivity(model.GroupId, model.PaidBy.FirstOrDefault()?.UserId, "新增帳目", "新增", model.TotalAmount, expenseId);
             entities.SaveChanges();
@@ -643,7 +638,7 @@ namespace wu2.Controllers
             TempData["SuccessMessage"] = "支出創建成功！";
             if (Request.IsAjaxRequest())
             {
-                // 如果是 AJAX 请求，返回 JSON 错误响应
+              
                 return Json(new { success = true });
             }
             {
@@ -1162,7 +1157,6 @@ namespace wu2.Controllers
                 expense.CreatedAt = model.Date;
                 expense.LastTime = DateTime.Now;
 
-                // 更新照片路径（如果有）
                 if (Photo != null && Photo.ContentLength > 0)
                 {
                     var fileName = Path.GetFileName(Photo.FileName);
@@ -1171,14 +1165,14 @@ namespace wu2.Controllers
                     expense.Photo = "/ExpensePhoto/" + fileName;
                 }
 
-                // 更新付款人和分摊详情
+        
 
                 entities.ExpensePayers.RemoveRange(expense.ExpensePayers);
                 entities.ExpenseDetails.RemoveRange(expense.ExpenseDetails);
                 // 刪除舊的 Debts
                 var oldDebts = entities.Debts.Where(d => d.ExpenseId == expense.ExpenseId).ToList();
                 entities.Debts.RemoveRange(oldDebts);
-                // 添加新记录
+           
                 expense.ExpensePayers = model.PaidBy.Select(p => new ExpensePayers
                 {
                     UserId = p.UserId,
@@ -1198,7 +1192,7 @@ namespace wu2.Controllers
                 // 保存更改
                 entities.SaveChanges();
 
-                // 计算和记录债务
+         
                 var paidByDict = model.PaidBy.ToDictionary(p => p.UserId, p => p.Amount);
                 var splitDetailsDict = model.SplitDetails.ToDictionary(s => s.UserId, s => s.Amount);
 
@@ -1243,12 +1237,11 @@ namespace wu2.Controllers
                     }
                 }
 
-                // 添加所有债务到数据库
                 entities.Debts.AddRange(debtsToAdd);
                 var userId = (int)Session["UserID"];
                 var user = entities.Users.FirstOrDefault(u => u.UserId == userId);
                 var userName = user != null ? user.FullName : "某用戶";
-                // 发送通知
+       
                 var expenseId = expense.ExpenseId;
                 foreach (var payer in model.PaidBy)
                 {
@@ -1275,7 +1268,7 @@ namespace wu2.Controllers
                     }
                 }
 
-                // 记录活动日志
+      
                 LogActivity(model.GroupId, model.PaidBy.FirstOrDefault()?.UserId, "編輯帳目", "編輯", model.TotalAmount, expenseId);
 
                 entities.SaveChanges();
@@ -1284,7 +1277,7 @@ namespace wu2.Controllers
                 return RedirectToAction("Index", new { groupId = model.GroupId });
             }
 
-            // 如果验证失败，重新加载视图数据
+            
             ViewBag.Users = entities.GroupMembers
                                     .Where(gm => gm.GroupId == model.GroupId)
                                     .Select(gm => gm.Users)
@@ -1308,7 +1301,7 @@ namespace wu2.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] // 添加CSRF防护
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteExpense(int expenseId)
         {
             if (Session["UserID"] == null)
@@ -1340,7 +1333,7 @@ namespace wu2.Controllers
             var userName = user != null ? user.FullName : "某用户";
             var groupId = expense.GroupId;
 
-            // 发送通知给所有参与分账的成员
+        
             var members = expense.ExpensePayers.Select(p => p.UserId)
                           .Union(expense.ExpenseDetails.Select(d => d.UserId))
                           .Distinct()
@@ -1352,31 +1345,30 @@ namespace wu2.Controllers
                 SendNotification(memberId, groupId, false, "ExpenseDeleted", message, expenseId);
             }
 
-            // 记录日志活动
+   
             LogActivity(groupId, userId, "刪除帳目", "刪除", expense.TotalAmount, expenseId);
 
-            // 删除相关的 ActivityLogs 记录
+       
             var activityLogs = entities.ActivityLogs.Where(al => al.ExpenseId == expenseId).ToList();
             entities.ActivityLogs.RemoveRange(activityLogs);
 
-            // 删除相关的付款人和分攤细节
+
             entities.ExpensePayers.RemoveRange(expense.ExpensePayers);
             entities.ExpenseDetails.RemoveRange(expense.ExpenseDetails);
 
-            // 删除相关的债务
+       
             var existingDebts = entities.Debts.Where(d => d.ExpenseId == expenseId).ToList();
             entities.Debts.RemoveRange(existingDebts);
 
-            // 删除支出记录
+          
             entities.Expenses.Remove(expense);
 
-            // 保存更改
             entities.SaveChanges();
 
             TempData["SuccessMessage"] = "支出刪除成功！";
             return RedirectToAction("Index", new { groupId = groupId });
         }
-        // 显示债务列表
+
         [HttpGet]
         public ActionResult DebtList(int? groupId)
         {
@@ -1405,7 +1397,7 @@ namespace wu2.Controllers
             ViewBag.GroupId = groupId;
             return View(debts);
         }
-        // 标记债务为已支付
+
         [HttpPost]
         public ActionResult MarkAsPaid(int id, int groupId)
         {
@@ -1423,9 +1415,6 @@ namespace wu2.Controllers
             return RedirectToAction("DebtList", new { groupId = groupId });
         }
 
-
-        // 显示组员详细债务表
-        // 显示组员总债务表
         [HttpGet]
         public ActionResult MemberDebtOverview(int? groupId)
         {

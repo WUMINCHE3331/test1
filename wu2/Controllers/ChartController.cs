@@ -115,10 +115,10 @@ namespace wu2.Controllers
             {
                 Labels = memberTotalExpenses.Select(ge => ge.FullName).ToList(),
                 TotalExpenses = memberTotalExpenses.Select(ge => ge.TotalAmount).ToList(),
-                TotalDebts = memberDebtOverview.Select(m => m.TotalOwed).ToList(), // 修改这里以确保债务数据正确
+                TotalDebts = memberDebtOverview.Select(m => m.TotalOwed).ToList(),
                 ExpenseTypes = expenseTypes.Select(et => et.Type).ToList(),
                 TypeExpenses = expenseTypes.Select(et => et.TotalAmount).ToList(),
-                NetProfits = memberDebtOverview.Select(m => m.NetDebt).ToList(), // 添加净利数据
+                NetProfits = memberDebtOverview.Select(m => m.NetDebt).ToList(),
                         PaymentMethodTypes = paymentMethods.Select(pm => pm.Type).ToList(),
                 PaymentMethodCounts = paymentMethods.Select(pm => pm.Count).ToList()
             };

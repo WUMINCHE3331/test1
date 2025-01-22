@@ -317,7 +317,7 @@ namespace wu2.Controllers
 
             if (group == null)
             {
-                return HttpNotFound(); // 返回 404 錯誤
+                return HttpNotFound(); 
             }
             int userId = (int)Session["UserID"];
             // 查詢當前用戶角色
@@ -364,7 +364,7 @@ namespace wu2.Controllers
                     ViewBag.ErrorMessage = "需要大於分帳總金額";
                     return View(model);
                 }
-                // 将修改动作整合成中文字符串
+             
                 string previousDetails = $"";
 
                 if (existingGroup.GroupName != model.GroupName)
@@ -418,7 +418,6 @@ namespace wu2.Controllers
                     existingGroup.Budget = model.Budget;
                     existingGroup.GroupName = model.GroupName;
 
-                    // 如果有修改，则记录到 activitylogs
                     if (!string.IsNullOrEmpty(previousDetails))
                     {
                         var userId = (int)Session["UserID"];
@@ -454,7 +453,7 @@ namespace wu2.Controllers
                 entities.ActivityLogs.Add(activityLog);
                 entities.SaveChanges();
             }
-            // 邀请成员
+         
             [HttpGet]
             public ActionResult Invite(int? groupId)
             {
@@ -696,8 +695,6 @@ namespace wu2.Controllers
 
                 return View();
             }
-
-            // 加载通知
             public ActionResult Notifications()
             {
                 if (Session["UserID"] == null)
@@ -908,23 +905,23 @@ namespace wu2.Controllers
                     notification.GroupId = null;
                 }
 
-                // 删除群组内的所有成员
+      
                 foreach (var member in members)
                 {
                     entities.GroupMembers.Remove(member);
                 }
-                // 更新所有与该群组相关的待处理或已发出邀请通知的状态
+         
                 notifications = entities.Notifications
                                             .Where(n => n.GroupId == groupId && (n.Status == "Accepted" || n.NotificationType == "Invitation"))
                                             .ToList();
 
                 foreach (var notification in notifications)
                 {
-                    notification.Status = "Declined"; // 设置状态为取消
-                    notification.IsRead = true; // 标记为已读
+                    notification.Status = "Declined";  
+                    notification.IsRead = true;
                 }
 
-                // 删除群组
+          
                 entities.Groups.Remove(group);
                 entities.SaveChanges();
                 TempData["ErrorMessage"] = "已成功刪除群組";
@@ -954,13 +951,13 @@ namespace wu2.Controllers
 
                     return RedirectToAction("Details", new { id = groupId });
                 }
-                // 获取成员的详细债务信息
+              
                 var debts = entities.Debts
                                     .Where(d => d.GroupId == groupId)
                                     .ToList();
                 var memberDebts = debts.Where(d => d.DebtorId == memberId && !d.IsPaid).Sum(d => d.Amount);
                 var memberCredits = debts.Where(d => d.CreditorId == memberId && !d.IsPaid).Sum(d => d.Amount);
-                // 如果成员有未结清的应收账款或应付账款，不能删除
+              
                 if (memberDebts > 0 || memberCredits > 0)
                 {
                     TempData["ErrorMessage"] = "成員有未結清的帳目，不能刪除";
@@ -977,8 +974,8 @@ namespace wu2.Controllers
                                   .ToList();
                 foreach (var notification in notifications)
                 {
-                    notification.Status = "Declined"; // 设置状态为取消
-                    notification.IsRead = true; // 标记为已读
+                    notification.Status = "Declined"; 
+                    notification.IsRead = true; 
                 }   // 記錄活動日誌
 
                 var user = entities.Users.FirstOrDefault(u => u.UserId == memberId);
@@ -1046,7 +1043,7 @@ namespace wu2.Controllers
                     return RedirectToAction("MyGroups");
                 }
 
-                // 更新所有与该成员相关的待处理或已发出邀请通知的状态
+            
                 var notifications = entities.Notifications.Where(n => n.GroupId == groupId && n.UserId == currentUserId && (n.Status == "Accepted" || n.NotificationType == "Invitation"))
                     .ToList();
 

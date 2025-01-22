@@ -34,19 +34,19 @@ namespace wu2.Controllers
             }
             catch (Exception ex)
             {
-                // 记录异常日志
-                Console.WriteLine("数据库连接失败: " + ex.Message);
-                throw new InvalidOperationException("数据库连接失败，请检查连接字符串配置。");
+           
+                Console.WriteLine("data連線失敗 " + ex.Message);
+                throw new InvalidOperationException("");
             }
         }
         public ActionResult CheckSession()
         {
             if (Session["UserID"] == null)
             {
-                return Json(new { isLoggedIn = false }, JsonRequestBehavior.AllowGet);  // 返回未登录状态
+                return Json(new { isLoggedIn = false }, JsonRequestBehavior.AllowGet);  
             }
 
-            // 用户已登录
+         
             return Json(new { isLoggedIn = true }, JsonRequestBehavior.AllowGet);
         }
 
@@ -271,22 +271,20 @@ namespace wu2.Controllers
             // 检查用户是否已登录
             if (Session["UserID"] == null)
             {
-                // 如果未登录，重定向到登录页面
+
                 return RedirectToAction("Login", "Account");
             }
 
             // 如果未傳遞 userId，則使用當前登入的使用者 ID
             var currentUserId = (int)Session["UserID"];
             userId = userId ?? currentUserId;
-            // 从数据库中查找用户
+
             var user = db.Users.Find(userId); var currentUserRole = Session["Role"] as string;
             if (user == null)
             {
-                // 如果用户未找到，返回404错误
+
                 return HttpNotFound();
             }
-
-            // 将Users实体转换为UserViewModel
             var model = new UserViewModel
             {
                 UserId = user.UserId,
@@ -297,10 +295,10 @@ namespace wu2.Controllers
                 BankAccount = user.BankAccount,
                 PhoneNumber = user.PhoneNumber,
                 RegistrationDate = user.RegistrationDate,
-                // 根据需要映射其他属性
+          
             };
 
-            // 将视图模型传递给视图
+
             return View(model);
         }
 
@@ -342,7 +340,7 @@ namespace wu2.Controllers
                 TempData["ErrorMessage"] = "Passwords do not match.";
                 return View(model);
             }
-            // 图片处理逻辑
+       
             if (ProfilePhoto != null && ProfilePhoto.ContentLength > 0)
             {
                 var fileName = Path.GetFileName(ProfilePhoto.FileName);
@@ -611,13 +609,6 @@ color:white;
         }
 
 
-        //private string HashPassword(string password)
-        //{
-        //    using (var sha256 = SHA256.Create())
-        //    {
-        //        var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-        //        return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
-        //    }
-        //}
+       
     }
 }

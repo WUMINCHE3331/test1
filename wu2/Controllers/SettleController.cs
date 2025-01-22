@@ -154,7 +154,7 @@ namespace wu2.Controllers
 
             if (debts != null && debts.Any())
             {
-                var pendingDebt = debts.FirstOrDefault(d => d.IsPending == true); // 显式转换为 bool
+                var pendingDebt = debts.FirstOrDefault(d => d.IsPending == true); 
                 if (pendingDebt != null)
                 {
                     TempData["SuccessMessage"] = "您已經發起了支付請求，請等待對方確認";
@@ -163,15 +163,14 @@ namespace wu2.Controllers
                 {
                     foreach (var debt in debts)
                     {
-                        debt.IsPending = true; // 更新为等待确认状态
+                        debt.IsPending = true; 
                         debt.UpdatedAt = DateTime.Now;
                     }
                     entities.SaveChanges();
 
                     var debtorName = entities.Users.FirstOrDefault(u => u.UserId == debtorId)?.FullName;
                     var creditorName = entities.Users.FirstOrDefault(u => u.UserId == creditorId)?.FullName;
-                    // 通知债权人
-                    // 發送郵件通知
+                 
                     var creditorEmail = entities.Users.FirstOrDefault(u => u.UserId == creditorId)?.Email;
                     var debtorEmail = entities.Users.FirstOrDefault(u => u.UserId == debtorId)?.Email;
 
@@ -328,74 +327,7 @@ namespace wu2.Controllers
             return RedirectToAction("Notifications", "Group");
         }
 
-        //[HttpPost]
-        //public ActionResult ConfirmPayment(int debtId, bool isReceived)
-        //{
-        //    var debt = entities.Debts.FirstOrDefault(d => d.DebtId == debtId);
-        //    if (debt != null)
-        //    {
-        //        var debtorName = entities.Users.FirstOrDefault(u => u.UserId == debt.DebtorId)?.FullName;
-        //        var creditorName = entities.Users.FirstOrDefault(u => u.UserId == debt.CreditorId)?.FullName;
-
-        //        if (isReceived)
-        //        {
-        //            var relatedDebts = entities.Debts
-        //                .Where(d => d.DebtorId == debt.DebtorId && d.CreditorId == debt.CreditorId && !d.IsPaid)
-        //                .ToList();
-
-        //            foreach (var relatedDebt in relatedDebts)
-        //            {
-        //                relatedDebt.IsPaid = true;
-        //                relatedDebt.IsPending = false; // 更新待确认状态
-        //                relatedDebt.IsConfirmed = true;
-        //                relatedDebt.UpdatedAt = DateTime.Now;
-        //            }
-
-
-        //            // 更新相关通知为已读
-        //            var notifications = entities.Notifications
-        //                   .Where(n => n.RelatedDebtId == debt.DebtId && n.IsRead != true)
-        //                .ToList();
-
-        //            foreach (var notification in notifications)
-        //            {
-        //                notification.IsRead = true;
-        //            }
-
-        //            SendNotification(debt.DebtorId, debt.GroupId, "PaymentReceived", false, $"你支付的 {debt.Amount} 元已被 {creditorName} 確認收到。", debt.DebtId);
-        //            TempData["Message"] = "付款已經確認";
-        //            SendNotification(debt.CreditorId, debt.GroupId, "PaymentAccepted", false, $"你已經收到來自 {debtorName} 的 {debt.Amount} 元。", debt.DebtId);
-        //        }
-        //        else
-        //        {
-        //            debt.IsPaid = false;
-        //            debt.IsPending = false; // 更新待确认状态
-
-        //            // 更新相关通知为已读
-        //            var notifications = entities.Notifications
-        //                 .Where(n => n.RelatedDebtId == debt.DebtId && n.IsRead != true)
-        //                .ToList();
-
-        //            foreach (var notification in notifications)
-        //            {
-        //                notification.IsRead = true;
-        //            }
-
-
-        //            SendNotification(debt.DebtorId, debt.GroupId, "PaymentDisputed", false, $"{creditorName} 拒絕確認你支付的 {debt.Amount} 元，請聯繫對方解決。", debt.DebtId);
-        //            TempData["Message"] = "你已經拒絕了對方的付款確認";
-
-        //        }
-        //        entities.SaveChanges();
-        //    }
-        //    else
-        //    {
-        //        TempData["ErrorMessage"] = "找不到相關債務紀錄";
-        //    }
-        //    return RedirectToAction("Notifications","Group");
-
-        //}
-
+      
         [HttpPost]
         public ActionResult SendReminder(int debtorId, int creditorId, decimal amount, int groupId, bool roundOff)
         {
@@ -422,9 +354,9 @@ namespace wu2.Controllers
                     var debtorEmail = entities.Users.FirstOrDefault(u => u.UserId == debt.DebtorId)?.Email;
                     var creditorEmail = entities.Users.FirstOrDefault(u => u.UserId == debt.CreditorId)?.Email;
                     SendNotification(debt.DebtorId, groupId, "Payment Reminder", false, $"{creditorName} 提醒你支付 {amount} 元", debt.DebtId);
-                    // 发送操作记录通知给债权人
+     
                     SendNotification(debt.CreditorId, groupId, "Reminder Sent", true, $"你已提醒 {debtorName} 支付 {amount} 元", debt.DebtId);
-                    // 发送成功提醒信息到页面
+          
                     TempData["SuccessMessage"] = "提醒已發送";    // 發送郵件通知
                    if (!string.IsNullOrEmpty(debtorEmail))
                     {
@@ -438,7 +370,7 @@ namespace wu2.Controllers
                 }
                 else
                 {
-                    // 发送频率控制信息到页面
+                  
                     TempData["ErrorMessage"] = "你已經發送過提醒請再測試";
                 }
             }
